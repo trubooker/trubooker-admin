@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import PassengerTripTable from "@/components/Passenger/PassengerTrip";
+import RefKinProfile from "@/components/Passenger/RefKinProfile";
 
 const ViewPassenger = () => {
   const params = useParams();
@@ -17,10 +18,14 @@ const ViewPassenger = () => {
   return (
     <div>
       <Goback formerPage={"Passenger"} presentPage={`Passenger id ${id}`} />
-      <div className="bg-white p-5 rounded-lg mt-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
+      <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
         <div className="w-full flex gap-x-3 items-center">
           <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-            <AvatarImage src={""} />
+            <AvatarImage
+              src={
+                "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load"
+              }
+            />
             <AvatarFallback>
               <IoPersonOutline className="w-14 h-14" />
             </AvatarFallback>
@@ -61,6 +66,7 @@ const ViewPassenger = () => {
           </span>
         </div>
       </div>
+      <RefKinProfile />
       <PassengerTripTable />
     </div>
   );

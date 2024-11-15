@@ -17,8 +17,6 @@ const Overview = () => {
       </CardHeader>
       <CardContent>
         <div>
-          <h2 className="text-2xl font-bold"></h2>
-
           <div className="my-5 space-y-6">
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Active Trips:</span>

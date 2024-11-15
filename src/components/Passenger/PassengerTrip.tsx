@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-// import QuickActions from "@/components/(admin)/quick-action";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import Search from "@/components/SearchBar";
 import { SinglePassengerListData } from "@/constants";
 import {
   Table,

@@ -857,3 +857,47 @@ export const SinglePassengerListData = [
     status: "cancelled",
   },
 ];
+export const SinglePassengerReferalData = [
+  {
+    id: "1",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "completed",
+  },
+  {
+    id: "2",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "cancelled",
+  },
+  {
+    id: "3",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "upcoming",
+  },
+  {
+    id: "4",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "upcoming",
+  },
+  {
+    id: "6",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Uchenna Ofor",
+    date: "10/10/2024",
+    status: "cancelled",
+  },
+];
