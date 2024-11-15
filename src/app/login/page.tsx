@@ -59,36 +59,37 @@ export default function LoginComponent() {
 
   const onSubmit = async (data: z.infer<typeof LoginFormSchema>) => {
     setLoading(true); // Show loading state
-    try {
-      const response = await axios.post(`/api/login`, data);
+    router.push("/dashboard");
+    // try {
+    //   const response = await axios.post(`/api/login`, data);
 
-      if (response.status === 200) {
-        form.setValue("email", "");
-        form.setValue("password", "");
+    //   if (response.status === 200) {
+    //     form.setValue("email", "");
+    //     form.setValue("password", "");
 
-        toast.success("Login Successful!", {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      }
-    } catch (error: any) {
-      setLoading(false);
-      toast.error(error.data.msg, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: true,
-        theme: "light",
-      });
-      form.setValue("email", "");
-      form.setValue("password", "");
-    }
+    //     toast.success("Login Successful!", {
+    //       position: "top-center",
+    //       autoClose: 2000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "light",
+    //       transition: Bounce,
+    //     });
+    //   }
+    // } catch (error: any) {
+    //   setLoading(false);
+    //   toast.error(error.data.msg, {
+    //     position: "top-center",
+    //     autoClose: 2000,
+    //     hideProgressBar: true,
+    //     theme: "light",
+    //   });
+    //   form.setValue("email", "");
+    //   form.setValue("password", "");
+    // }
   };
 
   const handleBack = () => {

@@ -14,7 +14,9 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         <header className="sticky bg-white top-0 z-50 flex h-16 items-center gap-4 px-4 lg:h-[80px] lg:px-6">
           <MobileNavbar />
         </header>
-        <div className=" w-11/12 mx-auto my-10 ">{children}</div>
+        <div className=" w-11/12 lg:w-auto lg:m-10 mx-auto my-10">
+          {children}
+        </div>
       </div>
     </div>
   );

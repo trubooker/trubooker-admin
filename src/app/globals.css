@@ -15,7 +15,9 @@ body {
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
     --primary: #5554ed;
-    --primary-btn: #7979f9;
+    --primary-btn: #7e7efd;
+    --primary-orange: #fd8c00;
+    --primary-orange-btn: #fdac48;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
