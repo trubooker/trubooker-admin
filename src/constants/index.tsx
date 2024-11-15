@@ -664,7 +664,7 @@ export const SettingsListData = [
   {
     id: "1",
     name: "Thelma Ojo",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Wuse Abuja Bus Station",
@@ -674,7 +674,7 @@ export const SettingsListData = [
   {
     id: "2",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Wuse Abuja Bus Station",
@@ -684,7 +684,7 @@ export const SettingsListData = [
   {
     id: "3",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Wuse Abuja Bus Station",
@@ -694,7 +694,7 @@ export const SettingsListData = [
   {
     id: "4",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Wuse Abuja Bus Station",
@@ -704,7 +704,7 @@ export const SettingsListData = [
   {
     id: "5",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Kogi Bus station",
@@ -714,7 +714,7 @@ export const SettingsListData = [
   {
     id: "6",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Kogi Bus station",
@@ -724,11 +724,136 @@ export const SettingsListData = [
   {
     id: "7",
     name: "Ifeoma Nduka",
-    picture:
+    profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
     departure: "Kogi Bus station",
     arrival: "Wuse Abuja Bus Station",
     status: "completed",
+  },
+];
+
+export const PassengerListData = [
+  {
+    id: "1",
+    name: "Thelma Ojo",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "pending",
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "suspended",
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+];
+
+export const SinglePassengerListData = [
+  {
+    id: "1",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "completed",
+  },
+  {
+    id: "2",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "cancelled",
+  },
+  {
+    id: "3",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "upcoming",
+  },
+  {
+    id: "4",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "active",
+  },
+  {
+    id: "5",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "upcoming",
+  },
+  {
+    id: "6",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "active",
+  },
+  {
+    id: "7",
+    departure: "City A",
+    destination: "City B",
+    date: "10/10/2024",
+    amount: "#3000",
+    status: "cancelled",
   },
 ];

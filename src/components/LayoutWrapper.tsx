@@ -4,21 +4,19 @@ import Sidebar from "./Sidebar";
 
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="grid lg:grid-cols-[280px_1fr] h-full ">
+    <section className="grid lg:grid-cols-[280px_1fr] h-screen">
       <div className="hidden lg:block ">
         <div className="sticky bg-white top-0 flex flex-col ">
           <Sidebar />
         </div>
       </div>
-      <div className="flex flex-col h-full bg-[#F8F7F7]">
-        <header className="sticky bg-white top-0 z-50 flex h-16 items-center gap-4 px-4 lg:h-[80px] lg:px-6">
+      <main className="w-full relative overflow-y-auto bg-[#F8F7F7]">
+        <header className="sticky bg-white top-0 z-50 flex px-4 lg:h-20 h-[8vh] items-center gap-4">
           <MobileNavbar />
         </header>
-        <div className=" w-11/12 lg:w-auto lg:m-10 mx-auto my-10">
-          {children}
-        </div>
-      </div>
-    </div>
+        <div className="w-11/12 mx-auto my-10 ">{children}</div>
+      </main>
+    </section>
   );
 };
 

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 // import QuickActions from "@/components/(admin)/quick-action";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Search from "@/components/SearchBar";
-import { PassengerListData } from "@/constants";
+import { SinglePassengerListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -16,9 +16,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
-import { PassengerList } from "@/components/passengerList";
+import { PassengerTable } from "./PassengerTable";
 
-const Passengers = () => {
+const PassengerTripTable = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   // const {
@@ -37,11 +37,13 @@ const Passengers = () => {
       setPage(pageNumber);
     }
   };
-  const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
+  const [filteredStudents, setFilteredStudents] = useState(
+    SinglePassengerListData
+  );
 
   useEffect(() => {
-    if (PassengerListData) {
-      setFilteredStudents(PassengerListData);
+    if (SinglePassengerListData) {
+      setFilteredStudents(SinglePassengerListData);
     }
   }, [users]);
 
@@ -59,34 +61,34 @@ const Passengers = () => {
   };
   return (
     <div className="flex flex-col h-fit w-full">
-      <div className="py-4">
-        <h2 className="text-2xl font-bold">Passengers</h2>
-      </div>
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">
           <div className="bg-white rounded-lg w-full p-5 mt-5">
-            <Search
-              placeholder={"Search..."}
-              onSearch={handleSearch}
-              classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
-            />
+            <div className="py-4">
+              <h2 className="text-base font-bold">Trip history</h2>
+            </div>
             {isFetching || loading ? (
               <>
                 <Table className="">
                   <TableHeader>
                     <TableRow className="text-xs lg:text-sm">
                       <TableHead className="text-left font-bold w-1/6">
-                        Id
+                        Trip Id
                       </TableHead>
-                      <TableHead className="font-bold w-1/6">Name</TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Email
+                      <TableHead className="font-bold w-1/6">
+                        Departure
                       </TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
-                        Phone Number
+                        Destination
+                      </TableHead>
+                      <TableHead className="font-bold w-1/6 text-center">
+                        Date
                       </TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
                         Status
+                      </TableHead>
+                      <TableHead className="font-bold w-1/6 text-center">
+                        Amount paid
                       </TableHead>
                       <TableHead className="text-center font-bold w-1/6">
                         Actions
@@ -96,7 +98,7 @@ const Passengers = () => {
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                       <TableRow key={i}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                           <TableCell key={i}>
                             <div>
                               <div className="w-full rounded-md">
@@ -113,7 +115,7 @@ const Passengers = () => {
                 </Table>
               </>
             ) : (
-              <PassengerList
+              <PassengerTable
                 data={filteredStudents}
                 isFetching={isFetching}
                 loading={loading}
@@ -135,4 +137,4 @@ const Passengers = () => {
   );
 };
 
-export default Passengers;
+export default PassengerTripTable;
