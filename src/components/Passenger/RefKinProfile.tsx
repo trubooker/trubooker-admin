@@ -38,7 +38,9 @@ const RefKinProfile = () => {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Profile Information</CardTitle>
+                <CardTitle className="text-lg text-gray-500">
+                  Profile Information
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div>
@@ -127,7 +129,7 @@ const RefKinProfile = () => {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">
+                <CardTitle className="text-lg text-gray-500">
                   Next of Kin Information
                 </CardTitle>
               </CardHeader>
@@ -176,7 +178,9 @@ const RefKinProfile = () => {
         </div>
         <div className="xl:w-[60%] h-full bg-white rounded-lg w-full p-5">
           <div className="flex gap-x-3 items-center ps-3 mb-5">
-            <div className="text-xl font-bold">Referral Information</div>
+            <div className="text-lg text-gray-500 font-bold">
+              Referral Information
+            </div>
             <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
               {userData.length}
             </div>

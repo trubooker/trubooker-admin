@@ -16,7 +16,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
-import { PassengerList } from "@/components/passengerList";
+import { PassengerList } from "@/components/Passenger/passengerList";
 
 const Passengers = () => {
   const [page, setPage] = useState(1);
@@ -59,8 +59,13 @@ const Passengers = () => {
   };
   return (
     <div className="flex flex-col h-fit w-full">
-      <div className="py-4">
+      {/* <div className="py-4">
+      </div> */}
+      <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Passengers</h2>
+        <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
+          {PassengerListData.length}
+        </div>
       </div>
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">

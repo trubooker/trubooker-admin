@@ -582,6 +582,229 @@ export const Notification = [
   },
 ];
 
+export const PassengerFeedback = [
+  {
+    index: "1",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "2",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "3",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "4",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "5",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "6",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "7",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "8",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "9",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "10",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "11",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "12",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "13",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "14",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "15",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "16",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "17",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "18",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "19",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+  {
+    index: "20",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message:
+      "John Doe is an experienced driver with over 10 years in the transportation industry.",
+    email: "michaelade@gmail.com",
+    name: "Michael Adebayo",
+    date: "59 minutes ago",
+    rating: 5,
+  },
+];
+
 export const Referall = [
   {
     // id: 1,
@@ -734,6 +957,72 @@ export const SettingsListData = [
 ];
 
 export const PassengerListData = [
+  {
+    id: "1",
+    name: "Thelma Ojo",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "pending",
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "suspended",
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+];
+
+export const DriverListData = [
   {
     id: "1",
     name: "Thelma Ojo",
