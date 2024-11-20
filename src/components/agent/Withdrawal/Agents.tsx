@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
-import { DriverTable } from "./DriverTable";
+import { Tab } from "./Tab";
 
-const DriversTable = () => {
+const Withdrawal = () => {
   const [page, setPage] = useState(1);
   // const {
   //   isLoading: loading,
@@ -83,7 +83,7 @@ const DriversTable = () => {
               </Table>
             </>
           ) : (
-            <DriverTable
+            <Tab
               data={SinglePassengerListData}
               isFetching={isFetching}
               loading={loading}
@@ -104,4 +104,4 @@ const DriversTable = () => {
   );
 };
 
-export default DriversTable;
+export default Withdrawal;

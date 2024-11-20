@@ -24,7 +24,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
-export function DriverList({ data: Data, isFetching, loading }: any) {
+export function AgentList({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
 
   const handleSuspend = (id: string) => {
@@ -111,7 +111,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                           className="cursor-pointer"
                         >
                           <DropdownMenuItem
-                            onClick={() => router.push(`/drivers/${data?.id}`)}
+                            onClick={() => router.push(`/agent/${data?.id}`)}
                             className="w-full text-center cursor-pointer"
                           >
                             View

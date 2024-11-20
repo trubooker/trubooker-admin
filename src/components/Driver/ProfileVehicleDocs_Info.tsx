@@ -357,7 +357,9 @@ const ProfileVehicleDocs_Info = () => {
 
         <Card className="w-full overflow-auto h-[500px]">
           <CardHeader className="lg-white text-left">
-            Passengers Feedback
+            <CardTitle className="text-lg text-gray-500">
+              Passengers Feedback
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <>

@@ -34,22 +34,21 @@ import { NavLinks } from "@/constants";
 import { Separator } from "@/components/ui/separator";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import LogoutModal from "./LogoutModal";
 
 const MobileNavbar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
-
-    router.push("/auth/login");
+  const [openLog, setOpenLog] = React.useState(false);
+  const handleLogout = () => {
+    setOpenLog(true);
   };
   const { isLoading: loading }: any = true;
 
   const data: any = [];
   return (
     <div className="flex justify-between items-center w-full">
+      <LogoutModal open={openLog} setOpen={setOpenLog} />
       <div className="flex items-center gap-x-5">
         <div>
           <Sheet>
@@ -169,6 +168,11 @@ const MobileNavbar = () => {
               {data?.data?.last_name?.charAt(0)}
             </AvatarFallback>
           </Avatar>
+          <Separator orientation="vertical" className="h-10 ms-2 me-1" />
+          <HiOutlineLogout
+            className="h-9 w-9 text-red-500 cursor-pointer"
+            onClick={handleLogout}
+          />
           {/* </>
           )} */}
         </div>

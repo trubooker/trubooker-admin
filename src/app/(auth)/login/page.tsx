@@ -23,8 +23,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { Bounce, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import Image from "next/image";
 import axios from "axios";
@@ -51,45 +49,28 @@ export default function LoginComponent() {
 
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  // const [serverError, setServerError] = useState("");
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
   const [loading, setLoading] = useState(false); // Loading state for button
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const onSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`/api/login`, values);
 
-  const onSubmit = async (data: z.infer<typeof LoginFormSchema>) => {
-    setLoading(true); // Show loading state
-    router.push("/dashboard");
-    // try {
-    //   const response = await axios.post(`/api/login`, data);
-
-    //   if (response.status === 200) {
-    //     form.setValue("email", "");
-    //     form.setValue("password", "");
-
-    //     toast.success("Login Successful!", {
-    //       position: "top-center",
-    //       autoClose: 2000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //       transition: Bounce,
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   setLoading(false);
-    //   toast.error(error.data.msg, {
-    //     position: "top-center",
-    //     autoClose: 2000,
-    //     hideProgressBar: true,
-    //     theme: "light",
-    //   });
-    //   form.setValue("email", "");
-    //   form.setValue("password", "");
-    // }
+      if (response.status === 200) {
+        form.setValue("email", "");
+        form.setValue("password", "");
+        setLoading(false);
+        router.push("/dashboard");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      setEmailError(error.response?.data?.message?.email[0]);
+      setPasswordError(error.response?.data?.message?.password[0]);
+    }
   };
 
   const handleBack = () => {
@@ -135,7 +116,7 @@ export default function LoginComponent() {
                             className="py-6"
                           />
                         </FormControl>
-                        <FormMessage />
+                        {emailError && <FormMessage>{emailError}</FormMessage>}
                       </FormItem>
                     )}
                   />
@@ -177,7 +158,9 @@ export default function LoginComponent() {
                             Forgot your password?
                           </Link>
                         </div>
-                        <FormMessage />
+                        {passwordError && (
+                          <FormMessage>{passwordError}</FormMessage>
+                        )}
                       </FormItem>
                     )}
                   />

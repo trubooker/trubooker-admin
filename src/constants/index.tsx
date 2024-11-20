@@ -39,55 +39,55 @@ export const NavLinks: LinkItem[] = [
     icon: TbUserStar,
     link: "/agent",
   },
-  {
-    id: 5,
-    title: "Finance",
-    icon: LuCircleDollarSign,
-    link: "/finance",
-  },
-  {
-    id: 6,
-    title: "Notification",
-    icon: MdOutlineNotificationsActive,
-    link: "/notification",
-  },
-  {
-    id: 7,
-    title: "Settings",
-    icon: IoSettingsOutline,
-    sublinks: [
-      {
-        id: 1,
-        title: "Basic Settings",
-        icon: CiFlag1,
-        link: "/settings",
-      },
-      {
-        id: 2,
-        title: "Roles & permission",
-        icon: CiFlag1,
-        link: "/settings/roles",
-      },
-      {
-        id: 3,
-        title: "Referral program",
-        icon: CiFlag1,
-        link: "/settings/referral-program",
-      },
-      {
-        id: 4,
-        title: "Platform settings",
-        icon: CiFlag1,
-        link: "/settings/platform",
-      },
-    ],
-  },
-  {
-    id: 8,
-    title: "Report",
-    icon: MdErrorOutline,
-    link: "/report",
-  },
+  // {
+  //   id: 5,
+  //   title: "Finance",
+  //   icon: LuCircleDollarSign,
+  //   link: "/finance",
+  // },
+  // {
+  //   id: 6,
+  //   title: "Notification",
+  //   icon: MdOutlineNotificationsActive,
+  //   link: "/notification",
+  // },
+  // {
+  //   id: 7,
+  //   title: "Settings",
+  //   icon: IoSettingsOutline,
+  //   sublinks: [
+  //     {
+  //       id: 1,
+  //       title: "Basic Settings",
+  //       icon: CiFlag1,
+  //       link: "/settings",
+  //     },
+  //     {
+  //       id: 2,
+  //       title: "Roles & permission",
+  //       icon: CiFlag1,
+  //       link: "/settings/roles",
+  //     },
+  //     {
+  //       id: 3,
+  //       title: "Referral program",
+  //       icon: CiFlag1,
+  //       link: "/settings/referral-program",
+  //     },
+  //     {
+  //       id: 4,
+  //       title: "Platform settings",
+  //       icon: CiFlag1,
+  //       link: "/settings/platform",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 8,
+  //   title: "Report",
+  //   icon: MdErrorOutline,
+  //   link: "/report",
+  // },
 ];
 
 export interface Country {
@@ -1023,6 +1023,72 @@ export const PassengerListData = [
 ];
 
 export const DriverListData = [
+  {
+    id: "1",
+    name: "Thelma Ojo",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "pending",
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "suspended",
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+];
+
+export const AgentListData = [
   {
     id: "1",
     name: "Thelma Ojo",

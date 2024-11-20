@@ -16,7 +16,7 @@ export async function POST(req: Request, res: NextRequest) {
 
   const data = await resData.json();
   const token = data?.data?.token;
-  // console.log("token: ", token);
+  console.log(data);
 
   const serialized = serialize(`token`, token, {
     httpOnly: true,
@@ -28,8 +28,7 @@ export async function POST(req: Request, res: NextRequest) {
 
   if (data?.status == "success") {
     const response = {
-      message: data.errors,
-      data: data?.data,
+      data: data?.data?.user,
     };
     return new Response(JSON.stringify(response), {
       status: 200,
