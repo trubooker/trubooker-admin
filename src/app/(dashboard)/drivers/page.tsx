@@ -17,19 +17,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
 import { DriverList } from "@/components/Driver/DriverList";
+import { useGetDriversQuery } from "@/redux/services/Slices/driverApiSlice";
 
 const Drivers = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  // const {
-  //   isLoading: loading,
-  //   data,
-  //   isFetching,
-  // } = useGetStudentReportQuery({ page, search: searchQuery });
-  const loading: boolean = false;
-  const isFetching: boolean = false;
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetDriversQuery({ page, search: searchQuery });
+  console.log("Driver", userData);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userData: any = [];
   const users = userData;
   const totalPages = users?.data?.instructors?.last_page;
   const onPageChange = (pageNumber: number) => {

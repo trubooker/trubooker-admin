@@ -7,8 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "../ui/skeleton";
 
-const Overview = () => {
+interface Props {
+  data: {
+    active_trips: number;
+    upcoming_trips: number;
+    completed_trips: number;
+    cancelled_trips: number;
+  };
+  loading: boolean;
+}
+const Overview: React.FC<Props> = ({ data, loading }) => {
   return (
     <Card>
       <CardHeader>
@@ -20,19 +30,43 @@ const Overview = () => {
           <div className="my-5 space-y-6">
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Active Trips:</span>
-              <span className="font-medium text-sm">60,000</span>
+              <span className="font-medium text-sm">
+                {loading ? (
+                  <Skeleton className="h-4 w-[50px] bg-gray-200" />
+                ) : (
+                  data?.active_trips
+                )}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Upcoming Trips:</span>
-              <span className="font-medium text-sm">50,000</span>
+              <span className="font-medium text-sm">
+                {loading ? (
+                  <Skeleton className="h-4 w-[50px] bg-gray-200" />
+                ) : (
+                  data?.upcoming_trips
+                )}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Completed:</span>
-              <span className="font-medium text-sm">60,000</span>
+              <span className="font-medium text-sm">
+                {loading ? (
+                  <Skeleton className="h-4 w-[50px] bg-gray-200" />
+                ) : (
+                  data?.completed_trips
+                )}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Cancelled:</span>
-              <span className="font-medium text-sm">60,000</span>
+              <span className="font-medium text-sm">
+                {loading ? (
+                  <Skeleton className="h-4 w-[50px] bg-gray-200" />
+                ) : (
+                  data?.cancelled_trips
+                )}
+              </span>
             </div>
           </div>
         </div>

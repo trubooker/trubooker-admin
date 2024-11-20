@@ -1,7 +1,7 @@
 "use client";
 
 import Goback from "@/components/Goback";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -9,12 +9,20 @@ import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import PassengerTripTable from "@/components/Passenger/PassengerTrip";
 import RefKinProfile from "@/components/Passenger/RefKinProfile";
+import { useGetOnePassengerQuery } from "@/redux/services/Slices/passenger.ApiSlice";
 
 const ViewPassenger = () => {
   const params = useParams();
   const id = String(params.slug);
   const router = useRouter();
   const status = "active";
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetOnePassengerQuery(id);
+  console.log("SinglePassenger", userData);
+
   return (
     <div>
       <Goback formerPage={"Passenger"} presentPage={`Passenger id ${id}`} />

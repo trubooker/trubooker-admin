@@ -27,13 +27,19 @@ export async function POST(req: Request, res: NextRequest) {
   });
 
   if (data?.status == "success") {
-    const response = {
-      data: data?.data?.user,
-    };
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { "Set-cookie": serialized },
-    });
+    if (data?.data?.user?.role === "admin") {
+      const response = {
+        data: data?.data?.user,
+      };
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Set-cookie": serialized },
+      });
+    } else {
+      return new Response(JSON.stringify({ message: "Unauthorized!! Admin only" }), {
+        status: 401,
+      });
+    }
   } else {
     const response = {
       message: data?.errors,

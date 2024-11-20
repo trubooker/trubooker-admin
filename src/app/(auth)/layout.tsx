@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "../globals.css";
 import StoreProvider from "@/redux/providers";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <html lang="en" suppressHydrationWarning={true}>
-        <body className={montserrat.className}>{children}</body>
+        <body className={montserrat.className}>
+          {children} <Toaster />
+        </body>
       </html>
     </StoreProvider>
   );

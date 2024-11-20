@@ -1,4 +1,3 @@
-import { current } from "@reduxjs/toolkit";
 import { api } from "../apiSlice";
 
 const userApiConfig = api.enhanceEndpoints({ addTagTypes: ["User"] });

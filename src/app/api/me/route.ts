@@ -17,15 +17,5 @@ export async function GET() {
 
   const { value } = token;
 
-  const headers = {
-    Authorization: `Bearer ${value}`,
-    "Content-Type": "application/json",
-  };
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`, {
-    headers,
-  });
-
-  const user = await res.json();
-
-  return NextResponse.json({ token: value, user });
+  return NextResponse.json({ token: value });
 }

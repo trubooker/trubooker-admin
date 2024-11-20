@@ -5,6 +5,7 @@ import {
   FetchArgs,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${process.env.NEXT_PUBLIC_API_URL}`,

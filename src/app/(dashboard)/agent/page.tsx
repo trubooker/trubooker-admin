@@ -17,19 +17,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
 import { AgentList } from "@/components/agent/agentList";
+import { useGetAgentsQuery } from "@/redux/services/Slices/agentApiSlice";
 
 const Agent = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  // const {
-  //   isLoading: loading,
-  //   data,
-  //   isFetching,
-  // } = useGetStudentReportQuery({ page, search: searchQuery });
-  const loading: boolean = false;
-  const isFetching: boolean = false;
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetAgentsQuery({ page, search: searchQuery });
+  console.log("Agent", userData);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userData: any = [];
   const users = userData;
   const totalPages = users?.data?.instructors?.last_page;
   const onPageChange = (pageNumber: number) => {

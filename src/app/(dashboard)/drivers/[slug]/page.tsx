@@ -8,12 +8,19 @@ import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import ProfileVehicleDocs_Info from "@/components/Driver/ProfileVehicleDocs_Info";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { useGetOneDriverQuery } from "@/redux/services/Slices/driverApiSlice";
 
 const ViewDriver = () => {
   const params = useParams();
   const id = String(params.slug);
   const router = useRouter();
   const status = "active";
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetOneDriverQuery(id);
+  console.log("SingleDriver", userData);
   return (
     <div>
       <Goback formerPage={"Drivers"} presentPage={`Driver id ${id}`} />

@@ -3,6 +3,7 @@ import "../globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { Montserrat } from "next/font/google";
 import StoreProvider from "@/redux/providers";
+import { Toaster } from "react-hot-toast";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,7 +24,9 @@ export default function RootLayout({
     <StoreProvider>
       <html lang="en">
         <body className={montserrat.className} suppressHydrationWarning={true}>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <LayoutWrapper>
+            {children} <Toaster />
+          </LayoutWrapper>
         </body>
       </html>
     </StoreProvider>

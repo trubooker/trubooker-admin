@@ -18,13 +18,17 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { FC } from "react";
+import CountUp from "react-countup";
 
 interface Props {
   chartConfig: ChartConfig;
-  chartData: any[];
+  revenue: {
+    graph_data: any[];
+    total_revenue: number;
+  };
 }
 
-export const LineChartDisplay: FC<Props> = ({ chartConfig, chartData }) => {
+export const LineChartDisplay: FC<Props> = ({ chartConfig, revenue }) => {
   return (
     <Card>
       <CardHeader>
@@ -35,7 +39,9 @@ export const LineChartDisplay: FC<Props> = ({ chartConfig, chartData }) => {
               Earnings for the Month
             </CardDescription>
           </div>
-          <span className="text-xl">$300,000,000</span>
+          <span className="text-xl">
+            <CountUp end={revenue?.total_revenue} prefix="$ " />
+          </span>
         </div>
       </CardHeader>
       <CardContent>
@@ -43,7 +49,7 @@ export const LineChartDisplay: FC<Props> = ({ chartConfig, chartData }) => {
           <AreaChart
             className="m-0 p-0"
             accessibilityLayer
-            data={chartData}
+            data={revenue?.graph_data}
             margin={{
               left: 12,
               right: 12,

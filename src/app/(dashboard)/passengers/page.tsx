@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 // import QuickActions from "@/components/(admin)/quick-action";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+// import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Search from "@/components/SearchBar";
 import { PassengerListData } from "@/constants";
 import {
@@ -17,21 +17,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
 import { PassengerList } from "@/components/Passenger/passengerList";
+import { useGetPassengersQuery } from "@/redux/services/Slices/passenger.ApiSlice";
 
 const Passengers = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  // const {
-  //   isLoading: loading,
-  //   data,
-  //   isFetching,
-  // } = useGetStudentReportQuery({ page, search: searchQuery });
-  const loading: boolean = false;
-  const isFetching: boolean = false;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userData: any = [];
-  const users = userData;
-  const totalPages = users?.data?.instructors?.last_page;
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetPassengersQuery({ page, search: searchQuery });
+
+  console.log("Passenger", userData);
+
+  const totalPages = userData?.data?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -43,7 +42,7 @@ const Passengers = () => {
     if (PassengerListData) {
       setFilteredStudents(PassengerListData);
     }
-  }, [users]);
+  }, [userData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(

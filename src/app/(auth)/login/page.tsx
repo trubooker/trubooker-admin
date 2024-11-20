@@ -27,6 +27,7 @@ import { useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function LoginComponent() {
   const LoginFormSchema = z.object({
@@ -36,8 +37,7 @@ export default function LoginComponent() {
       .min(1, { message: "Email is required" }),
     password: z
       .string()
-      .min(8, { message: "Password must be 8 characters or more" })
-      .max(15, { message: "Password too long" }),
+      .min(8, { message: "Password must be 8 characters or more" }),
   });
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
@@ -68,8 +68,16 @@ export default function LoginComponent() {
       }
     } catch (error: any) {
       setLoading(false);
-      setEmailError(error.response?.data?.message?.email[0]);
-      setPasswordError(error.response?.data?.message?.password[0]);
+      if (error?.status === 400) {
+        setEmailError(error.response?.data?.message?.email[0]);
+        setPasswordError(error.response?.data?.message?.password[0]);
+      }
+      if (error.status === 401) {
+        toast.error(error?.response?.data?.message);
+      }
+      if (error?.status === 500) {
+        toast.error("Internal Server Error");
+      }
     }
   };
 

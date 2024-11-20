@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import CountUp from "react-countup";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +11,7 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 import Notification from "@/components/Notification";
 import { LineChartDisplay } from "@/components/charts/LineChart";
 import * as data from "@/constants";
-
+import { useGetDashboardQuery } from "@/redux/services/Slices/dashboardApiSlice";
 import { SettingsListData } from "@/constants";
 
 import {
@@ -38,38 +31,46 @@ import Pagination from "@/components/Pagination";
 
 const Dashboard = () => {
   const [page, setPage] = useState(1);
-  const loading: boolean = false;
-  const isFetching: boolean = false;
-  const userData: any = [];
-  const totalPages = userData?.data?.instructors?.last_page;
+
+  const {
+    data: info,
+    isLoading: loading,
+    isFetching,
+  } = useGetDashboardQuery({ page });
+  console.log(info);
+
+  const totalPages = info?.data?.active_trips?.last_page;
+  const userData = info?.data?.active_trips?.data || [];
+  const overview = info?.data?.overviews;
+  const revenue = info?.data;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
-  const [sortConfig, setSortConfig] = useState<{
-    column: string;
-    order: string;
-  } | null>(null);
 
-  const sortedData = [...SettingsListData].sort((a, b) => {
-    if (!sortConfig) return 0;
-    const { column, order } = sortConfig;
-    const valA = a[column as keyof typeof a];
-    const valB = b[column as keyof typeof b];
-    if (valA < valB) return order === "asc" ? -1 : 1;
-    if (valA > valB) return order === "asc" ? 1 : -1;
-    return 0;
-  });
+  // const [sortConfig, setSortConfig] = useState<{
+  //   column: string;
+  //   order: string;
+  // } | null>(null);
 
-  const handleSort = (column: string) => {
-    setSortConfig((prev) => {
-      if (prev?.column === column) {
-        return { column, order: prev.order === "asc" ? "desc" : "asc" };
-      }
-      return { column, order: "asc" };
-    });
-  };
+  // const sortedData = [...userData].sort((a, b) => {
+  //   if (!sortConfig) return 0;
+  //   const { column, order } = sortConfig;
+  //   const valA = a[column as keyof typeof a];
+  //   const valB = b[column as keyof typeof b];
+  //   if (valA < valB) return order === "asc" ? -1 : 1;
+  //   if (valA > valB) return order === "asc" ? 1 : -1;
+  //   return 0;
+  // });
+  // const handleSort = (column: string) => {
+  //   setSortConfig((prev) => {
+  //     if (prev?.column === column) {
+  //       return { column, order: prev.order === "asc" ? "desc" : "asc" };
+  //     }
+  //     return { column, order: "asc" };
+  //   });
+  // };
 
   return (
     <div className="flex flex-col h-fit w-full  gap-4">
@@ -87,7 +88,7 @@ const Dashboard = () => {
                       {loading ? (
                         <Skeleton className="h-8 w-[50px] bg-gray-200" />
                       ) : (
-                        <CountUp end={Number(userData?.data?.total_students)} />
+                        <CountUp end={Number(revenue?.total_passengers)} />
                       )}
                     </span>
                   </div>
@@ -107,12 +108,12 @@ const Dashboard = () => {
                       {loading ? (
                         <Skeleton className="h-8 w-[50px] bg-gray-200" />
                       ) : (
-                        <CountUp end={Number(userData?.data?.new_students)} />
+                        <CountUp end={Number(revenue?.total_drivers)} />
                       )}
                     </span>
                   </div>
                   <span className="text-sm text-white font-normal">
-                    Active Drivers
+                    Total Drivers
                   </span>
                 </CardContent>
               </Card>
@@ -127,9 +128,7 @@ const Dashboard = () => {
                       {loading ? (
                         <Skeleton className="h-8 w-[50px] bg-gray-200" />
                       ) : (
-                        <CountUp
-                          end={Number(userData?.data?.active_students)}
-                        />
+                        <CountUp end={Number(revenue?.total_agents)} />
                       )}
                     </span>
                   </div>
@@ -145,12 +144,12 @@ const Dashboard = () => {
               <div className="">
                 <LineChartDisplay
                   chartConfig={data?.chartConfigLine}
-                  chartData={data.chartDataLine}
+                  revenue={revenue}
                 />
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            <Overview />
+            <Overview data={overview} loading={loading} />
           </div>
         </div>
         <div className="xl:w-[40%]">
@@ -161,7 +160,7 @@ const Dashboard = () => {
         <div className="flex gap-x-3 items-center ps-3 mb-5">
           <span className="font-bold">Active Trips</span>
           <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-            {SettingsListData.length}
+            {userData?.length}
           </div>
         </div>
         <ScrollArea className="w-full">
@@ -212,35 +211,35 @@ const Dashboard = () => {
                       Drivers
                     </TableHead>
                     <TableHead
-                      onClick={() => handleSort("departure")}
+                      // onClick={() => handleSort("departure")}
                       className="font-bold w-1/4 text-center"
                     >
                       <span className="flex gap-x-3 items-center cursor-pointer justify-center">
                         Departure
-                        <FaArrowUp
+                        {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
                             sortConfig?.column === "departure" &&
                             sortConfig?.order === "desc"
                               ? "rotate-180"
                               : ""
                           }`}
-                        />
+                        /> */}
                       </span>
                     </TableHead>
                     <TableHead
-                      onClick={() => handleSort("arrival")}
+                      // onClick={() => handleSort("arrival")}
                       className="font-bold w-1/4 text-center"
                     >
                       <span className="flex gap-x-3 items-center cursor-pointer justify-center">
                         Arrival
-                        <FaArrowUp
+                        {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
                             sortConfig?.column === "arrival" &&
                             sortConfig?.order === "desc"
                               ? "rotate-180"
                               : ""
                           }`}
-                        />
+                        /> */}
                       </span>
                     </TableHead>
                     <TableHead className="font-bold w-1/4 text-center">
@@ -249,7 +248,8 @@ const Dashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedData?.map((data: any) => (
+                  {/* {sortedData!.map((data: any) => ( */}
+                  {userData!.map((data: any) => (
                     <TableRow
                       key={data.id}
                       className="text-xs text-center lg:text-sm"
@@ -263,19 +263,19 @@ const Dashboard = () => {
                             </AvatarFallback>
                           </Avatar>
                           <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                            <span>{data.name} </span>
+                            <span>{data.driver} </span>
                             {/* <span>{data.last_name}</span> */}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className=" py-5 w-1/5 text-[--primary]">
-                        {data.departure}
+                        {data.departure_location}
                       </TableCell>
                       <TableCell className=" py-5 w-1/5">
-                        {data.arrival}
+                        {data.arrival_location}
                       </TableCell>
                       <TableCell className=" py-5">
-                        {data.status === "completed" ? (
+                        {/* {data.status === "completed" ? (
                           <div className="flex items-center mx-auto gap-x-2 p-1 justify-center w-[130px] py-2 rounded-full bg-[#CCFFCD] text-[#00B771]">
                             <VscCircleFilled className=" bg-[#00B771] rounded-full" />
                             <span className="font-semibold text-xs">
@@ -289,7 +289,13 @@ const Dashboard = () => {
                               {data.created_at}
                             </span>
                           </div>
-                        )}
+                        )} */}
+                        <div className="flex items-center mx-auto gap-x-2 p-1 justify-center w-[130px] py-2 rounded-full bg-[#CCFFCD] text-[#00B771]">
+                          <VscCircleFilled className=" bg-[#00B771] rounded-full" />
+                          <span className="font-semibold text-xs">
+                            {data?.status}
+                          </span>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

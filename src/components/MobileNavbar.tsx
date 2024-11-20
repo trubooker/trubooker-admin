@@ -35,6 +35,7 @@ import { Separator } from "@/components/ui/separator";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import LogoutModal from "./LogoutModal";
+import { useLoggedInUser } from "@/hooks/useLoggedUser";
 
 const MobileNavbar = () => {
   const pathname = usePathname();
@@ -45,7 +46,7 @@ const MobileNavbar = () => {
   };
   const { isLoading: loading }: any = true;
 
-  const data: any = [];
+  const { userData: data, userLoading, userRefetching } = useLoggedInUser();
   return (
     <div className="flex justify-between items-center w-full">
       <LogoutModal open={openLog} setOpen={setOpenLog} />
@@ -152,29 +153,29 @@ const MobileNavbar = () => {
       </div>
       <div className="flex">
         <div className="flex justify-between items-center space-x-5 w-full border border-none ps-4 me-2 text-sm font-medium text-gray-700">
-          {/* {loading || !data?.data?.first_name ? (
+          {loading ? (
             <Skeleton className="h-10 w-32" />
           ) : (
-            <> */}
-          <p className="text-sm font-semibold text-black lg:flex flex-col hidden ">
-            {/* Hello, {data?.data?.first_name} */}
-            <span className="text-lg ">Grace Ani</span>
-            <small className="text-xs font-normal">Super Admin</small>
-          </p>
-          <Avatar className="w-10 h-10">
-            <AvatarImage src={data?.data?.profile_picture} />
-            <AvatarFallback>
-              {data?.data?.first_name?.charAt(0)}
-              {data?.data?.last_name?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+            <>
+              <p className="text-sm font-semibold text-black lg:flex flex-col hidden ">
+                {/* Hello, {data?.data?.first_name} */}
+                <span className="text-lg "> {data?.first_name}</span>
+                <small className="text-xs font-normal">Super Admin</small>
+              </p>
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={data?.profile_picture} />
+                <AvatarFallback>
+                  {data?.first_name?.charAt(0)}
+                  {data?.last_name?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            </>
+          )}
           <Separator orientation="vertical" className="h-10 ms-2 me-1" />
           <HiOutlineLogout
             className="h-9 w-9 text-red-500 cursor-pointer"
             onClick={handleLogout}
           />
-          {/* </>
-          )} */}
         </div>
       </div>
     </div>

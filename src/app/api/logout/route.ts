@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 export async function POST() {
   // Clear the authToken and userData cookies
   cookies().set({
-    name: "authToken",
+    name: "token",
     value: "",
     maxAge: -1, // Deletes the cookie
     path: "/",

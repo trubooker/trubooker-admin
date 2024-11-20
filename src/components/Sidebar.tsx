@@ -12,11 +12,18 @@ import {
 import { usePathname } from "next/navigation";
 import { NavLinks } from "@/constants";
 import { Separator } from "@/components/ui/separator";
+import { CiLogout } from "react-icons/ci";
+import LogoutModal from "./LogoutModal";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const [openLog, setOpenLog] = React.useState(false);
+  const handleLogout = () => {
+    setOpenLog(true);
+  };
   return (
     <div className="h-screen z-50 overflow-y-auto flex flex-col justify-between">
+      <LogoutModal open={openLog} setOpen={setOpenLog} />
       <div>
         <div className="flex h-auto items-center px-4 lg:h-[90px] z-50 lg:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -83,6 +90,17 @@ const Sidebar = () => {
               )}
             </nav>
           ))}
+        </div>
+        <div className="p-1 mb-4 bottom-0 absolute w-full left-0">
+          <div
+            onClick={handleLogout}
+            className={`text-[--danger] font-bold transition duration-300 flex items-center w-full gap-3 rounded-lg px-3 py-2`}
+          >
+            <dt className="inline ">
+              <CiLogout aria-hidden="true" className="h-6 w-6" />
+            </dt>
+            <span>Logout</span>
+          </div>
         </div>
       </div>
     </div>

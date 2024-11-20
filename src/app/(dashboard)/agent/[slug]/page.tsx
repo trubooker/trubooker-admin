@@ -8,12 +8,19 @@ import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { FaMoneyBillWave } from "react-icons/fa";
 import AgentInfo from "@/components/agent/agentInfo";
+import { useGetOneAgentQuery } from "@/redux/services/Slices/agentApiSlice";
 
 const ViewAgent = () => {
   const params = useParams();
   const id = String(params.slug);
   const router = useRouter();
   const status = "active";
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetOneAgentQuery(id);
+  console.log("SingleAgent", userData);
   return (
     <div>
       <Goback formerPage={"Agents"} presentPage={`Agent id ${id}`} />
