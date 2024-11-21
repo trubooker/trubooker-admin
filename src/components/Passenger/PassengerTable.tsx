@@ -30,6 +30,10 @@ export function PassengerTable({
     alert(`Account id ${id} suspended!!`);
   };
 
+  const handleNotify = (id: string) => {
+    alert(`Account id ${id} notified!!`);
+  };
+
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
@@ -37,15 +41,18 @@ export function PassengerTable({
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              <TableHead className="text-left font-bold w-1/7">
+              {/* <TableHead className="text-left font-bold w-1/7">
                 Trip Id
-              </TableHead>
+              </TableHead> */}
               <TableHead className="font-bold w-1/7">Departure</TableHead>
+              <TableHead className="font-bold w-1/7 text-center">
+                Departure Date
+              </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
                 Destination
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
-                Date
+                Arrival Date
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
                 Status
@@ -62,18 +69,21 @@ export function PassengerTable({
             <>
               <>
                 {PassengerTableData?.map((data: any) => (
-                  <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    <TableCell className="py-5 font-medium w-1/7 text-left">
+                  <TableRow key={data.trip_id} className="text-xs lg:text-sm w-full">
+                    {/* <TableCell className="py-5 font-medium w-1/7 text-left">
                       {data.id}
+                    </TableCell> */}
+                    <TableCell className="w-1/7 py-5 text-center">
+                      {data.departure_location}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure}
+                      {data.departure_date}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.destination}
+                      {data.arrival_location}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.date}
+                      {data.arrival_date}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (
@@ -121,27 +131,18 @@ export function PassengerTable({
                           className="cursor-pointer"
                         >
                           <DropdownMenuItem
-                            onClick={() =>
-                              router.push(`/passengers/${data?.id}`)
-                            }
                             className="w-full text-center cursor-pointer"
-                          >
-                            View details
-                          </DropdownMenuItem>
-                          <Separator />
-                          <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.id)}
-                          >
-                            Resolve complaint
-                          </DropdownMenuItem>
-                          <Separator />
-                          <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.id)}
+                            onClick={() => handleSuspend(data?.trip_id)}
                           >
                             Delete
                           </DropdownMenuItem>
+                          {/* <Separator />
+                          <DropdownMenuItem
+                            className="w-full text-center cursor-pointer"
+                            onClick={() => handleNotify(data?.id)}
+                          >
+                            Send Notifications
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { SinglePassengerListData } from "@/constants";
+import React, { FC, useCallback, useEffect, useState } from "react";
+// import { SinglePassengerLisstData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -15,7 +15,23 @@ import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
 import { PassengerTable } from "./PassengerTable";
 
-const PassengerTripTable = () => {
+export interface SinglePassengerListDataProps {
+  data: [
+    {
+      amount: string | null;
+      arrival_date: string | null;
+      arrival_location: string | null;
+      departure_date: string | null;
+      departure_location: string | null;
+      departure_time: string | null;
+      status: "completed" | "active" | "upcoming" | "cancelled";
+      id: string | null;
+    }
+  ];
+}
+const PassengerTripTable: FC<SinglePassengerListDataProps> = ({
+  data: SinglePassengerListData,
+}) => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   // const {
@@ -25,7 +41,6 @@ const PassengerTripTable = () => {
   // } = useGetStudentReportQuery({ page, search: searchQuery });
   const loading: boolean = false;
   const isFetching: boolean = false;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const userData: any = [];
   const users = userData;
   const totalPages = users?.data?.instructors?.last_page;
@@ -42,7 +57,7 @@ const PassengerTripTable = () => {
     if (SinglePassengerListData) {
       setFilteredStudents(SinglePassengerListData);
     }
-  }, [users]);
+  }, [SinglePassengerListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(

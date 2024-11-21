@@ -3,8 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import Referral from "./Referral/Agents";
 import Withdrawal from "./Withdrawal/Agents";
+import { Skeleton } from "../ui/skeleton";
+import CountUp from "react-countup";
 
-const AgentInfo = () => {
+const AgentInfo = ({
+  withdrawal_req,
+  agent_ref,
+  ref,
+  earning_overview,
+  profile,
+  loading,
+  isFetching,
+}: any) => {
   return (
     <div className="w-full">
       <div className="gap-4 flex xl:flex-row flex-col w-full">
@@ -23,14 +33,27 @@ const AgentInfo = () => {
                       <span className="font-normal text-xs text-gray-500">
                         Full name
                       </span>
-                      <span className="font-medium text-sm">Grace Femi</span>
+                      <span className="font-medium text-sm">
+                        {profile?.first_name || profile?.last_name === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          <div className="flex gap-x-2">
+                            <span> {profile?.first_name}</span>
+                            <span> {profile?.last_name}</span>
+                          </div>
+                        )}
+                      </span>
                     </div>
                     <div className="flex text-end flex-col">
                       <span className="font-normal text-xs text-gray-500">
                         Email address
                       </span>
                       <span className="font-medium text-sm">
-                        gracefem@gmail.com
+                        {profile?.email === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.email
+                        )}
                       </span>
                     </div>
                   </div>
@@ -40,14 +63,12 @@ const AgentInfo = () => {
                         Phone number
                       </span>
                       <span className="font-medium text-sm">
-                        +234 813234567
+                        {profile?.phone === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.phone
+                        )}
                       </span>
-                    </div>
-                    <div className="flex text-end flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Password
-                      </span>
-                      <span className="font-medium text-sm">***********</span>
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -56,14 +77,24 @@ const AgentInfo = () => {
                         Address
                       </span>
                       <span className="font-medium text-sm">
-                        No 1, 123 london street, USA
+                        {profile?.address === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.address
+                        )}
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
                       <span className="font-normal text-xs text-gray-500">
                         Date of birth
                       </span>
-                      <span className="font-medium text-sm">10/10/2003</span>
+                      <span className="font-medium text-sm">
+                        {profile?.dob === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.dob
+                        )}{" "}
+                      </span>
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -71,13 +102,25 @@ const AgentInfo = () => {
                       <span className="font-normal text-xs text-gray-500">
                         City
                       </span>
-                      <span className="font-medium text-sm">Abuja</span>
+                      <span className="font-medium text-sm">
+                        {profile?.city === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.city
+                        )}
+                      </span>
                     </div>
                     <div className="flex text-end flex-col">
                       <span className="font-normal text-xs text-gray-500">
                         Country
                       </span>
-                      <span className="font-medium text-sm">Nigeria</span>
+                      <span className="font-medium text-sm">
+                        {profile?.country === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.country
+                        )}
+                      </span>
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -85,19 +128,32 @@ const AgentInfo = () => {
                       <span className="font-normal text-xs text-gray-500">
                         Gender
                       </span>
-                      <span className="font-medium text-sm">Female</span>
+                      <span className="font-medium text-sm">
+                        {profile?.gender === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.gender
+                        )}
+                      </span>
                     </div>
                     <div className="flex text-end flex-col">
                       <span className="font-normal text-xs text-gray-500">
                         Referral code
                       </span>
-                      <span className="font-medium text-sm">zWrtAq</span>
+                      <span className="font-medium text-sm">
+                        {profile?.referral_code === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          profile?.referral_code
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+
           <Card className="h-auto w-full">
             <CardHeader>
               <CardTitle className="text-lg text-gray-500">
@@ -114,7 +170,9 @@ const AgentInfo = () => {
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">₦10,000</span>
+                      <span className="font-medium text-sm">
+                        <CountUp end={profile?.total_earnings} prefix="₦ " />
+                      </span>
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -124,7 +182,12 @@ const AgentInfo = () => {
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">₦5,000</span>
+                      <span className="font-medium text-sm">
+                        <CountUp
+                          end={earning_overview?.payment_processed}
+                          prefix="₦ "
+                        />
+                      </span>
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -134,7 +197,12 @@ const AgentInfo = () => {
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">₦5,000</span>
+                      <span className="font-medium text-sm">
+                        <CountUp
+                          end={earning_overview?.pending_payment}
+                          prefix="₦ "
+                        />
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -149,10 +217,14 @@ const AgentInfo = () => {
               <div className="py-4 flex gap-x-3 items-center">
                 <h2 className="text-base font-bold">Referral performance</h2>
                 <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-                  {/* {DriverListData.length} */}7
+                  {agent_ref?.length}
                 </div>
               </div>
-              <Referral />
+              <Referral
+                data={agent_ref}
+                loading={loading}
+                isFetching={isFetching}
+              />
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -161,7 +233,11 @@ const AgentInfo = () => {
               <div className="py-4">
                 <h2 className="text-base font-bold">Withdrawal requests</h2>
               </div>
-              <Withdrawal />
+              <Withdrawal
+                data={withdrawal_req}
+                loading={loading}
+                isFetching={isFetching}
+              />
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

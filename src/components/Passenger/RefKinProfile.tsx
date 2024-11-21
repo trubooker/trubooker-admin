@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { FC, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefKinProfileTable } from "./RefKinProfileTable";
 import { SinglePassengerReferalData } from "@/constants";
@@ -14,7 +16,35 @@ import {
 import { Skeleton } from "../ui/skeleton";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
-const RefKinProfile = () => {
+interface Props {
+  ref: string[];
+  nok: {
+    name: string | null;
+    phone_number: string | null;
+    relationship: string | null;
+  };
+  profile: {
+    address: string | null;
+    city: string | null;
+    country: string | null;
+    created_at: string | null;
+    deleted_at: string | null;
+    dob: string | null;
+    email: string | null;
+    email_verified_at: string | null;
+    first_name: string | null;
+    gender: string | null;
+    last_name: string | null;
+    phone: string | null;
+    referral_code: string | null;
+    referred_by: string | null;
+    role: string | null;
+    status: string | null;
+    updated_at: string | null;
+  };
+}
+
+const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
   const loading: boolean = false;
   const isFetching: boolean = false;
   const userData: any = SinglePassengerReferalData;
@@ -50,14 +80,28 @@ const RefKinProfile = () => {
                         <span className="font-normal text-xs text-gray-500">
                           Full name
                         </span>
-                        <span className="font-medium text-sm">Grace Femi</span>
+                        <span className="font-medium text-sm">
+                          {profile?.first_name ||
+                          profile?.last_name === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            <div className="flex gap-x-2">
+                              <span> {profile?.first_name}</span>
+                              <span> {profile?.last_name}</span>
+                            </div>
+                          )}
+                        </span>
                       </div>
                       <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Email address
                         </span>
                         <span className="font-medium text-sm">
-                          gracefem@gmail.com
+                          {profile?.email === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.email
+                          )}
                         </span>
                       </div>
                     </div>
@@ -67,14 +111,12 @@ const RefKinProfile = () => {
                           Phone number
                         </span>
                         <span className="font-medium text-sm">
-                          +234 813234567
+                          {profile?.phone === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.phone
+                          )}
                         </span>
-                      </div>
-                      <div className="flex text-end flex-col">
-                        <span className="font-normal text-xs text-gray-500">
-                          Password
-                        </span>
-                        <span className="font-medium text-sm">***********</span>
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -83,14 +125,24 @@ const RefKinProfile = () => {
                           Address
                         </span>
                         <span className="font-medium text-sm">
-                          No 1, 123 london street, USA
+                          {profile?.address === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.address
+                          )}
                         </span>
                       </div>
                       <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Date of birth
                         </span>
-                        <span className="font-medium text-sm">10/10/2003</span>
+                        <span className="font-medium text-sm">
+                          {profile?.dob === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.dob
+                          )}{" "}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -98,13 +150,25 @@ const RefKinProfile = () => {
                         <span className="font-normal text-xs text-gray-500">
                           City
                         </span>
-                        <span className="font-medium text-sm">Abuja</span>
+                        <span className="font-medium text-sm">
+                          {profile?.city === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.city
+                          )}
+                        </span>
                       </div>
                       <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Country
                         </span>
-                        <span className="font-medium text-sm">Nigeria</span>
+                        <span className="font-medium text-sm">
+                          {profile?.country === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.country
+                          )}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between">
@@ -112,13 +176,25 @@ const RefKinProfile = () => {
                         <span className="font-normal text-xs text-gray-500">
                           Gender
                         </span>
-                        <span className="font-medium text-sm">Female</span>
+                        <span className="font-medium text-sm">
+                          {profile?.gender === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.gender
+                          )}
+                        </span>
                       </div>
                       <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Referral code
                         </span>
-                        <span className="font-medium text-sm">zWrtAq</span>
+                        <span className="font-medium text-sm">
+                          {profile?.referral_code === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            profile?.referral_code
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -142,17 +218,21 @@ const RefKinProfile = () => {
                           Full name
                         </span>
                         <span className="font-medium text-sm">
-                          Mrs Kemi Adewale
+                          {nok?.name === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            nok?.name
+                          )}
                         </span>
                       </div>
-                      <div className="flex text-end flex-col">
+                      {/* <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Email address
                         </span>
                         <span className="font-medium text-sm">
-                          kemiade222@gmail.com
+                          { nok?.email}
                         </span>
-                      </div>
+                      </div> */}
                     </div>
                     <div className="flex justify-between">
                       <div className="flex flex-col">
@@ -160,14 +240,24 @@ const RefKinProfile = () => {
                           Phone number
                         </span>
                         <span className="font-medium text-sm">
-                          +234 813234567
+                          {nok?.phone_number === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            nok?.phone_number
+                          )}
                         </span>
                       </div>
                       <div className="flex text-end flex-col">
                         <span className="font-normal text-xs text-gray-500">
                           Relationship
                         </span>
-                        <span className="font-medium text-sm">Mother</span>
+                        <span className="font-medium text-sm">
+                          {nok?.relationship === null ? (
+                            <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                          ) : (
+                            nok?.relationship
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -182,7 +272,7 @@ const RefKinProfile = () => {
               Referral Information
             </div>
             <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-              {userData.length}
+              {ref?.length}
             </div>
           </div>
           {isFetching || loading ? (
@@ -223,7 +313,7 @@ const RefKinProfile = () => {
           ) : (
             <ScrollArea className="h-[550px]">
               <RefKinProfileTable
-                data={userData}
+                data={ref}
                 isFetching={isFetching}
                 loading={loading}
               />

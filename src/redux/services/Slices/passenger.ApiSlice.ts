@@ -1,8 +1,5 @@
 import { api } from "../apiSlice";
 
-interface Prop {
-  passenger: string;
-}
 
 const passengersApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Passengers"],
@@ -17,7 +14,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Passengers"],
     }),
 
-    getOnePassenger: builder.query<Prop, string>({
+    getOnePassenger: builder.query({
       query: (passenger) => ({
         url: `/admin/passengers/${passenger}`,
         method: "GET",
@@ -25,7 +22,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Passengers"],
     }),
 
-    togglePassengerStatus: builder.query<Prop, string>({
+    togglePassengerStatus: builder.query({
       query: (passenger) => ({
         url: `/admin/passengers/toggle-status/${passenger}`,
         method: "PATCH",

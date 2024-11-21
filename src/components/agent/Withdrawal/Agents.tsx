@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { SinglePassengerListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -14,15 +13,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
 import { Tab } from "./Tab";
 
-const Withdrawal = () => {
+const Withdrawal = ({
+  data: SingleAgentListData,
+  loading,
+  isFetching,
+}: any) => {
   const [page, setPage] = useState(1);
   // const {
   //   isLoading: loading,
   //   data,
   //   isFetching,
   // } = useGetStudentReportQuery(page);
-  const loading: boolean = false;
-  const isFetching: boolean = false;
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const userData: any = [];
   const users = userData;
@@ -84,7 +86,7 @@ const Withdrawal = () => {
             </>
           ) : (
             <Tab
-              data={SinglePassengerListData}
+              data={SingleAgentListData}
               isFetching={isFetching}
               loading={loading}
             />

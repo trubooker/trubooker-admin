@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { SinglePassengerListData } from "@/constants";
+// import { SinglePassengerListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -14,15 +14,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
 import { DriverTable } from "./DriverTable";
 
-const DriversTable = () => {
+const DriversTable = ({
+  data: SinglePassengerListData,
+  loading,
+  isFetching,
+}: any) => {
   const [page, setPage] = useState(1);
   // const {
   //   isLoading: loading,
   //   data,
   //   isFetching,
   // } = useGetStudentReportQuery(page);
-  const loading: boolean = false;
-  const isFetching: boolean = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const userData: any = [];
   const users = userData;
@@ -42,9 +44,6 @@ const DriversTable = () => {
               <Table className="">
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
-                    <TableHead className="text-left font-bold w-1/6">
-                      Trip Id
-                    </TableHead>
                     <TableHead className="font-bold w-1/6">Departure</TableHead>
                     <TableHead className="font-bold w-1/6 text-center">
                       Destination

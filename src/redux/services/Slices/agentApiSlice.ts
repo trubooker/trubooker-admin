@@ -1,9 +1,5 @@
 import { api } from "../apiSlice";
 
-interface Prop {
-  agent: string;
-}
-
 const agentsApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Agents"],
 });
@@ -17,7 +13,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
       providesTags: ["Agents"],
     }),
 
-    getOneAgent: builder.query<Prop, string>({
+    getOneAgent: builder.query({
       query: (agent) => ({
         url: `/admin/agents/${agent}`,
         method: "GET",
@@ -25,7 +21,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
       providesTags: ["Agents"],
     }),
 
-    toggleAgentStatus: builder.query<Prop, string>({
+    toggleAgentStatus: builder.query({
       query: (agent) => ({
         url: `/admin/agents/toggle-status/${agent}`,
         method: "PATCH",

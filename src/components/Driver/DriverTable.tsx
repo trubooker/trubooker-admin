@@ -8,11 +8,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 export function DriverTable({
-  data: PassengerTableData,
+  data: DriverTableData,
   isFetching,
   loading,
 }: any) {
@@ -25,43 +33,50 @@ export function DriverTable({
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {PassengerTableData?.length >= 0 ? (
-        <Table className=" min-w-[700px] py-2">
+      {DriverTableData?.length > 0 ? (
+        <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              <TableHead className="text-left font-bold w-1/7">
-                Trip Id
-              </TableHead>
+              <TableHead className="font-bold w-1/7">Departure</TableHead>
               <TableHead className="font-bold w-1/7 text-center">
-                Departure
+                Departure Date
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
                 Destination
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
-                Date
+                Arrival Date
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
                 Status
+              </TableHead>
+              <TableHead className="font-bold w-1/7 text-center">
+                Amount paid
+              </TableHead>
+              <TableHead className="text-center font-bold w-1/7">
+                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <>
               <>
-                {PassengerTableData?.map((data: any) => (
-                  <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    <TableCell className="py-5 font-medium w-1/7 text-left">
-                      {data.id}
+                {DriverTableData?.map((data: any) => (
+                  <TableRow
+                    key={data.trip_id}
+                    className="text-xs lg:text-sm w-full"
+                  >
+                    <TableCell className="w-1/7 py-5 text-left">
+                      {data.departure_location}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure}
+                      {data.departure_date}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.destination}
+                      {data.arrival_location}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.date}
+                      {data.arrival_date}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (
@@ -91,6 +106,30 @@ export function DriverTable({
                           </span>
                         </div>
                       )}
+                    </TableCell>
+                    <TableCell className="w-1/7 py-5 text-center">
+                      {data.amount}
+                    </TableCell>
+                    <TableCell className="w-1/7 py-5 text-center w-[100px]">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="center"
+                          className="cursor-pointer"
+                        >
+                          <DropdownMenuItem
+                            className="w-full text-center cursor-pointer"
+                            onClick={() => handleSuspend(data?.trip_id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}

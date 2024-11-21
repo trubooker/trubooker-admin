@@ -30,7 +30,8 @@ const Passengers = () => {
 
   console.log("Passenger", userData);
 
-  const totalPages = userData?.data?.last_page;
+  const PassengerListData = userData?.data;
+  const totalPages = userData?.meta?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -42,7 +43,7 @@ const Passengers = () => {
     if (PassengerListData) {
       setFilteredStudents(PassengerListData);
     }
-  }, [userData]);
+  }, [PassengerListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -63,7 +64,7 @@ const Passengers = () => {
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Passengers</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {PassengerListData.length}
+          {PassengerListData?.length}
         </div>
       </div>
       <div className="flex flex-col xl:flex-row w-full">
@@ -79,9 +80,9 @@ const Passengers = () => {
                 <Table className="">
                   <TableHeader>
                     <TableRow className="text-xs lg:text-sm">
-                      <TableHead className="text-left font-bold w-1/6">
+                      {/* <TableHead className="text-left font-bold w-1/6">
                         Id
-                      </TableHead>
+                      </TableHead> */}
                       <TableHead className="font-bold w-1/6">Name</TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
                         Email

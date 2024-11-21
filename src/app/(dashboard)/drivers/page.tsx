@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 // import QuickActions from "@/components/(admin)/quick-action";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Search from "@/components/SearchBar";
-import { DriverListData } from "@/constants";
+// import { DriverListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -30,8 +30,8 @@ const Drivers = () => {
   console.log("Driver", userData);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const users = userData;
-  const totalPages = users?.data?.instructors?.last_page;
+  const DriverListData = userData?.data;
+  const totalPages = userData?.meta?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -43,7 +43,7 @@ const Drivers = () => {
     if (DriverListData) {
       setFilteredStudents(DriverListData);
     }
-  }, [users]);
+  }, [DriverListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -64,7 +64,7 @@ const Drivers = () => {
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Drivers</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {DriverListData.length}
+          {DriverListData?.length}
         </div>
       </div>
       <div className="flex flex-col xl:flex-row w-full">
@@ -80,9 +80,9 @@ const Drivers = () => {
                 <Table className="">
                   <TableHeader>
                     <TableRow className="text-xs lg:text-sm">
-                      <TableHead className="text-left font-bold w-1/6">
+                      {/* <TableHead className="text-left font-bold w-1/6">
                         Id
-                      </TableHead>
+                      </TableHead> */}
                       <TableHead className="font-bold w-1/6">Name</TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
                         Email
@@ -101,7 +101,7 @@ const Drivers = () => {
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                       <TableRow key={i}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                        {[1, 2, 3, 4, 5].map((i) => (
                           <TableCell key={i}>
                             <div>
                               <div className="w-full rounded-md">

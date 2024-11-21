@@ -30,8 +30,8 @@ const Agent = () => {
   console.log("Agent", userData);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const users = userData;
-  const totalPages = users?.data?.instructors?.last_page;
+  const AgentListData = userData?.data;
+  const totalPages = AgentListData?.data?.instructors?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -43,7 +43,7 @@ const Agent = () => {
     if (AgentListData) {
       setFilteredStudents(AgentListData);
     }
-  }, [users]);
+  }, [AgentListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -64,7 +64,7 @@ const Agent = () => {
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Agents</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {AgentListData.length}
+          {AgentListData?.length}
         </div>
       </div>
       <div className="flex flex-col xl:flex-row w-full">
@@ -80,9 +80,9 @@ const Agent = () => {
                 <Table className="">
                   <TableHeader>
                     <TableRow className="text-xs lg:text-sm">
-                      <TableHead className="text-left font-bold w-1/6">
+                      {/* <TableHead className="text-left font-bold w-1/6">
                         Id
-                      </TableHead>
+                      </TableHead> */}
                       <TableHead className="font-bold w-1/6">Name</TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
                         Email

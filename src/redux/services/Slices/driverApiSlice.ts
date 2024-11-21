@@ -1,9 +1,5 @@
 import { api } from "../apiSlice";
 
-interface Prop {
-  driver: string;
-}
-
 const driversApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Drivers"],
 });
@@ -17,7 +13,7 @@ const driversApi = driversApiConfig.injectEndpoints({
       providesTags: ["Drivers"],
     }),
 
-    getOneDriver: builder.query<Prop, string>({
+    getOneDriver: builder.query({
       query: (driver) => ({
         url: `/admin/drivers/${driver}`,
         method: "GET",
@@ -25,7 +21,7 @@ const driversApi = driversApiConfig.injectEndpoints({
       providesTags: ["Drivers"],
     }),
 
-    toggleDriverStatus: builder.query<Prop, string>({
+    toggleDriverStatus: builder.query({
       query: (driver) => ({
         url: `/admin/drivers/toggle-status/${driver}`,
         method: "PATCH",

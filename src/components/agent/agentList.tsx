@@ -34,13 +34,13 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {Data?.length >= 0 ? (
+      {Data?.length > 0 ? (
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              <TableHead className="text-left font-bold w-[200px]">
+              {/* <TableHead className="text-left font-bold w-[200px]">
                 Id
-              </TableHead>
+              </TableHead> */}
               <TableHead className="font-bold w-1/5">Name</TableHead>
               <TableHead className="font-bold w-1/5 text-center">
                 Email
@@ -61,10 +61,10 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
               <>
                 {Data?.map((data: any) => (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    <TableCell className="py-5 font-medium w-[100px] text-left">
+                    {/* <TableCell className="py-5 font-medium w-[100px] text-left">
                       {data.id}
-                    </TableCell>
-                    <TableCell className=" py-5 text-center text-[--primary]">
+                    </TableCell> */}
+                    <TableCell className=" py-5 text-left text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
                           <AvatarImage src={data?.profile_picture} />

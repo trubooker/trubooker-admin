@@ -159,7 +159,9 @@ const MobileNavbar = () => {
             <>
               <p className="text-sm font-semibold text-black lg:flex flex-col hidden ">
                 {/* Hello, {data?.data?.first_name} */}
-                <span className="text-lg "> {data?.first_name}</span>
+                <span className="text-lg ">
+                  {data?.first_name} {data?.last_name}
+                </span>
                 <small className="text-xs font-normal">Super Admin</small>
               </p>
               <Avatar className="w-10 h-10">

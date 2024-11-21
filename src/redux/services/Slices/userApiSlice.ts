@@ -6,7 +6,7 @@ const userApi = userApiConfig.injectEndpoints({
     getCurrentUser: builder.query({
       query: () => `/user`,
       providesTags: ["User"],
-      keepUnusedDataFor: 5,
+      // keepUnusedDataFor: 5,
     }),
 
     updateProfile: builder.mutation({
