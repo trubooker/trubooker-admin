@@ -1,10 +1,10 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DriversTable from "@/components/Driver/Driver";
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { PassengerFeedback } from "@/constants";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import Link from "next/link";
 import StarRatings from "react-star-ratings";
@@ -167,90 +167,147 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
-              <div className="my-5 space-y-6">
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle Type
-                    </span>
-                    <span className="font-medium text-sm">Bus</span>
-                  </div>
-                  <div className="flex text-end flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle Model
-                    </span>
-                    <span className="font-medium text-sm">Mercedes G63</span>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      License plate number
-                    </span>
-                    <span className="font-medium text-sm">JIG-454-DDF</span>
-                  </div>
-                  <div className="flex text-end flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle capacity
-                    </span>
-                    <span className="font-medium text-sm">8 Seats</span>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle photo
-                    </span>
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={35}
-                            height={35}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-sm font-medium text-[#333F53]">
-                            Vehicle photo1.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
+              {vehicle?.map((deets: any) => (
+                <div key={deets.id} className="my-5 space-y-6">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        Vehicle Type
                       </span>
-                    </span>
+                      <span className="font-medium text-sm">
+                        {deets?.vehicle_type?.name === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.vehicle_type?.name
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex text-end flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        Vehicle Model
+                      </span>
+                      <span className="font-medium text-sm">
+                        {deets?.model === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.model
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex text-end flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle colour
-                    </span>
-                    <span className="font-medium text-sm">Blue</span>
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        License plate number
+                      </span>
+                      <span className="font-medium text-sm">
+                        {deets?.license_plate_number === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.license_plate_number
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex text-end flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        Vehicle capacity
+                      </span>
+                      <span className="font-medium text-sm">
+                        {deets?.capacity === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.capacity
+                        )}{" "}
+                        Seats
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex text-start flex-col">
-                  <span className="font-normal text-xs text-gray-500">
-                    Vehicle photo
-                  </span>
-                  <span className="font-medium text-sm">
-                    <span className="flex gap-x-2">
-                      <Link href={""}>
-                        <Image
-                          src={"/photoGrid.svg"}
-                          alt="Vehicle Photo"
-                          width={35}
-                          height={35}
-                        />
-                      </Link>
-                      <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                        <div className="text-sm font-medium text-[#333F53]">
-                          Vehicle photo1.png
-                        </div>
-                        <div className=" text-[#344054] text-xs">10kb</div>
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        Vehicle colour
+                      </span>
+                      <span className="font-medium text-sm">
+                        {deets?.color === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.color
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex text-end flex-col">
+                      <span className="font-normal text-xs text-gray-500">
+                        Insurance
+                      </span>
+                      <span className="font-medium text-sm">
+                        {deets?.insurance === null ? (
+                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                        ) : (
+                          deets?.insurance
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Tabs defaultValue="vehiclePhotos" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="vehiclePhotos">Photos</TabsTrigger>
+                      <TabsTrigger value="features">Features</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="vehiclePhotos">
+                      <div className="w-full grid grid-cols-1 pt-5 gap-4">
+                        {deets?.photos?.map((i: any, index: number) => (
+                          <div key={index}>
+                            <Link href={i} target="_blank">
+                              <span className="font-medium text-sm">
+                                <span className="flex gap-x-2 items-center">
+                                  <Image
+                                    src={"/photoGrid.svg"}
+                                    alt="Vehicle Photo"
+                                    width={35}
+                                    height={35}
+                                  />
+
+                                  <div className="text-sm font-medium text-[#333F53]">
+                                    Vehicle photo {index + 1}.png
+                                  </div>
+                                </span>
+                              </span>
+                            </Link>
+                          </div>
+                        ))}
                       </div>
-                    </span>
-                  </span>
+                    </TabsContent>
+                    <TabsContent value="features">
+                      <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
+                        {deets?.features?.length > 1 ? (
+                          <div>
+                            <span className="font-medium text-sm">
+                              <span className="flex gap-x-2 items-center">
+                                <div className="text-sm font-medium text-[#333F53]">
+                                  {deets.features.join(", ")}
+                                </div>
+                              </span>
+                            </span>
+                          </div>
+                        ) : (
+                          deets?.features?.map((i: any, index: number) => (
+                            <div key={index}>
+                              <span className="font-medium text-sm">
+                                <span className="flex gap-x-2 items-center">
+                                  <div className="text-sm font-medium text-[#333F53]">
+                                    {i}
+                                  </div>
+                                </span>
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -264,141 +321,53 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
-              <div className="my-5">
-                <div className="grid grid-rows-1 xl:grid-cols-2 gap-8">
-                  <div className="flex flex-col gap-y-2">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle photo
-                    </span>
+              {vehicle?.reg_docs?.length > 0 ? (
+                <div className="my-5">
+                  <div className="grid grid-rows-1 xl:grid-cols-2 gap-8">
+                    {vehicle?.reg_docs.map((docs: any, index: number) => (
+                      <div key={index} className="flex flex-col gap-y-2">
+                        <span className="font-normal text-xs text-gray-500">
+                          Vehicle photo
+                        </span>
 
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
-
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-y-2">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle photo
-                    </span>
-
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
-
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-y-2">
-                    <span className="font-normal text-xs text-gray-500">
-                      Vehicle photo
-                    </span>
-
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
-
-                    <span className="font-medium text-sm">
-                      <span className="flex gap-x-2">
-                        <Link href={""}>
-                          <Image
-                            src={"/photoGrid.svg"}
-                            alt="Vehicle Photo"
-                            width={30}
-                            height={30}
-                          />
-                        </Link>
-                        <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                          <div className="text-[12px] font-medium text-[#333F53]">
-                            Vehicle.png
-                          </div>
-                          <div className=" text-[#344054] text-xs">10kb</div>
-                        </div>
-                      </span>
-                    </span>
+                        <span className="font-medium text-sm">
+                          <span className="flex gap-x-2">
+                            <Link href={""}>
+                              <Image
+                                src={"/photoGrid.svg"}
+                                alt="Vehicle Photo"
+                                width={30}
+                                height={30}
+                              />
+                            </Link>
+                            <div className="w-full flex flex-col gap-x-2 gap-y-1">
+                              <div className="text-[12px] font-medium text-[#333F53]">
+                                Vehicle.png
+                              </div>
+                              <div className=" text-[#344054] text-xs">
+                                10kb
+                              </div>
+                            </div>
+                          </span>
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center w-full h-[400px] flex-col justify-center">
+                  <Image
+                    src={"/nodata.svg"}
+                    alt=""
+                    width={200}
+                    height={200}
+                    className="object-cover me-5"
+                  />
+                  <h1 className="mt-8 text-lg text-center font-semibold">
+                    No Data
+                  </h1>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
