@@ -45,11 +45,7 @@ const ViewAgent = () => {
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage
-                  src={
-                    "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load"
-                  }
-                />
+                <AvatarImage src={profile?.profile_image} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -59,7 +55,7 @@ const ViewAgent = () => {
                   <span className="text-xl font-extrabold">
                     {profile?.first_name} {profile?.last_name}
                   </span>
-                  <>
+                  {/* <>
                     {profile?.status === "active" ? (
                       <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
@@ -75,21 +71,24 @@ const ViewAgent = () => {
                         </span>
                       </div>
                     )}
-                  </>
+                  </> */}
                 </div>
                 <div className="lg:mt-3 mt-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
-                    {profile?.role}
+                    {profile?.role || profile?.type}
                   </span>
                   <span className="text-gray-400 text-xs">
-                    #{profile?.referral_code}
+                    #{profile?.referral}
                   </span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
-                <FaMoneyBillWave /> NGN 2,000,000
+                <FaMoneyBillWave /> NGN{" "}
+                {profile.current_balance === null
+                  ? "0.00"
+                  : profile.current_balance}
               </div>
               <Button
                 variant={"outline"}
@@ -107,7 +106,10 @@ const ViewAgent = () => {
               </span>
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
-              <FaMoneyBillWave /> NGN 2,000,000
+              <FaMoneyBillWave /> NGN{" "}
+              {profile.current_balance === null
+                ? "0.00"
+                : profile.current_balance}
             </div>
           </div>
           <AgentInfo

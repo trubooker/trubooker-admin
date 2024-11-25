@@ -47,11 +47,7 @@ const ViewPassenger = () => {
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage
-                  src={
-                    "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load"
-                  }
-                />
+                <AvatarImage src={profile?.profile_image} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -61,7 +57,7 @@ const ViewPassenger = () => {
                   <span className="text-xl font-extrabold">
                     {profile?.first_name} {profile?.last_name}
                   </span>
-                  <>
+                  {/* <>
                     {profile?.status === "active" ? (
                       <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
@@ -77,14 +73,14 @@ const ViewPassenger = () => {
                         </span>
                       </div>
                     )}
-                  </>
+                  </> */}
                 </div>
                 <div className="lg:mt-3 mt-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
-                    {profile?.role}
+                    {profile?.type || profile?.role}
                   </span>
                   <span className="text-gray-400 text-xs">
-                    #{profile?.referral_code}
+                    #{profile?.referral}
                   </span>
                 </div>
               </div>

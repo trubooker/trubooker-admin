@@ -39,12 +39,12 @@ export const NavLinks: LinkItem[] = [
     icon: TbUserStar,
     link: "/agent",
   },
-  // {
-  //   id: 5,
-  //   title: "Finance",
-  //   icon: LuCircleDollarSign,
-  //   link: "/finance",
-  // },
+  {
+    id: 5,
+    title: "Finance",
+    icon: LuCircleDollarSign,
+    link: "/finance",
+  },
   // {
   //   id: 6,
   //   title: "Notification",

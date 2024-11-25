@@ -38,7 +38,8 @@ const ProfileVehicleDocs_Info = ({
                       Full name
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.first_name || profile?.last_name === null ? (
+                      {profile?.first_name === null ||
+                      profile?.last_name === null ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
                         <div className="flex gap-x-2">
@@ -96,7 +97,11 @@ const ProfileVehicleDocs_Info = ({
                       {profile?.dob === null ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.dob
+                        new Date(profile?.dob).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
                       )}{" "}
                     </span>
                   </div>
@@ -145,10 +150,10 @@ const ProfileVehicleDocs_Info = ({
                       Referral code
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.referral_code === null ? (
+                      {profile?.referral === null ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.referral_code
+                        profile?.referral
                       )}
                     </span>
                   </div>
