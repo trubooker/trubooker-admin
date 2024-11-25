@@ -51,43 +51,43 @@ export const NavLinks: LinkItem[] = [
   //   icon: MdOutlineNotificationsActive,
   //   link: "/notification",
   // },
-  // {
-  //   id: 7,
-  //   title: "Settings",
-  //   icon: IoSettingsOutline,
-  //   sublinks: [
-  //     {
-  //       id: 1,
-  //       title: "Basic Settings",
-  //       icon: CiFlag1,
-  //       link: "/settings",
-  //     },
-  //     {
-  //       id: 2,
-  //       title: "Roles & permission",
-  //       icon: CiFlag1,
-  //       link: "/settings/roles",
-  //     },
-  //     {
-  //       id: 3,
-  //       title: "Referral program",
-  //       icon: CiFlag1,
-  //       link: "/settings/referral-program",
-  //     },
-  //     {
-  //       id: 4,
-  //       title: "Platform settings",
-  //       icon: CiFlag1,
-  //       link: "/settings/platform",
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 8,
-  //   title: "Report",
-  //   icon: MdErrorOutline,
-  //   link: "/report",
-  // },
+  {
+    id: 7,
+    title: "Settings",
+    icon: IoSettingsOutline,
+    sublinks: [
+      {
+        id: 1,
+        title: "Basic Settings",
+        icon: CiFlag1,
+        link: "/settings",
+      },
+      {
+        id: 2,
+        title: "Roles & permission",
+        icon: CiFlag1,
+        link: "/settings/roles",
+      },
+      {
+        id: 3,
+        title: "Referral program",
+        icon: CiFlag1,
+        link: "/settings/referral-program",
+      },
+      // {
+      //   id: 4,
+      //   title: "Platform settings",
+      //   icon: CiFlag1,
+      //   link: "/settings/platform",
+      // },
+    ],
+  },
+  {
+    id: 8,
+    title: "Report",
+    icon: MdErrorOutline,
+    link: "/report",
+  },
 ];
 
 export interface Country {
@@ -864,12 +864,12 @@ export const Referall = [
 ];
 
 export const chartDataLine = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
 ];
 
 export const chartConfigLine = {
@@ -877,82 +877,85 @@ export const chartConfigLine = {
     label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
 };
 
-export const SettingsListData = [
+export const FinanceListData = [
   {
     id: "1",
-    name: "Thelma Ojo",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Wuse Abuja Bus Station",
-    arrival: "Kogi Bus station",
-    status: "completed",
+    status: "paid",
   },
   {
     id: "2",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Wuse Abuja Bus Station",
-    arrival: "Kogi Bus station",
-    status: "completed",
+    status: "paid",
   },
   {
     id: "3",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Wuse Abuja Bus Station",
-    arrival: "Kogi Bus station",
     status: "pending",
   },
   {
     id: "4",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Wuse Abuja Bus Station",
-    arrival: "Kogi Bus station",
-    status: "completed",
+    status: "paid",
   },
   {
     id: "5",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Kogi Bus station",
-    arrival: "Wuse Abuja Bus Station",
-    status: "completed",
+    status: "paid",
   },
   {
     id: "6",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Kogi Bus station",
-    arrival: "Wuse Abuja Bus Station",
-    status: "completed",
+    status: "failed",
   },
   {
     id: "7",
     name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     created_at: "Aug 29, 2024",
-    departure: "Kogi Bus station",
-    arrival: "Wuse Abuja Bus Station",
-    status: "completed",
+    status: "failed",
   },
 ];
 
