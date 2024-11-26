@@ -54,8 +54,13 @@ const Sidebar = () => {
                   <span>{navlink.title}</span>
                 </Link>
               ) : (
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value={`item-${index + 1}`} className=" my-2">
+                <Accordion
+                  type="single"
+                  collapsible
+                  defaultValue="item-1"
+                  className="w-full"
+                >
+                  <AccordionItem value="item-1" className=" my-2">
                     <AccordionTrigger>
                       <div className="flex items-center gap-3 rounded-lg px-3 text-xs lg:text-sm transition-all text-gray-400">
                         <navlink.icon aria-hidden="true" className="h-6 w-6" />

@@ -12,7 +12,6 @@ import Notification from "@/components/Notification";
 import { LineChartDisplay } from "@/components/charts/LineChart";
 import * as data from "@/constants";
 import { useGetDashboardQuery } from "@/redux/services/Slices/dashboardApiSlice";
-import { SettingsListData } from "@/constants";
 
 import {
   Table,

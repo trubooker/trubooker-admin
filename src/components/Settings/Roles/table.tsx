@@ -23,7 +23,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 
-export function PassengerList({ data: Data, isFetching, loading }: any) {
+export function Roles_Table({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
 
   const handleSuspend = (id: string) => {
@@ -40,12 +40,12 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
               {/* <TableHead className="text-left font-bold w-[200px]">
                 Id
               </TableHead> */}
-              <TableHead className="font-bold w-1/5">Name</TableHead>
+              <TableHead className="font-bold w-1/5">Username</TableHead>
               <TableHead className="font-bold w-1/5 text-center">
                 Email
               </TableHead>
               <TableHead className="font-bold w-1/5 text-center">
-                Phone Number
+                Roles
               </TableHead>
               <TableHead className="font-bold w-1/5 text-center">
                 Status
@@ -80,7 +80,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                       {data.email}
                     </TableCell>
                     <TableCell className=" py-5 text-center">
-                      {data.phone_number}
+                      {data.role}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (
@@ -141,19 +141,13 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
                     <TableHead className="text-left font-bold w-1/7">
-                      Name
+                      Username
                     </TableHead>
                     <TableHead className="font-bold w-1/7 text-center">
                       Email
                     </TableHead>
                     <TableHead className="font-bold w-1/7 text-center">
-                      Country
-                    </TableHead>
-                    <TableHead className="font-bold w-1/7 text-center">
-                      Courses Enrolled
-                    </TableHead>
-                    <TableHead className="font-bold w-1/7 text-center">
-                      Last Login
+                      Roles
                     </TableHead>
                     <TableHead className="font-bold w-1/7 text-center">
                       Status
