@@ -32,6 +32,8 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Modal } from "@/components/DualModal";
+import { TransactionDetails } from "@/components/finance/transactionDetails";
 
 const Finance = () => {
   const [page, setPage] = useState(1);
@@ -325,27 +327,21 @@ const Finance = () => {
                             )}
                           </TableCell>
                           <TableCell className=" py-5 text-center w-[100px]">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                  <span className="sr-only">Open menu</span>
-                                  <MoreHorizontal />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="center"
-                                className="cursor-pointer"
-                              >
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    router.push(`/agent/${data?.id}`)
-                                  }
-                                  className="w-full text-center cursor-pointer"
+                            <Modal
+                              trigger={
+                                <Button
+                                  variant={"outline"}
+                                  size={"sm"}
+                                  className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer font-medium"
                                 >
-                                  View
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                  View Details
+                                </Button>
+                              }
+                              title={"Transaction details"}
+                              description={""}
+                              content={<TransactionDetails />}
+                              classname="hidden"
+                            />
                           </TableCell>
                         </TableRow>
                       ))}

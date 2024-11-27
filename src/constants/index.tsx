@@ -82,12 +82,12 @@ export const NavLinks: LinkItem[] = [
       // },
     ],
   },
-  {
-    id: 8,
-    title: "Report",
-    icon: MdErrorOutline,
-    link: "/report",
-  },
+  // {
+  //   id: 8,
+  //   title: "Report",
+  //   icon: MdErrorOutline,
+  //   link: "/report",
+  // },
 ];
 
 export interface Country {

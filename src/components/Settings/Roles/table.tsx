@@ -50,9 +50,9 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
               <TableHead className="font-bold w-1/5 text-center">
                 Status
               </TableHead>
-              <TableHead className="text-center font-bold w-[200px]">
+              {/* <TableHead className="text-center font-bold w-[200px]">
                 Actions
-              </TableHead>
+              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,7 +97,7 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className=" py-5 text-center w-[100px]">
+                    {/* <TableCell className=" py-5 text-center w-[100px]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -126,7 +126,7 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </>

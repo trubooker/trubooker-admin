@@ -80,20 +80,6 @@ export function RolePermissions({ id }: any) {
     alert(JSON.stringify(data, null, 2));
   }
 
-  //   const handleSelectAll = (category: string, checked: boolean) => {
-  //     form.setValue(
-  //       "permissions",
-  //       form.getValues("permissions").map((perm) =>
-  //         perm.category === category
-  //           ? {
-  //               ...perm,
-  //               options: checked ? ["Read", "Write", "Create"] : [],
-  //             }
-  //           : perm
-  //       )
-  //     );
-  //   };
-
   const handleGlobalSelectAll = (checked: boolean) => {
     form.setValue(
       "permissions",
@@ -106,7 +92,10 @@ export function RolePermissions({ id }: any) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 lg:space-y-6 max-w-screen lg:max-w-full"
+      >
         {/* Global Select All */}
         <div className="flex justify-between items-center">
           <FormLabel className="font-bold">Administrator Access</FormLabel>
@@ -125,9 +114,9 @@ export function RolePermissions({ id }: any) {
           <>
             <div
               key={perm.category}
-              className=" grid grid-cols-2  items-center"
+              className=" lg:flex lg:justify-between items-center"
             >
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between lg:w-[40%] mb-3 lg:mb-0 items-center">
                 <FormLabel>{perm.category}</FormLabel>
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -177,23 +166,14 @@ export function RolePermissions({ id }: any) {
         ))}
 
         {/* Submit Button */}
-        <div className="flex justify-end space-x-4">
+        <div className="w-full">
           <Button
             type="submit"
             variant="outline"
-            className="bg-[--primary] hover:bg-[--primary-btn] text-white hover:text-white"
+            className="bg-[--primary] hover:bg-[--primary-btn] text-white hover:text-white w-full"
           >
             Submit
           </Button>
-          <DialogClose>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => form.reset()}
-            >
-              Cancel
-            </Button>
-          </DialogClose>
         </div>
       </form>
     </Form>

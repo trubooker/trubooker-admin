@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FaPlus } from "react-icons/fa6";
 import RolesTable from "@/components/Settings/Roles/RolesTable";
 import { roles } from "@/constants";
-import { Modal } from "@/components/Modal";
+import { Modal } from "@/components/DualModal";
 import { RolePermissions } from "@/components/RolePermissions";
 
 const Roles = () => {
@@ -31,7 +31,7 @@ const Roles = () => {
         </span>
       </div>
       <div className="w-full mb-5 lg:mb-8">
-        <div className="grid grid-rows-1 lg:grid-rows-none gap-4 lg:grid-cols-3">
+        <div className="grid grid-rows-1 lg:grid-rows-none gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {roles?.map((tot: any, index: number) => (
             <Card key={index} className={`w-full border-none my-auto bg-white`}>
               <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center">

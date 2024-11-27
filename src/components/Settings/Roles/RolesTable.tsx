@@ -40,7 +40,8 @@ const RolesTable = () => {
     if (SettingsRoleListData) {
       setFilteredStudents(SettingsRoleListData);
     }
-  }, [SettingsRoleListData]);
+  }, []);
+  // }, [SettingsRoleListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -81,9 +82,9 @@ const RolesTable = () => {
                     <TableHead className="font-bold w-1/6 text-center">
                       Status
                     </TableHead>
-                    <TableHead className="text-center font-bold w-1/6">
+                    {/* <TableHead className="text-center font-bold w-1/6">
                       Actions
-                    </TableHead>
+                    </TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
