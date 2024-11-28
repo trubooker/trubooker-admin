@@ -71,7 +71,7 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="w-full flex flex-col justify-start text-left  xl:flex-row gap-x-2 gap-y-1 text-gray-500">
+                        <span className="w-full flex justify-start text-left  flex-row gap-x-2 gap-y-1 text-gray-500">
                           <span>{data.first_name} </span>
                           <span>{data.last_name} </span>
                         </span>

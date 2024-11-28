@@ -73,7 +73,7 @@ export const Modal: FC<Props> = ({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <ScrollArea className="px-5 pt-2 h-[500px]">
+        <ScrollArea className="px-5 pt-2 max-h-[500px]">
           {content}
           <ScrollBar orientation="vertical" />
         </ScrollArea>
