@@ -34,26 +34,36 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/DualModal";
 import { TransactionDetails } from "@/components/finance/transactionDetails";
+import {
+  useGetFinancialReportQuery,
+  useGetTransactionHistoryQuery,
+} from "@/redux/services/Slices/financeApiSlice";
 
 const Finance = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
-  // const {
-  //   data: info,
-  //   isLoading: loading,
-  //   isFetching,
-  // } = useGetDashboardQuery({ page, search : searchQuery });
+  const {
+    data: report,
+    isLoading: reportLoading,
+    isFetching: reportFetching,
+  } = useGetFinancialReportQuery(null);
 
-  const loading = false;
-  const isFetching = true;
-  const info: any = [];
-  const totalPages = info?.data?.active_trips?.last_page;
-  const userData = info?.data?.active_trips?.data || [];
-  const revenue = info?.data;
+  const {
+    data: history,
+    isLoading: historyLoading,
+    isFetching: historyFetching,
+  } = useGetTransactionHistoryQuery({ page, search: searchQuery });
+
+  console.log("history: ", history);
+  console.log("report: ", report);
+
+  const totalPages = history?.data?.active_trips?.last_page;
+  const userData = history?.data?.active_trips?.data || [];
+  const revenue = history?.data;
   const onPageChange = (pageNumber: number) => {
-    if (!isFetching && pageNumber !== page) {
+    if (!historyFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
@@ -102,7 +112,7 @@ const Finance = () => {
                       <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
                         <div className="flex gap-x-3 text-white items-center">
                           <span className="flex gap-x-2 items-center">
-                            {loading ? (
+                            {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
@@ -124,7 +134,7 @@ const Finance = () => {
                       <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
                         <div className="flex gap-x-3 text-white items-center">
                           <span className="flex gap-x-2 items-center">
-                            {loading ? (
+                            {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp end={Number(revenue?.total_drivers)} />
@@ -143,7 +153,7 @@ const Finance = () => {
                       <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
                         <div className="flex gap-x-3 text-white items-center">
                           <span className="flex gap-x-2 items-center">
-                            {loading ? (
+                            {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp end={Number(revenue?.total_agents)} />
@@ -162,7 +172,7 @@ const Finance = () => {
                       <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
                         <div className="flex gap-x-3 text-white items-center">
                           <span className="flex gap-x-2 items-center">
-                            {loading ? (
+                            {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp end={Number(revenue?.total_drivers)} />
@@ -209,7 +219,7 @@ const Finance = () => {
               />
             </div>
             <ScrollArea className="w-full">
-              {loading ? (
+              {historyLoading ? (
                 <>
                   <Table className=" min-w-[700px] py-2">
                     <TableHeader>

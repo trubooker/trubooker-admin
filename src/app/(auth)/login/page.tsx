@@ -58,15 +58,21 @@ export default function LoginComponent() {
   const onSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
     setLoading(true);
     try {
+      setEmailError("");
+      setPasswordError("");
       const response = await axios.post(`/api/login`, values);
-
       if (response.status === 200) {
         form.setValue("email", "");
         form.setValue("password", "");
         setLoading(false);
-        router.push("/dashboard");
+        toast.success("Successfully Logged In");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
       }
     } catch (error: any) {
+      setEmailError("");
+      setPasswordError("");
       setLoading(false);
       if (error?.status === 400) {
         setEmailError(error.response?.data?.message?.email[0]);

@@ -71,15 +71,16 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                          <span>{data.name} </span>
+                        <span className="w-full flex flex-col justify-start text-left  xl:flex-row gap-x-2 gap-y-1 text-gray-500">
+                          <span>{data.first_name} </span>
+                          <span>{data.last_name} </span>
                         </span>
                       </div>
                     </TableCell>
                     <TableCell className=" py-5 text-center text-[--primary]">
                       {data.email}
                     </TableCell>
-                    <TableCell className=" py-5 text-center">
+                    <TableCell className="capitalize py-5 text-center">
                       {data.role}
                     </TableCell>
                     <TableCell>

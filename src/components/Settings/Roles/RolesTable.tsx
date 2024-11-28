@@ -14,34 +14,36 @@ import debounce from "lodash/debounce";
 import { Skeleton } from "../../ui/skeleton";
 import Pagination from "../../Pagination";
 import { Roles_Table } from "./table";
-import { SettingsRoleListData } from "@/constants";
+import { useGetUsersByRoleQuery } from "@/redux/services/Slices/settings/rolesApiSlice";
 
 const RolesTable = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  //   const {
-  //     isLoading: loading,
-  //     data: userData,
-  //     isFetching,
-  //   } = useGetPassengersQuery({ page, search: searchQuery });
-  const userData: any = {};
-  const isFetching: boolean = false;
-  const loading: boolean = false;
-  const totalPages = userData?.meta?.last_page;
+  const {
+    data,
+    isLoading: userByRoleLoading,
+    isFetching: userByRoleFetching,
+  } = useGetUsersByRoleQuery({ page, search: searchQuery });
+
+  const usersByRole = data?.data;
+  console.log("UserByRole: ", usersByRole);
+
+  const totalPages = usersByRole?.data?.active_trips?.last_page;
+
   const onPageChange = (pageNumber: number) => {
-    if (!isFetching && pageNumber !== page) {
+    if (!userByRoleFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
-  const [filteredStudents, setFilteredStudents] =
-    useState(SettingsRoleListData);
+
+  const [filteredStudents, setFilteredStudents] = useState(usersByRole);
 
   useEffect(() => {
-    if (SettingsRoleListData) {
-      setFilteredStudents(SettingsRoleListData);
+    if (usersByRole) {
+      setFilteredStudents(usersByRole);
     }
-  }, []);
-  // }, [SettingsRoleListData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usersByRole]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -64,7 +66,7 @@ const RolesTable = () => {
             onSearch={handleSearch}
             classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
           />
-          {isFetching || loading ? (
+          {userByRoleFetching || userByRoleLoading ? (
             <>
               <Table className="">
                 <TableHeader>
@@ -109,8 +111,8 @@ const RolesTable = () => {
           ) : (
             <Roles_Table
               data={filteredStudents}
-              isFetching={isFetching}
-              loading={loading}
+              isFetching={userByRoleFetching}
+              loading={userByRoleLoading}
             />
           )}
           {totalPages > 1 && (
