@@ -52,27 +52,27 @@ const ViewDriver = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
-                <div className="flex items-center gap-x-5">
-                  <span className="text-xl font-extrabold">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
+                  <span className="text-xl font-extrabold  text-start">
                     {profile?.first_name} {profile?.last_name}
                   </span>
-                  {/* <>
+                  <>
                     {profile?.status === "active" ? (
-                      <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                      <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                         <span className="font-semibold text-xs">
                           {profile?.status}
                         </span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
+                      <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                         <span className="font-semibold text-xs">
                           {profile?.status}
                         </span>
                       </div>
                     )}
-                  </> */}
+                  </>
                 </div>
                 <div className="lg:mt-3 mt-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">

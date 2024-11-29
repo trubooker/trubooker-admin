@@ -81,7 +81,7 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
                       {data.email}
                     </TableCell>
                     <TableCell className=" py-5 text-center">
-                      {data.phone}
+                      {data.phone_number}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (

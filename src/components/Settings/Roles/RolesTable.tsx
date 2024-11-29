@@ -25,10 +25,10 @@ const RolesTable = () => {
     isFetching: userByRoleFetching,
   } = useGetUsersByRoleQuery({ page, search: searchQuery });
 
-  const usersByRole = data?.data;
+  const usersByRole = data?.data?.data;
   console.log("UserByRole: ", usersByRole);
 
-  const totalPages = usersByRole?.data?.active_trips?.last_page;
+  const totalPages = data?.data?.last_page;
 
   const onPageChange = (pageNumber: number) => {
     if (!userByRoleFetching && pageNumber !== page) {

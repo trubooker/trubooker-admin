@@ -218,7 +218,7 @@ const Dashboard = () => {
                       // onClick={() => handleSort("departure")}
                       className="font-bold w-1/4 text-center"
                     >
-                      <span className="flex gap-x-3 items-center cursor-pointer justify-center">
+                      <span className="flex gap-x-3 items-center cursor-pointer justify-left">
                         Departure
                         {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
@@ -234,7 +234,7 @@ const Dashboard = () => {
                       // onClick={() => handleSort("arrival")}
                       className="font-bold w-1/4 text-center"
                     >
-                      <span className="flex gap-x-3 items-center cursor-pointer justify-center">
+                      <span className="flex gap-x-3 items-center cursor-pointer justify-left">
                         Arrival
                         {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
@@ -272,12 +272,27 @@ const Dashboard = () => {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className=" py-5 w-1/5 text-[--primary]">
-                        {data.departure_location || "Kogi"}
+
+                      <TableCell className="w-1/7 py-5 text-left">
+                        <div className="flex flex-col">
+                          <span> {data.departure_location || "Kogi"}</span>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Date:</span>{" "}
+                            {data.departure_date || "2022-01-01"}
+                          </small>
+                        </div>
                       </TableCell>
-                      <TableCell className=" py-5 w-1/5">
-                        {data.arrival_location || "Benin City"}
+
+                      <TableCell className="w-1/7 py-5 text-left ">
+                        <div className="flex flex-col">
+                          <span> {data.arrival_location || "Benin City"}</span>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Date:</span>{" "}
+                            {data.arrival_date}, {data?.arrival_time}
+                          </small>
+                        </div>
                       </TableCell>
+
                       <TableCell className=" py-5">
                         {data.status === "active" ? (
                           <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">

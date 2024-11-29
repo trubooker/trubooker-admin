@@ -38,20 +38,17 @@ export function DriverTable({
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
               <TableHead className="font-bold w-1/7">Departure</TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Departure Date
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
+
+              <TableHead className="font-bold w-1/7 text-left">
                 Destination
               </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Arrival Date
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Status
-              </TableHead>
+
               <TableHead className="font-bold w-1/7 text-center">
                 Amount paid
+              </TableHead>
+
+              <TableHead className="font-bold w-1/7 text-center">
+                Status
               </TableHead>
               <TableHead className="text-center font-bold w-1/7">
                 Actions
@@ -60,80 +57,88 @@ export function DriverTable({
           </TableHeader>
           <TableBody>
             <>
-              <>
-                {DriverTableData?.map((data: any) => (
-                  <TableRow
-                    key={data.trip_id}
-                    className="text-xs lg:text-sm w-full"
-                  >
-                    <TableCell className="w-1/7 py-5 text-left">
-                      {data.departure_location}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure_date}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.arrival_location}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.arrival_date}
-                    </TableCell>
-                    <TableCell>
-                      {data.status === "active" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                          <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                          <span className="font-semibold text-xs">Active</span>
-                        </div>
-                      ) : data.status === "completed" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
-                          <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Completed
-                          </span>
-                        </div>
-                      ) : data.status === "upcoming" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                          <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Upcoming
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                          <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Cancelled
-                          </span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.amount}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center w-[100px]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="center"
-                          className="cursor-pointer"
+              {DriverTableData?.map((data: any) => (
+                <TableRow
+                  key={data.trip_id}
+                  className="text-xs lg:text-sm w-full justify-start"
+                >
+                  {/* <TableCell># {data?.trip_id}</TableCell> */}
+                  <TableCell className="w-1/7 py-5 text-left ">
+                    <div className="flex flex-col">
+                      <span> {data.departure_location}</span>
+                      <small className="mt-1 font-light flex gap-x-2">
+                        <span className="font-normal">Date:</span>{" "}
+                        {data.departure_date}, {data?.departure_time}
+                      </small>
+                    </div>
+                  </TableCell>
+                  <TableCell className="w-1/7 py-5 text-left ">
+                    <div className="flex flex-col">
+                      <span> {data.arrival_location?.address}</span>
+                      <small className="mt-1 font-light flex gap-x-2">
+                        <span className="font-normal">Date:</span>{" "}
+                        {data.arrival_date}, {data?.arrival_time}
+                      </small>
+                      <small className="mt-1 font-light flex gap-x-2">
+                        <span className="font-normal">Latitude:</span>{" "}
+                        {data.arrival_location?.latitude}
+                      </small>
+                      <small className="mt-1 font-light flex gap-x-2">
+                        <span className="font-normal">Longitude:</span>{" "}
+                        {data.arrival_location?.longitude}
+                      </small>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="w-1/7 py-5 text-center">
+                    ₦ {data.amount}
+                  </TableCell>
+                  <TableCell>
+                    {data.status === "active" ? (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                        <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                        <span className="font-semibold text-xs">Active</span>
+                      </div>
+                    ) : data.status === "completed" ? (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
+                        <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
+                        <span className="font-semibold text-xs">Completed</span>
+                      </div>
+                    ) : data.status === "upcoming" ? (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                        <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                        <span className="font-semibold text-xs">Upcoming</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                        <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                        <span className="font-semibold text-xs">Cancelled</span>
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="w-1/7 py-5 text-center w-[100px]">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="center"
+                        className="cursor-pointer"
+                      >
+                        <DropdownMenuItem
+                          className="w-full text-center cursor-pointer"
+                          onClick={() => handleSuspend(data?.trip_id)}
                         >
-                          <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.trip_id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </>
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             </>
           </TableBody>
         </Table>

@@ -404,26 +404,22 @@ const ProfileVehicleDocs_Info = ({
                     <div className="my-6">
                       <div className="flex w-full items-start space-x-4">
                         <Avatar className="lg:w-14 h-10 lg:h-14 w-10">
-                          <AvatarImage
-                            src={
-                              "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load"
-                            }
-                          />
+                          <AvatarImage src={actions?.profile_picture} />
                           <AvatarFallback>
-                            <IoPersonOutline className="w-14 h-14" />
+                            <IoPersonOutline className="w-5 h-5" />
                           </AvatarFallback>
                         </Avatar>
                         <div className="">
                           <p className="text-gray-800 font-bold text-sm">
-                            {actions.name}
+                            {actions?.passenger}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          {/* <p className="text-xs text-gray-500">
                             {actions.email}
-                          </p>
+                          </p> */}
                           <span className="flex items-center gap-x-3">
-                            {actions.rating}.0{" "}
+                            {actions?.rating}.0{" "}
                             <StarRatings
-                              rating={actions.rating}
+                              rating={actions?.rating}
                               numberOfStars={5}
                               name="rating"
                               starRatedColor="#F5A623"
@@ -434,7 +430,7 @@ const ProfileVehicleDocs_Info = ({
                           </span>
                         </div>
                       </div>
-                      <div className="text-sm mt-3">{actions.message}</div>
+                      <div className="text-sm mt-3">{actions?.comment}</div>
                     </div>
                   </div>
                 ))}

@@ -164,14 +164,6 @@ export default function LoginComponent() {
                             </button>
                           </div>
                         </FormControl>
-                        <div className="flex items-center justify-end">
-                          <Link
-                            href="/forgot-password"
-                            className="ml-auto inline-block text-gray-500 text-sm"
-                          >
-                            Forgot your password?
-                          </Link>
-                        </div>
                         {passwordError && (
                           <FormMessage>{passwordError}</FormMessage>
                         )}

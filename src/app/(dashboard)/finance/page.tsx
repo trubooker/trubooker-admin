@@ -20,7 +20,6 @@ import { IoPersonOutline } from "react-icons/io5";
 import Pagination from "@/components/Pagination";
 import Notifications from "@/components/Notification";
 import { BarCharts } from "@/components/charts/BarChart";
-import { FinanceListData } from "@/constants";
 import debounce from "lodash/debounce";
 import Search from "@/components/SearchBar";
 import {
@@ -38,6 +37,8 @@ import {
   useGetFinancialReportQuery,
   useGetTransactionHistoryQuery,
 } from "@/redux/services/Slices/financeApiSlice";
+import { Span } from "next/dist/trace";
+import Image from "next/image";
 
 const Finance = () => {
   const [page, setPage] = useState(1);
@@ -59,23 +60,23 @@ const Finance = () => {
   console.log("history: ", history);
   console.log("report: ", report);
 
-  const totalPages = history?.data?.active_trips?.last_page;
-  const userData = history?.data?.active_trips?.data || [];
-  const revenue = history?.data;
+  const totalPages = history?.meta?.last_page;
+  const revenue = report?.data;
+  const expense = history?.data;
   const onPageChange = (pageNumber: number) => {
     if (!historyFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
 
-  const [filteredStudents, setFilteredStudents] = useState(FinanceListData);
+  const [filtered, setFiltered] = useState(expense);
 
   useEffect(() => {
-    if (FinanceListData) {
-      setFilteredStudents(FinanceListData);
+    if (expense) {
+      setFiltered(expense);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [FinanceListData]);
+  }, [expense]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -115,10 +116,14 @@ const Finance = () => {
                             {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
-                              <CountUp
-                                prefix="₦ "
-                                end={Number(revenue?.total_passengers)}
-                              />
+                              revenue?.total_balance?.map((info: any) => (
+                                <>
+                                  <span>{info?.currency}</span>{" "}
+                                  <span>
+                                    <CountUp end={Number(info?.balance)} />
+                                  </span>
+                                </>
+                              ))
                             )}
                           </span>
                         </div>
@@ -137,7 +142,11 @@ const Finance = () => {
                             {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
-                              <CountUp end={Number(revenue?.total_drivers)} />
+                              <CountUp
+                                end={Number(
+                                  revenue?.total_agent_pending_withdrawals
+                                )}
+                              />
                             )}
                           </span>
                         </div>
@@ -156,31 +165,16 @@ const Finance = () => {
                             {reportLoading ? (
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
-                              <CountUp end={Number(revenue?.total_agents)} />
+                              <CountUp
+                                end={Number(
+                                  revenue?.total_driver_pending_withdrawals
+                                )}
+                              />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending
-                        </span>
-                      </CardContent>
-                    </Card>
-
-                    <Card
-                      className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
-                    >
-                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
-                        <div className="flex gap-x-3 text-white items-center">
-                          <span className="flex gap-x-2 items-center">
-                            {reportLoading ? (
-                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
-                            ) : (
-                              <CountUp end={Number(revenue?.total_drivers)} />
-                            )}
-                          </span>
-                        </div>
-                        <span className="text-sm text-white font-normal">
-                          Total Drivers
+                          Pending Drivers Payout
                         </span>
                       </CardContent>
                     </Card>
@@ -261,104 +255,121 @@ const Finance = () => {
                   </Table>
                 </>
               ) : (
-                <ScrollArea>
-                  <Table className=" min-w-[700px] py-2">
-                    <TableHeader>
-                      <TableRow className="text-xs lg:text-sm text-center">
-                        <TableHead className="font-bold w-1/4 text-left">
-                          Date
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-left">
-                          Username
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-center">
-                          Earnings
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="w-1/4 font-bold text-center">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredStudents?.map((data: any) => (
-                        <TableRow
-                          key={data.id}
-                          className="text-xs text-center lg:text-sm"
-                        >
-                          <TableCell className=" py-5 w-1/5 text-left">
-                            {data.created_at}
-                          </TableCell>
-                          <TableCell className=" py-5 font-medium text-left me-4">
-                            <div className="w-full flex gap-x-3 items-center">
-                              <Avatar className="w-8 h-8">
-                                <AvatarImage src={data?.profile_picture} />
-                                <AvatarFallback>
-                                  <IoPersonOutline />
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
-                                <span className="font-semibold">
-                                  {data.name}
-                                </span>
-                                <span className="font-medium text-xs capitalize">
-                                  {data.role}
-                                </span>
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className=" py-5 w-1/5">
-                            {data.earnings}
-                          </TableCell>
-                          <TableCell className="py-5">
-                            {data.status === "paid" ? (
-                              <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                                <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                <span className="font-semibold text-xs">
-                                  Paid
-                                </span>
-                              </div>
-                            ) : data.status === "pending" ? (
-                              <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                <span className="font-semibold text-xs">
-                                  Pending
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                <span className="font-semibold text-xs">
-                                  Failed
-                                </span>
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className=" py-5 text-center w-[100px]">
-                            <Modal
-                              trigger={
-                                <Button
-                                  variant={"outline"}
-                                  size={"sm"}
-                                  className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer font-medium"
-                                >
-                                  View Details
-                                </Button>
-                              }
-                              title={"Transaction details"}
-                              description={""}
-                              content={<TransactionDetails />}
-                              classname="hidden"
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                <>
+                  {filtered?.length > 0 ? (
+                    <ScrollArea>
+                      <Table className=" min-w-[700px] py-2">
+                        <TableHeader>
+                          <TableRow className="text-xs lg:text-sm text-center">
+                            <TableHead className="font-bold w-1/4 text-left">
+                              Date
+                            </TableHead>
+                            <TableHead className="font-bold w-1/4 text-left">
+                              Username
+                            </TableHead>
+                            <TableHead className="font-bold w-1/4 text-center">
+                              Earnings
+                            </TableHead>
+                            <TableHead className="font-bold w-1/4 text-center">
+                              Status
+                            </TableHead>
+                            <TableHead className="w-1/4 font-bold text-center">
+                              Actions
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filtered?.map((data: any) => (
+                            <TableRow
+                              key={data.id}
+                              className="text-xs text-center lg:text-sm"
+                            >
+                              <TableCell className=" py-5 w-1/5 text-left">
+                                {data.created_at}
+                              </TableCell>
+                              <TableCell className=" py-5 font-medium text-left me-4">
+                                <div className="w-full flex gap-x-3 items-center">
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarImage src={data?.profile_picture} />
+                                    <AvatarFallback>
+                                      <IoPersonOutline />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
+                                    <span className="font-semibold">
+                                      {data.name}
+                                    </span>
+                                    <span className="font-medium text-xs capitalize">
+                                      {data.role}
+                                    </span>
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className=" py-5 w-1/5">
+                                {data.earnings}
+                              </TableCell>
+                              <TableCell className="py-5">
+                                {data.status === "paid" ? (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                                    <span className="font-semibold text-xs">
+                                      Paid
+                                    </span>
+                                  </div>
+                                ) : data.status === "pending" ? (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                    <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                                    <span className="font-semibold text-xs">
+                                      Pending
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                    <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                                    <span className="font-semibold text-xs">
+                                      Failed
+                                    </span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell className=" py-5 text-center w-[100px]">
+                                <Modal
+                                  trigger={
+                                    <Button
+                                      variant={"outline"}
+                                      size={"sm"}
+                                      className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer font-medium"
+                                    >
+                                      View Details
+                                    </Button>
+                                  }
+                                  title={"Transaction details"}
+                                  description={""}
+                                  content={<TransactionDetails />}
+                                  classname="hidden"
+                                />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
+                  ) : (
+                    <div className="flex items-center w-full h-[357px] flex-col justify-center">
+                      <Image
+                        src={"/nodata.svg"}
+                        alt=""
+                        width={200}
+                        height={200}
+                        className="object-cover me-5"
+                      />
+                      <h1 className="mt-8 text-lg text-center font-semibold">
+                        No Data
+                      </h1>
+                    </div>
+                  )}
+                </>
               )}
               <ScrollBar orientation="horizontal" />
             </ScrollArea>

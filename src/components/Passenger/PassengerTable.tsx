@@ -45,14 +45,8 @@ export function PassengerTable({
                 Trip Id
               </TableHead> */}
               <TableHead className="font-bold w-1/7">Departure</TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Departure Date
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
+              <TableHead className="font-bold w-1/7 text-left">
                 Destination
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Arrival Date
               </TableHead>
               <TableHead className="font-bold w-1/7 text-center">
                 Status
@@ -69,22 +63,30 @@ export function PassengerTable({
             <>
               <>
                 {PassengerTableData?.map((data: any) => (
-                  <TableRow key={data.trip_id} className="text-xs lg:text-sm w-full">
-                    {/* <TableCell className="py-5 font-medium w-1/7 text-left">
-                      {data.id}
-                    </TableCell> */}
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure_location}
+                  <TableRow
+                    key={data.trip_id}
+                    className="text-xs lg:text-sm w-full"
+                  >
+                    <TableCell className="w-1/7 py-5 text-left">
+                      <div className="flex flex-col">
+                        <span> {data.departure_location}</span>
+                        <small className="mt-1 font-light flex gap-x-2">
+                          <span className="font-normal">Date:</span>{" "}
+                          {data.departure_date}
+                        </small>
+                      </div>
                     </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure_date}
+
+                    <TableCell className="w-1/7 py-5 text-left ">
+                      <div className="flex flex-col">
+                        <span> {data.arrival_location || "Benin City"}</span>
+                        <small className="mt-1 font-light flex gap-x-2">
+                          <span className="font-normal">Date:</span>{" "}
+                          {data.arrival_date}, {data?.arrival_time}
+                        </small>
+                      </div>
                     </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.arrival_location}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.arrival_date}
-                    </TableCell>
+
                     <TableCell>
                       {data.status === "active" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
