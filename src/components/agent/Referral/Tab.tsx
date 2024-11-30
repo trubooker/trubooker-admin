@@ -21,7 +21,7 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {PassengerTableData?.length >= 0 ? (
+      {PassengerTableData?.length > 0 ? (
         <Table className=" min-w-[700px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
@@ -136,7 +136,7 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
               </Table>
             </>
           ) : (
-            <div className="flex items-center w-full h-[400px] flex-col justify-center">
+            <div className="flex items-center w-full h-[357px] flex-col justify-center">
               <Image
                 src={"/nodata.svg"}
                 alt=""

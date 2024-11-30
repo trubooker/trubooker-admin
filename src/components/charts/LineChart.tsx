@@ -22,13 +22,15 @@ import CountUp from "react-countup";
 
 interface Props {
   chartConfig: ChartConfig;
-  revenue: {
-    graph_data: any[];
-    total_revenue: number;
-  };
+  graph_data: any[];
+  total_revenue: number;
 }
 
-export const LineChartDisplay: FC<Props> = ({ chartConfig, revenue }) => {
+export const LineChartDisplay: FC<Props> = ({
+  chartConfig,
+  total_revenue,
+  graph_data,
+}) => {
   return (
     <Card>
       <CardHeader>
@@ -40,16 +42,16 @@ export const LineChartDisplay: FC<Props> = ({ chartConfig, revenue }) => {
             </CardDescription>
           </div>
           <span className="text-xl">
-            <CountUp end={revenue?.total_revenue} prefix="$ " />
+            <CountUp end={total_revenue} prefix="₦ " />
           </span>
         </div>
       </CardHeader>
       <CardContent>
         <ChartContainer className="p-0 m-0" config={chartConfig}>
           <AreaChart
-            className="m-0 p-0"
+            className="m-0 p-0 h-[400px]"
             accessibilityLayer
-            data={revenue?.graph_data}
+            data={graph_data}
             margin={{
               left: 12,
               right: 12,

@@ -51,29 +51,29 @@ const ViewAgent = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
-                <div className="flex items-center gap-x-5">
-                  <span className="text-xl font-extrabold">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
+                  <span className="text-xl font-extrabold  text-start">
                     {profile?.first_name} {profile?.last_name}
                   </span>
-                  {/* <>
+                  <>
                     {profile?.status === "active" ? (
-                      <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                      <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                         <span className="font-semibold text-xs">
                           {profile?.status}
                         </span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
+                      <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                         <span className="font-semibold text-xs">
                           {profile?.status}
                         </span>
                       </div>
                     )}
-                  </> */}
+                  </>
                 </div>
-                <div className="lg:mt-3 mt-1 flex flex-col">
+                <div className="lg:mt-3 mt-1 ms-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
                     {profile?.role || profile?.type}
                   </span>
@@ -86,9 +86,9 @@ const ViewAgent = () => {
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave /> NGN{" "}
-                {profile.current_balance === null
+                {profile?.current_balance === null
                   ? "0.00"
-                  : profile.current_balance}
+                  : profile?.current_balance}
               </div>
               <Button
                 variant={"outline"}
@@ -107,9 +107,9 @@ const ViewAgent = () => {
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave /> NGN{" "}
-              {profile.current_balance === null
+              {profile?.current_balance === null
                 ? "0.00"
-                : profile.current_balance}
+                : profile?.current_balance}
             </div>
           </div>
           <AgentInfo

@@ -51,37 +51,37 @@ export const NavLinks: LinkItem[] = [
   //   icon: MdOutlineNotificationsActive,
   //   link: "/notification",
   // },
-  // {
-  //   id: 7,
-  //   title: "Settings",
-  //   icon: IoSettingsOutline,
-  //   sublinks: [
-  //     {
-  //       id: 1,
-  //       title: "Basic Settings",
-  //       icon: CiFlag1,
-  //       link: "/settings",
-  //     },
-  //     {
-  //       id: 2,
-  //       title: "Roles & permission",
-  //       icon: CiFlag1,
-  //       link: "/settings/roles",
-  //     },
-  //     {
-  //       id: 3,
-  //       title: "Referral program",
-  //       icon: CiFlag1,
-  //       link: "/settings/referral-program",
-  //     },
-  //     {
-  //       id: 4,
-  //       title: "Platform settings",
-  //       icon: CiFlag1,
-  //       link: "/settings/platform",
-  //     },
-  //   ],
-  // },
+  {
+    id: 7,
+    title: "Settings",
+    icon: IoSettingsOutline,
+    sublinks: [
+      {
+        id: 1,
+        title: "Basic Settings",
+        icon: CiFlag1,
+        link: "/settings",
+      },
+      {
+        id: 2,
+        title: "Roles & permission",
+        icon: CiFlag1,
+        link: "/settings/roles",
+      },
+      {
+        id: 3,
+        title: "Referral program",
+        icon: CiFlag1,
+        link: "/settings/referral-program",
+      },
+      // {
+      //   id: 4,
+      //   title: "Platform settings",
+      //   icon: CiFlag1,
+      //   link: "/settings/platform",
+      // },
+    ],
+  },
   // {
   //   id: 8,
   //   title: "Report",
@@ -864,12 +864,12 @@ export const Referall = [
 ];
 
 export const chartDataLine = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
 ];
 
 export const chartConfigLine = {
@@ -877,11 +877,87 @@ export const chartConfigLine = {
     label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
 };
+
+export const FinanceListData = [
+  {
+    id: "1",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "paid",
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "paid",
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "pending",
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "paid",
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "paid",
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "failed",
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    email: "oliviarh@gmail.com",
+    role: "agent",
+    earnings: 5000,
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    created_at: "Aug 29, 2024",
+    status: "failed",
+  },
+];
 
 export const SettingsListData = [
   {
@@ -956,6 +1032,79 @@ export const SettingsListData = [
   },
 ];
 
+export const ReferralProgramListData = [
+  {
+    id: "1",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+
+    referrals: 8,
+    target_referrals: 10,
+    coupon: 5000,
+  },
+];
+
 export const PassengerListData = [
   {
     id: "1",
@@ -1017,6 +1166,210 @@ export const PassengerListData = [
     profile_picture:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     phone: "080-070-5069",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+];
+
+export const roles = [
+  {
+    id: "1",
+    users: 5,
+    role: "Manager",
+    images: [
+      {
+        profile_image:
+          "https://images.pexels.com/photos/159613/ghettoblaster-radio-recorder-boombox-old-school-159613.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1573424/pexels-photo-1573424.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1762578/pexels-photo-1762578.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1045298/pexels-photo-1045298.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1860668/pexels-photo-1860668.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+    ],
+  },
+  {
+    id: "2",
+    users: 5,
+    role: "Super admin",
+    images: [
+      {
+        profile_image:
+          "https://images.pexels.com/photos/159613/ghettoblaster-radio-recorder-boombox-old-school-159613.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1573424/pexels-photo-1573424.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1762578/pexels-photo-1762578.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1045298/pexels-photo-1045298.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1860668/pexels-photo-1860668.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+    ],
+  },
+  {
+    id: "3",
+    users: 5,
+    role: "Finance",
+    images: [
+      {
+        profile_image:
+          "https://images.pexels.com/photos/159613/ghettoblaster-radio-recorder-boombox-old-school-159613.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1573424/pexels-photo-1573424.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1762578/pexels-photo-1762578.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1045298/pexels-photo-1045298.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1860668/pexels-photo-1860668.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+    ],
+  },
+  {
+    id: "5",
+    users: 5,
+    role: "Trip manager",
+    images: [
+      {
+        profile_image:
+          "https://images.pexels.com/photos/159613/ghettoblaster-radio-recorder-boombox-old-school-159613.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1573424/pexels-photo-1573424.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1762578/pexels-photo-1762578.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1045298/pexels-photo-1045298.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1860668/pexels-photo-1860668.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+    ],
+  },
+  {
+    id: "7",
+    users: 5,
+    role: "Support",
+    images: [
+      {
+        profile_image:
+          "https://images.pexels.com/photos/159613/ghettoblaster-radio-recorder-boombox-old-school-159613.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1573424/pexels-photo-1573424.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1762578/pexels-photo-1762578.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1045298/pexels-photo-1045298.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+      {
+        profile_image:
+          "https://images.pexels.com/photos/1860668/pexels-photo-1860668.jpeg?auto=compress&cs=tinysrgb&w=400",
+      },
+    ],
+  },
+];
+
+export const SettingsRoleListData = [
+  {
+    id: "1",
+    name: "Thelma Ojo",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Manager",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Super admin",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Finance",
+    email: "trubooker@gmail.com",
+    status: "pending",
+  },
+  {
+    id: "4",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Super admin",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Trip manager",
+    email: "trubooker@gmail.com",
+    status: "suspended",
+  },
+  {
+    id: "6",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Super admin",
+    email: "trubooker@gmail.com",
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Ifeoma Nduka",
+    profile_picture:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    role: "Support",
     email: "trubooker@gmail.com",
     status: "active",
   },

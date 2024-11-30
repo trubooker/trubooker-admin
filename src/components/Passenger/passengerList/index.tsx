@@ -17,7 +17,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { Separator } from "../../ui/separator";
 import { Button } from "../../ui/button";
 import { MoreHorizontal } from "lucide-react";

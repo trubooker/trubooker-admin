@@ -21,12 +21,12 @@ const driversApi = driversApiConfig.injectEndpoints({
       providesTags: ["Drivers"],
     }),
 
-    toggleDriverStatus: builder.query({
+    toggleDriverStatus: builder.mutation({
       query: (driver) => ({
         url: `/admin/drivers/toggle-status/${driver}`,
         method: "PATCH",
       }),
-      providesTags: ["Drivers"],
+      invalidatesTags: ["Drivers"],
     }),
   }),
 });
@@ -34,5 +34,5 @@ const driversApi = driversApiConfig.injectEndpoints({
 export const {
   useGetDriversQuery,
   useGetOneDriverQuery,
-  useToggleDriverStatusQuery,
+  useToggleDriverStatusMutation,
 } = driversApi;

@@ -50,7 +50,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
   const userData: any = SinglePassengerReferalData;
   const [page, setPage] = useState(1);
   // const {
-  //   isLoading: loading,
+  //   isLoading: loading,+
   //   data,
   //   isFetching,
   // } = useGetStudentReportQuery({ page, search: searchQuery });
@@ -80,7 +80,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Full name
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.first_name === null ||
                           profile?.last_name === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
@@ -110,7 +110,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Phone number
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.phone === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -124,7 +124,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Address
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.address === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -136,7 +136,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Date of birth
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.dob === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -154,7 +154,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           City
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.city === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -166,7 +166,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Country
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.country === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -180,7 +180,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Gender
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.gender === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -192,7 +192,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Referral code
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {profile?.referral === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -221,7 +221,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Full name
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {nok?.name === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -233,7 +233,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Email address
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           { nok?.email}
                         </span>
                       </div> */}
@@ -243,7 +243,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Phone number
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {nok?.phone_number === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
@@ -255,7 +255,7 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                         <span className="font-normal text-xs text-gray-500">
                           Relationship
                         </span>
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm capitalize">
                           {nok?.relationship === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (

@@ -12,7 +12,6 @@ import Notification from "@/components/Notification";
 import { LineChartDisplay } from "@/components/charts/LineChart";
 import * as data from "@/constants";
 import { useGetDashboardQuery } from "@/redux/services/Slices/dashboardApiSlice";
-import { SettingsListData } from "@/constants";
 
 import {
   Table,
@@ -144,7 +143,12 @@ const Dashboard = () => {
               <div className="">
                 <LineChartDisplay
                   chartConfig={data?.chartConfigLine}
-                  revenue={revenue}
+                  total_revenue={revenue?.total_revenue}
+                  graph_data={
+                    data?.chartDataLine.length > 0
+                      ? data?.chartDataLine
+                      : revenue?.graph_data
+                  }
                 />
               </div>
               <ScrollBar orientation="horizontal" />
@@ -214,7 +218,7 @@ const Dashboard = () => {
                       // onClick={() => handleSort("departure")}
                       className="font-bold w-1/4 text-center"
                     >
-                      <span className="flex gap-x-3 items-center cursor-pointer justify-center">
+                      <span className="flex gap-x-3 items-center cursor-pointer justify-left">
                         Departure
                         {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
@@ -230,7 +234,7 @@ const Dashboard = () => {
                       // onClick={() => handleSort("arrival")}
                       className="font-bold w-1/4 text-center"
                     >
-                      <span className="flex gap-x-3 items-center cursor-pointer justify-center">
+                      <span className="flex gap-x-3 items-center cursor-pointer justify-left">
                         Arrival
                         {/* <FaArrowUp
                           className={`transition-transform duration-300 ${
@@ -249,7 +253,7 @@ const Dashboard = () => {
                 </TableHeader>
                 <TableBody>
                   {/* {sortedData!.map((data: any) => ( */}
-                  {userData!.map((data: any) => (
+                  {userData?.map((data: any) => (
                     <TableRow
                       key={data.id}
                       className="text-xs text-center lg:text-sm"
@@ -268,34 +272,43 @@ const Dashboard = () => {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className=" py-5 w-1/5 text-[--primary]">
-                        {data.departure_location}
+
+                      <TableCell className="w-1/7 py-5 text-left">
+                        <div className="flex flex-col">
+                          <span> {data.departure_location || "Kogi"}</span>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Date:</span>{" "}
+                            {data.departure_date || "2022-01-01"}
+                          </small>
+                        </div>
                       </TableCell>
-                      <TableCell className=" py-5 w-1/5">
-                        {data.arrival_location}
+
+                      <TableCell className="w-1/7 py-5 text-left ">
+                        <div className="flex flex-col">
+                          <span> {data.arrival_location || "Benin City"}</span>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Date:</span>{" "}
+                            {data.arrival_date}, {data?.arrival_time}
+                          </small>
+                        </div>
                       </TableCell>
+
                       <TableCell className=" py-5">
-                        {/* {data.status === "completed" ? (
-                          <div className="flex items-center mx-auto gap-x-2 p-1 justify-center w-[130px] py-2 rounded-full bg-[#CCFFCD] text-[#00B771]">
-                            <VscCircleFilled className=" bg-[#00B771] rounded-full" />
+                        {data.status === "active" ? (
+                          <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                            <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                             <span className="font-semibold text-xs">
-                              Completed
+                              {data?.status}
                             </span>
                           </div>
                         ) : (
-                          <div className="flex items-center mx-auto gap-x-2 p-1 justify-center w-[130px] py-2 rounded-full bg-[#CCFFCD] text-[#00B771]">
-                            <VscCircleFilled className="bg-[#00B771] rounded-full" />
+                          <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                            <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                             <span className="font-semibold text-xs">
-                              {data.created_at}
+                              {data.status}
                             </span>
                           </div>
-                        )} */}
-                        <div className="flex items-center mx-auto gap-x-2 p-1 justify-center w-[130px] py-2 rounded-full bg-[#CCFFCD] text-[#00B771]">
-                          <VscCircleFilled className=" bg-[#00B771] rounded-full" />
-                          <span className="font-semibold text-xs">
-                            {data?.status}
-                          </span>
-                        </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
