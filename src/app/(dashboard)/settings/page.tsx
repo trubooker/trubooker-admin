@@ -89,7 +89,7 @@ const Settings = () => {
   };
 
   const handleUploadPicture = async () => {
-    setLoading(true);
+    // setLoading(true);
 
     try {
       if (selectedFile) {
@@ -112,13 +112,13 @@ const Settings = () => {
 
         const resdata = await res.json();
         if (resdata?.status == "success") {
-          setLoading(false);
+          // setLoading(false);
         }
       }
     } catch {
-      setLoading(false);
+      // setLoading(false);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -189,7 +189,7 @@ const Settings = () => {
                 <span className="flex flex-col lg:flex-row gap-2">
                   <label
                     htmlFor="fileInput"
-                    className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
+                    className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
                   >
                     Upload new
                     <input
@@ -203,7 +203,7 @@ const Settings = () => {
                   {previewSrc ? (
                     <div
                       onClick={handleUploadPicture}
-                      className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
+                      className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
                     >
                       Upload Picture
                     </div>
