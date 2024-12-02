@@ -53,7 +53,10 @@ export const Modal: FC<Props> = ({
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <div className="">
-            {content}
+            <ScrollArea className="max-h-[500px] pt-2 overflow-y-auto">
+              {content}
+              <ScrollBar orientation="vertical" />
+            </ScrollArea>
             <DialogClose className={`w-full mt-3 ${classname}`}>
               <Button className="w-full" type="button" variant="secondary">
                 Cancel
@@ -73,7 +76,7 @@ export const Modal: FC<Props> = ({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <ScrollArea className="px-5 pt-2 max-h-[500px]">
+        <ScrollArea className="px-5 pt-2 max-h-[500px] overflow-y-auto">
           {content}
           <ScrollBar orientation="vertical" />
         </ScrollArea>

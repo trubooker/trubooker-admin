@@ -9,10 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Notification } from "@/constants";
 import Logo from "@/public/trubookerNotification.svg";
+import Spinner from "./Spinner";
 
 const Notifications = () => {
   const router = useRouter();
-
+  const isFetching: boolean = false;
   return (
     // <div className="mb-10 xl:mb-5">
     <div className="">
@@ -21,52 +22,52 @@ const Notifications = () => {
           Notifications
         </CardHeader>
         <CardContent>
-          {/* {Notify?.length > 0 ? ( */}
-          <>
-            {Notification?.map((actions: any) => (
-              <div key={actions.id}>
-                <Separator />
-                <div className="my-4">
-                  <div className="flex w-full items-start space-x-4">
-                    <Image
-                      src={Logo}
-                      width="40"
-                      alt="Logo"
-                      className=" flex "
-                    />
-                    <div className="">
-                      <p className="text-gray-800 font-medium text-sm flex">
-                        {actions.message}
-                      </p>
-                      <p className="text-xs text-gray-500">{actions.date}</p>
+          {Notification?.length > 0 ? (
+            <>
+              {Notification?.map((actions: any) => (
+                <div key={actions.id}>
+                  <Separator />
+                  <div className="my-4">
+                    <div className="flex w-full items-start space-x-4">
+                      <Image
+                        src={Logo}
+                        width="40"
+                        alt="Logo"
+                        className=" flex "
+                      />
+                      <div className="">
+                        <p className="text-gray-800 font-medium text-sm flex">
+                          {actions.message}
+                        </p>
+                        <p className="text-xs text-gray-500">{actions.date}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </>
-          {/*    ) : (
-             <>
-               {isFetching ? (
-                 <div className="h-[400px]">
-                   <Spinner />
-                 </div>
-               ) : (
-                 <div className="flex items-center w-full h-[400px] flex-col justify-center">
-                   <Image
-                     src={"/inbox.svg"}
-                     alt=""
-                     width={200}
-                     height={200}
-                     className="object-cover me-5"
-                   />
-                   <h1 className="mt-8 text-lg text-center font-semibold">
-                     You are all caught up
-                   </h1>
-                 </div>
-               )}
-             </>
-           )} */}
+              ))}
+            </>
+          ) : (
+            <>
+              {isFetching ? (
+                <div className="h-[400px]">
+                  <Spinner />
+                </div>
+              ) : (
+                <div className="flex items-center w-full h-[400px] flex-col justify-center">
+                  <Image
+                    src={"/nodata.svg"}
+                    alt=""
+                    width={200}
+                    height={200}
+                    className="object-cover me-5"
+                  />
+                  <h1 className="mt-8 text-lg text-center font-semibold">
+                    You are all caught up
+                  </h1>
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

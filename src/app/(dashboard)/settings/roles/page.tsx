@@ -8,13 +8,14 @@ import { FaPlus } from "react-icons/fa6";
 import RolesTable from "@/components/Settings/Roles/RolesTable";
 import { roles } from "@/constants";
 import { Modal } from "@/components/DualModal";
-import { RolePermissions } from "@/components/RolePermissions";
+import { EditRoles } from "@/components/Settings/Roles/EditRoles";
 import {
   useGetPermissionsByIdQuery,
   useGetPermissionsQuery,
   useGetRolesByIdQuery,
   useGetRolesQuery,
 } from "@/redux/services/Slices/settings/rolesApiSlice";
+import { AddStaffRoles } from "@/components/Settings/Roles/AddStaffRoles";
 
 const Roles = () => {
   const {
@@ -60,9 +61,9 @@ const Roles = () => {
                 <FaPlus /> Add Member to Role
               </Button>
             }
-            title={""}
-            description={""}
-            content={null}
+            title={"Add Staff to Role"}
+            description={"Set role permissions"}
+            content={<AddStaffRoles />}
           />
         </span>
       </div>
@@ -91,7 +92,7 @@ const Roles = () => {
                       }
                       title={"Edit Role"}
                       description={"Set role permissions"}
-                      content={<RolePermissions id={tot?.id} />}
+                      content={<EditRoles id={tot?.id} />}
                     />
                   </div>
                   <div className="flex ms-auto gap-x-3 text-black items-center">

@@ -104,10 +104,10 @@ export function DriverTable({
                         <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
                         <span className="font-semibold text-xs">Completed</span>
                       </div>
-                    ) : data.status === "upcoming" ? (
+                    ) : data.status === "pending" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
                         <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                        <span className="font-semibold text-xs">Upcoming</span>
+                        <span className="font-semibold text-xs">Pending</span>
                       </div>
                     ) : (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">

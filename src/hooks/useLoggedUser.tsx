@@ -10,7 +10,6 @@ export const useLoggedInUser = () => {
   } = useGetCurrentUserQuery(null);
 
   const userData = data?.data || null;
-  console.log(data);
 
   return { userData, userError, userLoading, userRefetching, status };
 };

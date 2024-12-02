@@ -34,7 +34,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {Data?.length >= 0 ? (
+      {Data?.length > 0 ? (
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">

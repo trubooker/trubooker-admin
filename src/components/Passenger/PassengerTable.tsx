@@ -37,7 +37,7 @@ export function PassengerTable({
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {PassengerTableData?.length >= 0 ? (
+      {PassengerTableData?.length > 0 ? (
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
