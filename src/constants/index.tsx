@@ -864,12 +864,18 @@ export const Referall = [
 ];
 
 export const chartDataLine = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
+  { month: "Jan", revenue: 186 },
+  { month: "Feb", revenue: 305 },
+  { month: "March", revenue: 237 },
+  { month: "April", revenue: 73 },
+  { month: "May", revenue: 209 },
+  { month: "June", revenue: 214 },
+  { month: "July", revenue: 214 },
+  { month: "Aug", revenue: 119 },
+  { month: "Sept", revenue: 100 },
+  { month: "Oct", revenue: 100 },
+  { month: "Nov", revenue: 111 },
+  { month: "Dec", revenue: 104 },
 ];
 
 export const chartConfigLine = {

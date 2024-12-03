@@ -117,13 +117,13 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                           >
                             View
                           </DropdownMenuItem>
-                          <Separator />
+                          {/* <Separator />
                           <DropdownMenuItem
                             className="w-full text-center cursor-pointer"
                             onClick={() => handleSuspend(data?.id)}
                           >
                             Suspend
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

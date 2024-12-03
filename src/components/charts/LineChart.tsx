@@ -88,7 +88,7 @@ export const LineChartDisplay: FC<Props> = ({
             </defs>
 
             <Area
-              dataKey="desktop"
+              dataKey="revenue"
               type="natural"
               fill="url(#fillDesktop)"
               fillOpacity={0.4}

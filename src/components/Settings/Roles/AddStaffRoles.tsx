@@ -1,13 +1,3 @@
-// import React from 'react'
-
-// const AddStaffRoles = () => {
-//   return (
-//     <div>AddStaffRoles</div>
-//   )
-// }
-
-// export default AddStaffRoles
-
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +14,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -43,9 +40,28 @@ const permissions = [
   },
 ];
 
+const role = [
+  {
+    name: "Admin",
+  },
+  {
+    name: "Driver",
+  },
+  {
+    name: "Passenger",
+  },
+  {
+    name: "Agent",
+  },
+  {
+    name: "Manager",
+  },
+];
+
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Required Field" }),
   email: z.string().email().min(1, { message: "Email is required" }),
+  role: z.string().min(1, { message: "Role is required" }),
   permissions: z
     .array(
       z.object({
@@ -125,85 +141,116 @@ export function AddStaffRoles() {
               )}
             />
           </div>
-
-          {/* Global Select All */}
-          <div className="flex justify-between items-center my-5">
-            <FormLabel className="font-bold">Administrator Access</FormLabel>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                onCheckedChange={(checked) =>
-                  handleGlobalSelectAll(checked as boolean)
-                }
-              />
-              <FormLabel>Select All</FormLabel>
-            </div>
+          <div className="grid gap-2">
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="mx-1">
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormLabel>Role</FormLabel>
+                    <FormControl>
+                      <SelectTrigger className="py-6">
+                        <SelectValue placeholder="" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {role?.map((category: any, i: number) => (
+                        <SelectItem key={i} value={category?.name}>
+                          {category?.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          <Separator />
-          {/* Permissions Grid */}
-          {permissions.map((perm) => (
-            <>
-              <div
-                key={perm.category}
-                className=" lg:flex lg:justify-between items-center"
-              >
-                <div className="flex justify-between lg:w-[40%] mb-3 lg:mb-0 items-center">
-                  <FormLabel>{perm.category}</FormLabel>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  {perm.options.map((option) => (
-                    <FormField
-                      key={option}
-                      control={form.control}
-                      name="permissions"
-                      render={() => {
-                        const field = form
-                          .getValues("permissions")
-                          .find((p) => p.category === perm.category);
-                        return (
-                          <FormItem className="flex items-end space-x-2">
-                            <FormControl>
-                              <Checkbox
-                                checked={field?.options.includes(option)}
-                                onCheckedChange={(checked) => {
-                                  form.setValue(
-                                    "permissions",
-                                    form.getValues("permissions").map((p) =>
-                                      p.category === perm.category
-                                        ? {
-                                            ...p,
-                                            options: checked
-                                              ? [...p.options, option]
-                                              : p.options.filter(
-                                                  (o) => o !== option
-                                                ),
-                                          }
-                                        : p
-                                    )
-                                  );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel>{option}</FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-              <Separator />
-            </>
-          ))}
 
-          {/* Submit Button */}
-          <div className="w-full">
-            <Button
-              type="submit"
-              variant="outline"
-              className="bg-[--primary] hover:bg-[--primary-btn] text-white hover:text-white w-full"
-            >
-              Submit
-            </Button>
+          <div className="space-y-4 lg:space-y-6">
+            {" "}
+            {/* Global Select All */}
+            <div className="flex justify-between items-center mb-5 mt-10">
+              <FormLabel className="font-bold">Administrator Access</FormLabel>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  onCheckedChange={(checked) =>
+                    handleGlobalSelectAll(checked as boolean)
+                  }
+                />
+                <FormLabel>Select All</FormLabel>
+              </div>
+            </div>
+            <Separator />
+            {/* Permissions Grid */}
+            {permissions.map((perm) => (
+              <>
+                <div
+                  key={perm.category}
+                  className=" lg:flex lg:justify-between items-center"
+                >
+                  <div className="flex justify-between lg:w-[40%] mb-3 lg:mb-0 items-center">
+                    <FormLabel>{perm.category}</FormLabel>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    {perm.options.map((option) => (
+                      <FormField
+                        key={option}
+                        control={form.control}
+                        name="permissions"
+                        render={() => {
+                          const field = form
+                            .getValues("permissions")
+                            .find((p) => p.category === perm.category);
+                          return (
+                            <FormItem className="flex items-end space-x-2">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field?.options.includes(option)}
+                                  onCheckedChange={(checked) => {
+                                    form.setValue(
+                                      "permissions",
+                                      form.getValues("permissions").map((p) =>
+                                        p.category === perm.category
+                                          ? {
+                                              ...p,
+                                              options: checked
+                                                ? [...p.options, option]
+                                                : p.options.filter(
+                                                    (o) => o !== option
+                                                  ),
+                                            }
+                                          : p
+                                      )
+                                    );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel>{option}</FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <Separator />
+              </>
+            ))}
+            {/* Submit Button */}
+            <div className="w-full">
+              <Button
+                type="submit"
+                variant="outline"
+                className="bg-[--primary] hover:bg-[--primary-btn] text-white hover:text-white w-full"
+              >
+                Submit
+              </Button>
+            </div>
           </div>
         </form>
       </Form>

@@ -54,7 +54,7 @@ const ViewPassenger = () => {
               </Avatar>
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                 <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
-                  <span className="text-xl font-extrabold  text-start">
+                  <span className="text-xl font-extrabold capitalize text-start">
                     {profile?.first_name} {profile?.last_name}
                   </span>
                   <>

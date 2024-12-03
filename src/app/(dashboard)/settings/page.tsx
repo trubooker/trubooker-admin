@@ -22,7 +22,7 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IoPersonOutline } from "react-icons/io5";
 import { Separator } from "@/components/ui/separator";
@@ -33,20 +33,20 @@ import fetchToken from "@/lib/auth";
 import { useLoggedInUser } from "@/hooks/useLoggedUser";
 import { FaSpinner } from "react-icons/fa";
 import LogoutModal from "@/components/LogoutModal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useUpdateProfileMutation } from "@/redux/services/Slices/userApiSlice";
+import UpdatePassword from "@/components/Settings/UpdatePassword";
 
 const FormSchema = z.object({
-  first_name: z.string().min(1, { message: "Required" }),
-  last_name: z.string().min(1, { message: "Required" }),
-  email: z.string({
-    required_error: "Please select an email to display.",
-  }),
-  phone_number: z.string().min(1, { message: "Required" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be 6 characters or more" }),
-  new_password: z
-    .string()
-    .min(6, { message: "Password must be 6 characters or more" }),
+  first_name: z.any().optional(),
+  last_name: z.any().optional(),
+  email: z.any().optional(),
+  city: z.any().optional(),
+  address: z.any().optional(),
+  country: z.any().optional(),
+  phone: z.any().optional(),
+  gender: z.enum(["male", "female"]).optional(),
 });
 
 const Settings = () => {
@@ -55,14 +55,13 @@ const Settings = () => {
     defaultValues: {},
   });
   const [loading, setLoading] = useState(false);
-  const [isloading, setIsLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [previewSrc, setPreviewSrc] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [openLog, setOpenLog] = React.useState(false);
+  const [dobError, setDobError] = useState("");
   const { userData } = useLoggedInUser();
+  const [update, { isLoading }] = useUpdateProfileMutation();
 
   const handleFileChange = async (e: any) => {
     const file = e.target.files?.[0];
@@ -112,6 +111,7 @@ const Settings = () => {
 
         const resdata = await res.json();
         if (resdata?.status == "success") {
+          toast.success(`Profile Image Updated!! ✅`);
           setLoading(false);
         }
       }
@@ -122,23 +122,60 @@ const Settings = () => {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-  const toggleNewPasswordVisibility = () => {
-    setShowNewPassword(!showNewPassword);
-  };
+  // const handleDeleteAccount = () => {
+  //   alert("clicked");
+  // };
 
-  const handleDeleteAccount = () => {
-    alert("clicked");
-  };
+  useEffect(() => {
+    if (userData) {
+      form.reset({
+        first_name: userData?.first_name,
+        last_name: userData?.last_name,
+        city: userData?.city,
+        address: userData?.address,
+        country: userData?.country,
+        phone: userData?.phone,
+        email: userData?.email,
+      });
+
+      const DOB = new Date(userData?.dob);
+      setSelectedDate(DOB);
+    }
+  }, [userData, form]);
+
+  const genderString =
+    userData?.gender === "male"
+      ? "male"
+      : userData?.gender === "female"
+      ? "female"
+      : undefined;
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      console.log(data);
-      setIsLoading(false);
-    }, 3000);
+    const dateString = selectedDate
+      ? selectedDate.toISOString().split("T")[0]
+      : null;
+
+    const formdata = {
+      first_name: data.first_name || null,
+      last_name: data.last_name || null,
+      city: data.city || null,
+      address: data.address || null,
+      phone: data.phone || null,
+      country: data.country || null,
+      gender: data.gender || genderString,
+      dob: dateString,
+      email: data.email || null,
+    };
+    console.log("formdata: ", formdata);
+    await update(formdata)
+      .unwrap()
+      .then((res: any) => {
+        console.log(res);
+        toast.success(`Updated Successfully!! ✅`);
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
   };
 
   const handleLogout = () => {
@@ -149,80 +186,64 @@ const Settings = () => {
     <div>
       <LogoutModal open={openLog} setOpen={setOpenLog} />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div>
-            <div className="flex justify-between items-center mb-5">
-              <div className="font-bold text-lg">Basic Settings</div>
-              <span className="flex gap-x-2">
-                {/* <Button variant={"outline"} size="sm">
+      <div className="space-y-8">
+        <div className="flex justify-between items-center mb-5">
+          <div className="font-bold text-lg">Basic Settings</div>
+          <span className="flex gap-x-2">
+            {/* <Button variant={"outline"} size="sm">
                   Cancel
                 </Button> */}
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  variant={"outline"}
-                  size={"sm"}
-                  className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn]"
+          </span>
+        </div>
+        <div className="bg-white rounded-xl p-5">
+          <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
+            <Avatar className="w-40 h-40">
+              <AvatarImage
+                src={previewSrc ? previewSrc : userData?.profile_image}
+              />
+              <AvatarFallback>
+                <IoPersonOutline className="h-14 w-14" />
+              </AvatarFallback>
+            </Avatar>
+            <span className="flex flex-col lg:flex-row gap-2">
+              <label
+                htmlFor="fileInput"
+                className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
+              >
+                Upload new
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </label>
+              {previewSrc ? (
+                <div
+                  onClick={handleUploadPicture}
+                  className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
                 >
-                  {isloading ? (
+                  {loading ? (
                     <>
-                      <FaSpinner className="animate-spin w-8 h-8" size={24} />
+                      <FaSpinner
+                        className="animate-spin w-4 h-4 mx-auto"
+                        size={24}
+                      />
                     </>
                   ) : (
-                    "Update"
+                    "Upload Picture"
                   )}
-                </Button>
-              </span>
-            </div>
-            <div className="bg-white rounded-xl p-5">
-              <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
-                <Avatar className="w-40 h-40">
-                  <AvatarImage
-                    src={previewSrc ? previewSrc : userData?.profile_image}
-                  />
-                  <AvatarFallback>
-                    <IoPersonOutline className="h-14 w-14" />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="flex flex-col lg:flex-row gap-2">
-                  <label
-                    htmlFor="fileInput"
-                    className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
-                  >
-                    Upload new
-                    <input
-                      type="file"
-                      id="fileInput"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                  </label>
-                  {previewSrc ? (
-                    <div
-                      onClick={handleUploadPicture}
-                      className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
-                    >
-                      {loading ? (
-                        <>
-                          <FaSpinner
-                            className="animate-spin w-8 h-8"
-                            size={24}
-                          />
-                        </>
-                      ) : (
-                        "Upload Picture"
-                      )}
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                </span>
-              </div>
+                </div>
+              ) : (
+                ""
+              )}
+            </span>
+          </div>
 
-              <Separator />
-
+          <Separator />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <Card className="border-none shadow-none lg:p-5 py-5">
                 <CardHeader className="px-0">
                   <CardTitle className="text-lg text-gray-500">
@@ -235,6 +256,7 @@ const Settings = () => {
                 </CardHeader>
                 <CardContent className="border-none px-0 rounded-lg">
                   <div className="grid gap-4">
+                    {/* firstName and lastName */}
                     <div className="grid grid-rows-1 lg:grid-cols-2 gap-4 lg:gap-20">
                       <div className="grid gap-2">
                         <FormField
@@ -246,7 +268,6 @@ const Settings = () => {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder="John"
                                   className="py-6"
                                   {...field}
                                 />
@@ -266,7 +287,6 @@ const Settings = () => {
                               <FormControl>
                                 <Input
                                   type="text"
-                                  placeholder="Doe"
                                   className="py-6"
                                   {...field}
                                 />
@@ -277,6 +297,8 @@ const Settings = () => {
                         />
                       </div>
                     </div>
+
+                    {/* email and phone */}
                     <div className="grid grid-rows-1 lg:grid-cols-2 gap-4 lg:gap-20">
                       <div className="grid gap-2">
                         <FormField
@@ -288,8 +310,7 @@ const Settings = () => {
                               <FormControl>
                                 <Input
                                   type="email"
-                                  // disabled
-                                  placeholder="johndoe@gmail.com"
+                                  disabled
                                   className="py-6"
                                   {...field}
                                 />
@@ -302,14 +323,58 @@ const Settings = () => {
                       <div className="grid gap-2">
                         <FormField
                           control={form.control}
-                          name="phone_number"
+                          name="phone"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
                                 <Input
                                   type="tel"
-                                  placeholder="+234 3456 5678 90"
+                                  className="py-6"
+                                  disabled
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* city and country  */}
+                    <div className="grid grid-rows-1 lg:grid-cols-2 gap-4 lg:gap-20">
+                      <div className="grid gap-2">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input
+                                  id="city"
+                                  type="text"
+                                  className="py-6"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  id="country"
+                                  type="text"
                                   className="py-6"
                                   {...field}
                                 />
@@ -320,118 +385,240 @@ const Settings = () => {
                         />
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Separator />
-
-              <Card className="border-none shadow-none lg:p-5 py-5">
-                <CardHeader className="px-0">
-                  <CardTitle className="text-lg text-gray-500">
-                    Password
-                  </CardTitle>
-                  <CardDescription>
-                    Modify your current password
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="border-none px-0 rounded-lg">
-                  <div className="grid gap-4">
+                    {/* dob and gender  */}
                     <div className="grid grid-rows-1 lg:grid-cols-2 gap-4 lg:gap-20">
-                      <div className="grid gap-2">
-                        <FormField
-                          control={form.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="Enter Current Password"
-                                    className="py-6"
-                                    {...field}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={togglePasswordVisibility}
-                                    className="text-xs font-semibold underline absolute right-4 top-5"
-                                  >
-                                    {showPassword ? "Hide" : "Show"}
-                                  </button>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                              {passwordError && (
-                                <FormMessage>{passwordError}</FormMessage>
-                              )}
-                            </FormItem>
-                          )}
-                        />
+                      <div>
+                        <FormLabel htmlFor="dateInput">Date of Birth</FormLabel>
+                        <div className="border border-gray-200 p-2 mt-2 rounded-lg flex flex-col">
+                          <DatePicker
+                            selected={selectedDate}
+                            onChange={(date: Date | null) =>
+                              setSelectedDate(date)
+                            }
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="YYYY-MM-DD"
+                            id="dateInput"
+                            className="date-picker-input border-none w-full outline-none h-10 pl-3 text-base py-4 placeholder:text-sm"
+                          />
+                        </div>
+
+                        {dobError ? (
+                          <FormMessage className="mt-2 text-red-500">
+                            {dobError}
+                          </FormMessage>
+                        ) : (
+                          <FormDescription className="mt-2">
+                            Input date of birth, not less than 18 years of age.
+                            If null, defaults to 1970-01-01
+                          </FormDescription>
+                        )}
                       </div>
-                      <div className="grid gap-2">
-                        <FormField
-                          control={form.control}
-                          name="new_password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>New Password</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input
-                                    id="password"
-                                    type={showNewPassword ? "text" : "password"}
-                                    placeholder="Enter New Password"
-                                    className="py-6"
-                                    {...field}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={toggleNewPasswordVisibility}
-                                    className="text-xs font-semibold underline absolute right-4 top-5"
+
+                      <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                          <FormItem className="">
+                            <FormLabel>Gender</FormLabel>
+                            <FormControl>
+                              <>
+                                {userData ? (
+                                  <>
+                                    {userData?.gender === "male" ? (
+                                      <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue="male"
+                                        className="border grid grid-cols-2 p-4 mt-0 rounded-lg"
+                                      >
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="male"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Male
+                                          </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="female"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Female
+                                          </FormLabel>
+                                        </FormItem>
+                                      </RadioGroup>
+                                    ) : userData?.gender === "female" ? (
+                                      <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={"female"}
+                                        className="border grid grid-cols-2 p-4 mt-0 rounded-lg"
+                                      >
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="male"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Male
+                                          </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="female"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Female
+                                          </FormLabel>
+                                        </FormItem>
+                                      </RadioGroup>
+                                    ) : (
+                                      <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className="border grid grid-cols-2 p-4 mt-0 rounded-lg"
+                                      >
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="male"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Male
+                                          </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                            <RadioGroupItem
+                                              className="border-muted-foreground h-5 w-5"
+                                              value="female"
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal text-base text-muted-foreground">
+                                            Female
+                                          </FormLabel>
+                                        </FormItem>
+                                      </RadioGroup>
+                                    )}
+                                  </>
+                                ) : (
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="border grid grid-cols-2 p-4 mt-0 rounded-lg"
                                   >
-                                    {showNewPassword ? "Hide" : "Show"}
-                                  </button>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                              {passwordError && (
-                                <FormMessage>{passwordError}</FormMessage>
-                              )}
-                            </FormItem>
-                          )}
-                        />
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="male"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        Male
+                                      </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="female"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        Female
+                                      </FormLabel>
+                                    </FormItem>
+                                  </RadioGroup>
+                                )}
+                              </>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* address */}
+                    <div className="grid grid-rows-1 lg:grid-cols-2 gap-4 lg:gap-20">
+                      <div className="grid grid-rows-1 gap-4 lg:gap-20">
+                        <div className="grid gap-2">
+                          <FormField
+                            control={form.control}
+                            name="address"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Address</FormLabel>
+                                <FormControl>
+                                  <Input className="py-6" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
+                      <Button
+                        type="submit"
+                        disabled={isLoading}
+                        variant={"outline"}
+                        size={"sm"}
+                        className="bg-[--primary] text-white hover:text-white mt-auto py-6 hover:bg-[--primary-btn] w-full"
+                      >
+                        {isLoading ? (
+                          <>
+                            <FaSpinner
+                              className="animate-spin w-8 h-8"
+                              size={24}
+                            />
+                          </>
+                        ) : (
+                          "Update"
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+            </form>
+          </Form>
 
-              <Separator />
+          <Separator />
 
-              <Card className="border-none shadow-none lg:p-5 py-5">
-                <CardHeader className="px-0">
-                  <CardTitle className="text-lg text-gray-500">
-                    Account Security
-                  </CardTitle>
-                  <CardDescription>
-                    Manage your account security
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="border-none px-0 rounded-lg">
-                  <span className="flex flex-col lg:flex-row gap-5">
-                    <div
-                      onClick={handleLogout}
-                      className="py-2 px-5 lg:w-32 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
-                    >
-                      <span className="flex gap-x-3 justify-center items-center">
-                        <LuDiamond />
-                        Log Out
-                      </span>
-                    </div>
-                    <div
+          <UpdatePassword />
+          <Separator />
+
+          <Card className="border-none shadow-none lg:p-5 py-5">
+            <CardHeader className="px-0">
+              <CardTitle className="text-lg text-gray-500">
+                Account Security
+              </CardTitle>
+              <CardDescription>Manage your account security</CardDescription>
+            </CardHeader>
+            <CardContent className="border-none px-0 rounded-lg">
+              <span className="flex flex-col lg:flex-row gap-5">
+                <div
+                  onClick={handleLogout}
+                  className="py-2 px-5 lg:w-32 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
+                >
+                  <span className="flex gap-x-3 justify-center items-center">
+                    <LuDiamond />
+                    Log Out
+                  </span>
+                </div>
+                {/* <div
                       onClick={handleDeleteAccount}
                       className="bg-[#B3261E] text-white hover:text-white hover:bg-[#C45650] py-2 px-5 rounded-lg text-[13px] cursor-pointer"
                     >
@@ -439,14 +626,12 @@ const Settings = () => {
                         <LuDiamond />
                         Delete my account
                       </span>
-                    </div>
-                  </span>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </form>
-      </Form>
+                    </div> */}
+              </span>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
