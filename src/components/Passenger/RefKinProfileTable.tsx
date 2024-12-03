@@ -22,7 +22,7 @@ export function RefKinProfileTable({
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {RefKinProfileTableData?.length >= 0 ? (
+      {RefKinProfileTableData?.length > 0 ? (
         <Table className=" min-w-[500px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">

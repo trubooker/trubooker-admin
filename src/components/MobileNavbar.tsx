@@ -96,9 +96,14 @@ const MobileNavbar = () => {
                           </SheetClose>
                         </>
                       ) : (
-                        <Accordion type="single" collapsible className="w-full">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          defaultValue="item-1"
+                          className="w-full"
+                        >
                           <AccordionItem
-                            value={`item-${index + 1}`}
+                            value={`item-1`}
                             className=" transition duration-300 w-full rounded-lg py-2  text-gray-400"
                           >
                             <AccordionTrigger>

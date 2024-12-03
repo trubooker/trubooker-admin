@@ -1,3 +1,11 @@
+// import React from "react";
+
+// const SystemAlert = () => {
+//   return <div>SystemAlert</div>;
+// };
+
+// export default SystemAlert;
+
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -19,7 +27,7 @@ import Pagination from "@/components/Pagination";
 import { PassengerList } from "@/components/Passenger/passengerList";
 import { useGetPassengersQuery } from "@/redux/services/Slices/passenger.ApiSlice";
 
-const Passengers = () => {
+const SystemAlert = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const {
@@ -59,17 +67,9 @@ const Passengers = () => {
   };
   return (
     <div className="flex flex-col h-fit w-full">
-      {/* <div className="py-4">
-      </div> */}
-      <div className="flex gap-x-3 items-center ps-3 mb-5">
-        <h2 className="text-2xl font-bold">Passengers</h2>
-        <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {PassengerListData?.length}
-        </div>
-      </div>
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">
-          <div className="bg-white rounded-lg w-full p-5 mt-5">
+          <div className="bg-white rounded-lg w-full p-5">
             <Search
               placeholder={"Search..."}
               onSearch={handleSearch}
@@ -101,7 +101,7 @@ const Passengers = () => {
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                       <TableRow key={i}>
-                        {[1, 2, 3, 4, 5].map((i) => (
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
                           <TableCell key={i}>
                             <div>
                               <div className="w-full rounded-md">
@@ -140,4 +140,4 @@ const Passengers = () => {
   );
 };
 
-export default Passengers;
+export default SystemAlert;

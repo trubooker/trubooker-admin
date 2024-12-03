@@ -33,7 +33,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Full name
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.first_name === null ||
                         profile?.last_name === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
@@ -63,7 +63,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Phone number
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.phone === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -77,7 +77,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Address
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.address === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -89,7 +89,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Date of birth
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.dob === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -107,7 +107,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         City
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.city === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -119,7 +119,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Country
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.country === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -133,7 +133,7 @@ const AgentInfo = ({
                       <span className="font-normal text-xs text-gray-500">
                         Gender
                       </span>
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         {profile?.gender === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
@@ -175,7 +175,7 @@ const AgentInfo = ({
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         <CountUp end={profile?.total_earnings} prefix="₦ " />
                       </span>
                     </div>
@@ -187,7 +187,7 @@ const AgentInfo = ({
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         <CountUp
                           end={earning_overview?.payment_processed}
                           prefix="₦ "
@@ -202,7 +202,7 @@ const AgentInfo = ({
                       </span>
                     </div>
                     <div className="flex text-end flex-col">
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm capitalize">
                         <CountUp
                           end={earning_overview?.pending_payment}
                           prefix="₦ "

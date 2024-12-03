@@ -101,7 +101,7 @@ const Agent = () => {
                   <TableBody>
                     {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                       <TableRow key={i}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                        {[1, 2, 3, 4, 5].map((i) => (
                           <TableCell key={i}>
                             <div>
                               <div className="w-full rounded-md">

@@ -14,16 +14,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Separator } from "./ui/separator";
-import { DialogClose } from "./ui/dialog";
+import { Separator } from "../../ui/separator";
+import { DialogClose } from "../../ui/dialog";
 
 const permissions = [
-  //   {
-  //     category: "Administrator Access",
-  //     options: ["Read", "Write", "Create"],
-  //   },
+  {
+    category: "Financial Access",
+    options: ["Read", "Write", "Create"],
+  },
   {
     category: "User Management",
+    options: ["Read", "Write", "Create"],
+  },
+  {
+    category: "Database Management",
     options: ["Read", "Write", "Create"],
   },
 ];
@@ -41,7 +45,7 @@ const FormSchema = z.object({
     }),
 });
 
-export function RolePermissions({ id }: any) {
+export function EditRoles({ id }: any) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -85,6 +89,7 @@ export function RolePermissions({ id }: any) {
               <FormLabel>Select All</FormLabel>
             </div>
           </div>
+          <Separator />
 
           {/* Permissions Grid */}
           {permissions.map((perm) => (

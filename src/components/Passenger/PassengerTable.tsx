@@ -26,18 +26,14 @@ export function PassengerTable({
 }: any) {
   const router = useRouter();
 
-  const handleSuspend = (id: string) => {
-    alert(`Account id ${id} suspended!!`);
-  };
-
-  const handleNotify = (id: string) => {
-    alert(`Account id ${id} notified!!`);
+  const handleDelete = (id: string) => {
+    alert(`Trip with id # ${id} Deleted!!`);
   };
 
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {PassengerTableData?.length >= 0 ? (
+      {PassengerTableData?.length > 0 ? (
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
@@ -100,12 +96,10 @@ export function PassengerTable({
                             Completed
                           </span>
                         </div>
-                      ) : data.status === "upcoming" ? (
+                      ) : data.status === "pending" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
                           <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Upcoming
-                          </span>
+                          <span className="font-semibold text-xs">Pending</span>
                         </div>
                       ) : (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
@@ -118,7 +112,7 @@ export function PassengerTable({
                     </TableCell>
 
                     <TableCell className="w-1/7 py-5 text-center">
-                      {data.amount}
+                      ₦ {data.amount}
                     </TableCell>
                     <TableCell className="w-1/7 py-5 text-center w-[100px]">
                       <DropdownMenu>
@@ -134,7 +128,7 @@ export function PassengerTable({
                         >
                           <DropdownMenuItem
                             className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.trip_id)}
+                            onClick={() => handleDelete(data?.trip_id)}
                           >
                             Delete
                           </DropdownMenuItem>

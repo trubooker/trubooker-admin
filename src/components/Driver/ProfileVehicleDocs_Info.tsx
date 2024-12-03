@@ -9,7 +9,14 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import Link from "next/link";
 import StarRatings from "react-star-ratings";
 import { IoPersonOutline } from "react-icons/io5";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Skeleton } from "../ui/skeleton";
+import { Table, TableHead, TableHeader, TableRow } from "../ui/table";
 
 const ProfileVehicleDocs_Info = ({
   th,
@@ -172,6 +179,177 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
+              {vehicle?.map((deets: any, index: number) => (
+                <Accordion
+                  key={deets.id}
+                  type="single"
+                  collapsible
+                  // defaultValue="item-1"
+                  className="w-full"
+                >
+                  <AccordionItem value={`item-${index + 1}`} className="">
+                    <AccordionTrigger className="my-3">
+                      <Table className="w-full">
+                        <TableHeader>
+                          <TableRow className="text-xs lg:text-sm">
+                            <TableHead className="font-bold w-1/2 text-left">
+                              <div className="flex flex-col">
+                                <span className="font-normal text-xs text-gray-500">
+                                  Vehicle Type
+                                </span>
+                                <span className="font-medium text-sm">
+                                  {deets?.vehicle_type?.name === null ? (
+                                    <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                  ) : (
+                                    deets?.vehicle_type?.name
+                                  )}
+                                </span>
+                              </div>
+                            </TableHead>
+
+                            <TableHead className="font-bold w-1/2 text-left">
+                              <div className="flex text-end flex-col">
+                                <span className="font-normal text-xs text-gray-500">
+                                  Vehicle Model
+                                </span>
+                                <span className="font-medium text-sm">
+                                  {deets?.model === null ? (
+                                    <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                  ) : (
+                                    deets?.model
+                                  )}
+                                </span>
+                              </div>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                      </Table>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="my-5 space-y-6">
+                        <div className="flex justify-between">
+                          <div className="flex flex-col">
+                            <span className="font-normal text-xs text-gray-500">
+                              License plate number
+                            </span>
+                            <span className="font-medium text-sm">
+                              {deets?.license_plate_number === null ? (
+                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                              ) : (
+                                deets?.license_plate_number
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex text-end flex-col">
+                            <span className="font-normal text-xs text-gray-500">
+                              Vehicle capacity
+                            </span>
+                            <span className="font-medium text-sm">
+                              {deets?.capacity === null ? (
+                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                              ) : (
+                                deets?.capacity
+                              )}{" "}
+                              Seats
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between">
+                          <div className="flex flex-col">
+                            <span className="font-normal text-xs text-gray-500">
+                              Vehicle colour
+                            </span>
+                            <span className="font-medium text-sm">
+                              {deets?.color === null ? (
+                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                              ) : (
+                                deets?.color
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex text-end flex-col">
+                            <span className="font-normal text-xs text-gray-500">
+                              Insurance
+                            </span>
+                            <span className="font-medium text-sm">
+                              {deets?.insurance === null ? (
+                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                              ) : (
+                                deets?.insurance
+                              )}
+                            </span>
+                          </div>
+                        </div>
+
+                        <Tabs defaultValue="vehiclePhotos" className="w-full">
+                          <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="vehiclePhotos">
+                              Photos
+                            </TabsTrigger>
+                            <TabsTrigger value="features">Features</TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="vehiclePhotos">
+                            <div className="w-full grid grid-cols-1 pt-5 gap-4">
+                              {deets?.photos?.map((i: any, index: number) => (
+                                <div key={index}>
+                                  <Link href={i} target="_blank">
+                                    <span className="font-medium text-sm">
+                                      <span className="flex gap-x-2 items-center">
+                                        <Image
+                                          src={"/photoGrid.svg"}
+                                          alt="Vehicle Photo"
+                                          width={35}
+                                          height={35}
+                                        />
+
+                                        <div className="text-sm font-medium text-[#333F53]">
+                                          Vehicle photo {index + 1}.png
+                                        </div>
+                                      </span>
+                                    </span>
+                                  </Link>
+                                </div>
+                              ))}
+                            </div>
+                          </TabsContent>
+                          <TabsContent value="features">
+                            <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
+                              {deets?.features?.length > 1 ? (
+                                <div>
+                                  <span className="font-medium text-sm">
+                                    <span className="flex gap-x-2 items-center">
+                                      <div className="text-sm font-medium text-[#333F53]">
+                                        {deets.features.join(", ")}
+                                      </div>
+                                    </span>
+                                  </span>
+                                </div>
+                              ) : (
+                                deets?.features?.map(
+                                  (i: any, index: number) => (
+                                    <div key={index}>
+                                      <span className="font-medium text-sm">
+                                        <span className="flex gap-x-2 items-center">
+                                          <div className="text-sm font-medium text-[#333F53]">
+                                            {i}
+                                          </div>
+                                        </span>
+                                      </span>
+                                    </div>
+                                  )
+                                )
+                              )}
+                            </div>
+                          </TabsContent>
+                        </Tabs>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              ))}
+            </div>
+
+            {/* <div>
               {vehicle?.map((deets: any) => (
                 <div key={deets.id} className="my-5 space-y-6">
                   <div className="flex justify-between">
@@ -313,7 +491,7 @@ const ProfileVehicleDocs_Info = ({
                   </Tabs>
                 </div>
               ))}
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 

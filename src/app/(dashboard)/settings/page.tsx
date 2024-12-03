@@ -28,6 +28,11 @@ import { IoPersonOutline } from "react-icons/io5";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { LuDiamond } from "react-icons/lu";
+import toast from "react-hot-toast";
+import fetchToken from "@/lib/auth";
+import { useLoggedInUser } from "@/hooks/useLoggedUser";
+import { FaSpinner } from "react-icons/fa";
+import LogoutModal from "@/components/LogoutModal";
 
 const FormSchema = z.object({
   first_name: z.string().min(1, { message: "Required" }),
@@ -49,9 +54,73 @@ const Settings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   });
+  const [loading, setLoading] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [openLog, setOpenLog] = React.useState(false);
+  const { userData } = useLoggedInUser();
+
+  const handleFileChange = async (e: any) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+      if (validImageTypes.includes(file.type)) {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          setPreviewSrc(reader.result as string);
+        };
+
+        reader.readAsDataURL(file);
+        setSelectedFile(file);
+      } else {
+        toast.error("Please upload a valid image file (JPEG, JPG, or PNG)");
+        setPreviewSrc("");
+      }
+    } else {
+      setPreviewSrc("");
+    }
+  };
+
+  const handleUploadPicture = async () => {
+    setLoading(true);
+
+    try {
+      if (selectedFile) {
+        const formdata = new FormData();
+        selectedFile && formdata.append("profile_image", selectedFile);
+
+        const token = await fetchToken();
+        const headers = {
+          Authorization: `Bearer ${token?.data?.token}`,
+          Accept: "application/json",
+        };
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/upload-profile-picture`,
+          {
+            method: "POST",
+            headers,
+            body: formdata,
+          }
+        );
+
+        const resdata = await res.json();
+        if (resdata?.status == "success") {
+          setLoading(false);
+        }
+      }
+    } catch {
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -59,23 +128,27 @@ const Settings = () => {
   const toggleNewPasswordVisibility = () => {
     setShowNewPassword(!showNewPassword);
   };
-  const [loading, setLoading] = useState(false);
 
-  const isLoading: boolean = false;
-
-  const handleUploadPicture = () => {
-    alert("clicked");
-  };
-  const handleAddNewPicture = () => {
-    alert("clicked");
-  };
-  const handleRemovePicture = () => {
+  const handleDeleteAccount = () => {
     alert("clicked");
   };
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {};
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      console.log(data);
+      setIsLoading(false);
+    }, 3000);
+  };
+
+  const handleLogout = () => {
+    setOpenLog(true);
+  };
+
   return (
     <div>
+      <LogoutModal open={openLog} setOpen={setOpenLog} />
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div>
@@ -87,49 +160,70 @@ const Settings = () => {
                 </Button> */}
                 <Button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={loading}
                   variant={"outline"}
                   size={"sm"}
                   className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn]"
                 >
-                  Update
+                  {isloading ? (
+                    <>
+                      <FaSpinner className="animate-spin w-8 h-8" size={24} />
+                    </>
+                  ) : (
+                    "Update"
+                  )}
                 </Button>
               </span>
             </div>
             <div className="bg-white rounded-xl p-5">
               <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
                 <Avatar className="w-40 h-40">
-                  <AvatarImage src={""} />
+                  <AvatarImage
+                    src={previewSrc ? previewSrc : userData?.profile_image}
+                  />
                   <AvatarFallback>
                     <IoPersonOutline className="h-14 w-14" />
                   </AvatarFallback>
                 </Avatar>
                 <span className="flex flex-col lg:flex-row gap-2">
-                  <div
-                    className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] cursor-pointer"
-                    onClick={handleAddNewPicture}
+                  <label
+                    htmlFor="fileInput"
+                    className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
                   >
                     Upload new
-                  </div>
-                  <div
-                    onClick={handleUploadPicture}
-                    className="hidden py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
-                  >
-                    Upload Picture
-                  </div>
-
-                  <div
-                    onClick={handleRemovePicture}
-                    className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
-                  >
-                    Remove picture
-                  </div>
+                    <input
+                      type="file"
+                      id="fileInput"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                  {previewSrc ? (
+                    <div
+                      onClick={handleUploadPicture}
+                      className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
+                    >
+                      {loading ? (
+                        <>
+                          <FaSpinner
+                            className="animate-spin w-8 h-8"
+                            size={24}
+                          />
+                        </>
+                      ) : (
+                        "Upload Picture"
+                      )}
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </span>
               </div>
 
               <Separator />
 
-              <Card className="border-none shadow-none p-5">
+              <Card className="border-none shadow-none lg:p-5 py-5">
                 <CardHeader className="px-0">
                   <CardTitle className="text-lg text-gray-500">
                     Personal information
@@ -194,7 +288,7 @@ const Settings = () => {
                               <FormControl>
                                 <Input
                                   type="email"
-                                  disabled
+                                  // disabled
                                   placeholder="johndoe@gmail.com"
                                   className="py-6"
                                   {...field}
@@ -232,7 +326,7 @@ const Settings = () => {
 
               <Separator />
 
-              <Card className="border-none shadow-none p-5">
+              <Card className="border-none shadow-none lg:p-5 py-5">
                 <CardHeader className="px-0">
                   <CardTitle className="text-lg text-gray-500">
                     Password
@@ -283,7 +377,7 @@ const Settings = () => {
                           name="new_password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>New Password</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Input
@@ -317,7 +411,7 @@ const Settings = () => {
 
               <Separator />
 
-              <Card className="border-none shadow-none p-5">
+              <Card className="border-none shadow-none lg:p-5 py-5">
                 <CardHeader className="px-0">
                   <CardTitle className="text-lg text-gray-500">
                     Account Security
@@ -329,7 +423,7 @@ const Settings = () => {
                 <CardContent className="border-none px-0 rounded-lg">
                   <span className="flex flex-col lg:flex-row gap-5">
                     <div
-                      onClick={handleRemovePicture}
+                      onClick={handleLogout}
                       className="py-2 px-5 lg:w-32 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
                     >
                       <span className="flex gap-x-3 justify-center items-center">
@@ -337,7 +431,10 @@ const Settings = () => {
                         Log Out
                       </span>
                     </div>
-                    <div className="bg-[#B3261E] text-white hover:text-white hover:bg-[#C45650] py-2 px-5 rounded-lg text-[13px] cursor-pointer">
+                    <div
+                      onClick={handleDeleteAccount}
+                      className="bg-[#B3261E] text-white hover:text-white hover:bg-[#C45650] py-2 px-5 rounded-lg text-[13px] cursor-pointer"
+                    >
                       <span className="flex gap-x-3 justify-center  items-center">
                         <LuDiamond />
                         Delete my account
