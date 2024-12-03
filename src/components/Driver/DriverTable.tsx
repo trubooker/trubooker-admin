@@ -26,8 +26,8 @@ export function DriverTable({
 }: any) {
   const router = useRouter();
 
-  const handleSuspend = (id: string) => {
-    alert(`Account id ${id} suspended!!`);
+  const handleDelete = (id: string) => {
+    alert(`Trip with id # ${id} Deleted!!`);
   };
 
   return (
@@ -130,7 +130,7 @@ export function DriverTable({
                       >
                         <DropdownMenuItem
                           className="w-full text-center cursor-pointer"
-                          onClick={() => handleSuspend(data?.trip_id)}
+                          onClick={() => handleDelete(data?.trip_id)}
                         >
                           Delete
                         </DropdownMenuItem>

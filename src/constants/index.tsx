@@ -76,12 +76,12 @@ export const NavLinks: LinkItem[] = [
       // },
     ],
   },
-  {
-    id: 7,
-    title: "Notification",
-    icon: MdOutlineNotificationsActive,
-    link: "/notification",
-  },
+  // {
+  //   id: 7,
+  //   title: "Notification",
+  //   icon: MdOutlineNotificationsActive,
+  //   link: "/notification",
+  // },
   // {
   //   id: 8,
   //   title: "Report",

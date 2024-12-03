@@ -184,12 +184,12 @@ const ProfileVehicleDocs_Info = ({
                   key={deets.id}
                   type="single"
                   collapsible
-                  defaultValue="item-1"
+                  // defaultValue="item-1"
                   className="w-full"
                 >
-                  <AccordionItem value={`item-${index + 1}`} className=" my-2">
+                  <AccordionItem value={`item-${index + 1}`} className="">
                     <AccordionTrigger className="my-3">
-                      <Table className="w-full py-2">
+                      <Table className="w-full">
                         <TableHeader>
                           <TableRow className="text-xs lg:text-sm">
                             <TableHead className="font-bold w-1/2 text-left">
