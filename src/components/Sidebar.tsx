@@ -99,7 +99,7 @@ const Sidebar = () => {
         <div className="p-1 mb-4 bottom-0 absolute w-full left-0">
           <div
             onClick={handleLogout}
-            className={`text-[--danger] font-bold transition duration-300 flex items-center w-full gap-3 rounded-lg px-3 py-2`}
+            className={`text-[--danger] font-bold transition duration-300 flex items-center w-full cursor-pointer gap-3 rounded-lg px-3 py-2`}
           >
             <dt className="inline ">
               <CiLogout aria-hidden="true" className="h-6 w-6" />

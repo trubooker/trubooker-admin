@@ -31,9 +31,7 @@ import { LuDiamond } from "react-icons/lu";
 import toast from "react-hot-toast";
 import fetchToken from "@/lib/auth";
 import { useLoggedInUser } from "@/hooks/useLoggedUser";
-import Spinner from "@/components/Spinner";
 import { FaSpinner } from "react-icons/fa";
-import { set } from "lodash";
 import LogoutModal from "@/components/LogoutModal";
 
 const FormSchema = z.object({
@@ -56,6 +54,8 @@ const Settings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   });
+  const [loading, setLoading] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -89,7 +89,7 @@ const Settings = () => {
   };
 
   const handleUploadPicture = async () => {
-    // setLoading(true);
+    setLoading(true);
 
     try {
       if (selectedFile) {
@@ -112,13 +112,13 @@ const Settings = () => {
 
         const resdata = await res.json();
         if (resdata?.status == "success") {
-          // setLoading(false);
+          setLoading(false);
         }
       }
     } catch {
-      // setLoading(false);
+      setLoading(false);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -128,17 +128,16 @@ const Settings = () => {
   const toggleNewPasswordVisibility = () => {
     setShowNewPassword(!showNewPassword);
   };
-  const [loading, setLoading] = useState(false);
 
   const handleDeleteAccount = () => {
     alert("clicked");
   };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    setLoading(true);
+    setIsLoading(true);
     setTimeout(() => {
       console.log(data);
-      setLoading(false);
+      setIsLoading(false);
     }, 3000);
   };
 
@@ -166,7 +165,7 @@ const Settings = () => {
                   size={"sm"}
                   className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn]"
                 >
-                  {loading ? (
+                  {isloading ? (
                     <>
                       <FaSpinner className="animate-spin w-8 h-8" size={24} />
                     </>
@@ -205,7 +204,16 @@ const Settings = () => {
                       onClick={handleUploadPicture}
                       className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
                     >
-                      Upload Picture
+                      {loading ? (
+                        <>
+                          <FaSpinner
+                            className="animate-spin w-8 h-8"
+                            size={24}
+                          />
+                        </>
+                      ) : (
+                        "Upload Picture"
+                      )}
                     </div>
                   ) : (
                     ""
