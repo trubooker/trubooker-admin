@@ -134,7 +134,7 @@ const Settings = () => {
         city: userData?.city,
         address: userData?.address,
         country: userData?.country,
-        phone: userData?.phone,
+        phone: userData?.phone || "088-090-9919",
         email: userData?.email,
       });
 
@@ -199,7 +199,13 @@ const Settings = () => {
           <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
             <Avatar className="w-40 h-40">
               <AvatarImage
-                src={previewSrc ? previewSrc : userData?.profile_image}
+                src={
+                  previewSrc
+                    ? previewSrc
+                    : userData?.profile_image
+                    ? userData?.profile_image
+                    : "https://images.pexels.com/photos/29366225/pexels-photo-29366225/free-photo-of-silhouette-of-cyclist-against-illuminated-shop-window.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load"
+                }
               />
               <AvatarFallback>
                 <IoPersonOutline className="h-14 w-14" />
