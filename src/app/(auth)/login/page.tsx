@@ -130,6 +130,7 @@ export default function LoginComponent() {
                             className="py-6"
                           />
                         </FormControl>
+                        {!emailError ? <FormMessage /> : ""}
                         {emailError && <FormMessage>{emailError}</FormMessage>}
                       </FormItem>
                     )}
@@ -164,6 +165,7 @@ export default function LoginComponent() {
                             </button>
                           </div>
                         </FormControl>
+                        {!passwordError ? <FormMessage /> : ""}
                         {passwordError && (
                           <FormMessage>{passwordError}</FormMessage>
                         )}
