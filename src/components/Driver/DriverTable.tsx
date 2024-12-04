@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
 
@@ -30,6 +30,8 @@ export function DriverTable({
     alert(`Trip with id # ${id} Deleted!!`);
   };
 
+  const params = useParams();
+  const driverId = params.driverId;
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
@@ -130,9 +132,14 @@ export function DriverTable({
                       >
                         <DropdownMenuItem
                           className="w-full text-center cursor-pointer"
-                          onClick={() => handleDelete(data?.trip_id)}
+                          // onClick={() => handleDelete(data?.trip_id)}
+                          onClick={() =>
+                            router.push(
+                              `/drivers/${driverId}/trip-detail/${data?.trip_id}`
+                            )
+                          }
                         >
-                          Delete
+                          View Details
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

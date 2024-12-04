@@ -21,7 +21,7 @@ import {
 
 const ViewDriver = () => {
   const params = useParams();
-  const id = String(params.slug);
+  const id = String(params.driverId);
   const router = useRouter();
   const status = "active";
   const {
