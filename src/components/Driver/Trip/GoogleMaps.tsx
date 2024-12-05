@@ -8,6 +8,7 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { io } from "socket.io-client";
+import BouncingBall from "@/components/BounceXanimation";
 
 interface BusStop {
   latitude: number;
@@ -83,12 +84,14 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
     }
   }, [isLoaded, busStops]);
 
-  if (!isLoaded) return <div>Loading...</div>;
-
-  const markerIcon = {
-    url: "/location.svg",
-    scaledSize: new google.maps.Size(40, 40),
-  };
+  if (!isLoaded)
+    return (
+      <div className="relative h-[500px] w-full border rounded-md p-4 justify-center text-center text-lg my-auto flex flex-col">
+        <div className="absolute inset-y-0 left-40 flex gap-x-3 italic items-center">
+          Map loading <BouncingBall />
+        </div>
+      </div>
+    );
 
   const driverIcon = {
     url: "/car.svg",
@@ -128,7 +131,6 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
           <Marker
             key={index}
             position={{ lat: stop.latitude, lng: stop.longitude }}
-            icon={markerIcon}
           />
         ))}
       </GoogleMap>
