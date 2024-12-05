@@ -59,7 +59,7 @@ export const LineChartDisplay: FC<Props> = ({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="day"
               tickLine={false}
               axisLine={false}
               tickMargin={8}

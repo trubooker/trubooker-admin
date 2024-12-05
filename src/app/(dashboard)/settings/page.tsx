@@ -60,7 +60,8 @@ const Settings = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [openLog, setOpenLog] = React.useState(false);
   const [dobError, setDobError] = useState("");
-  const { userData } = useLoggedInUser();
+  const [imageChange, setImageChange] = useState(false);
+  const { userData, userRefetching } = useLoggedInUser();
   const [update, { isLoading }] = useUpdateProfileMutation();
 
   const handleFileChange = async (e: any) => {
@@ -74,6 +75,7 @@ const Settings = () => {
 
         reader.onloadend = () => {
           setPreviewSrc(reader.result as string);
+          setImageChange(true);
         };
 
         reader.readAsDataURL(file);
@@ -113,6 +115,8 @@ const Settings = () => {
         if (resdata?.status == "success") {
           toast.success(`Profile Image Updated!! ✅`);
           setLoading(false);
+          userRefetching();
+          setImageChange(false);
         }
       }
     } catch {
@@ -199,13 +203,7 @@ const Settings = () => {
           <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
             <Avatar className="w-40 h-40">
               <AvatarImage
-                src={
-                  previewSrc
-                    ? previewSrc
-                    : userData?.profile_image
-                    ? userData?.profile_image
-                    : "https://images.pexels.com/photos/29366225/pexels-photo-29366225/free-photo-of-silhouette-of-cyclist-against-illuminated-shop-window.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load"
-                }
+                src={previewSrc ? previewSrc : userData?.profile_image}
               />
               <AvatarFallback>
                 <IoPersonOutline className="h-14 w-14" />
@@ -225,7 +223,7 @@ const Settings = () => {
                   onChange={handleFileChange}
                 />
               </label>
-              {previewSrc ? (
+              {imageChange ? (
                 <div
                   onClick={handleUploadPicture}
                   className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
@@ -233,7 +231,7 @@ const Settings = () => {
                   {loading ? (
                     <>
                       <FaSpinner
-                        className="animate-spin w-4 h-4 mx-auto"
+                        className="animate-spin w-4 h-4 text-gray-400 mx-auto"
                         size={24}
                       />
                     </>
@@ -617,7 +615,7 @@ const Settings = () => {
               <span className="flex flex-col lg:flex-row gap-5">
                 <div
                   onClick={handleLogout}
-                  className="py-2 px-5 lg:w-32 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
+                  className="bg-[#B3261E] text-white hover:text-white hover:bg-[#C45650] py-2 px-5 rounded-lg text-[13px] cursor-pointer"
                 >
                   <span className="flex gap-x-3 justify-center items-center">
                     <LuDiamond />

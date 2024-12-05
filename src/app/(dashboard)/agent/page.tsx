@@ -31,7 +31,7 @@ const Agent = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const AgentListData = userData?.data;
-  const totalPages = AgentListData?.data?.instructors?.last_page;
+  const totalPages = userData?.meta?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);

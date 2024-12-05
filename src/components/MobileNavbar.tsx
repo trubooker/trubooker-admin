@@ -172,13 +172,7 @@ const MobileNavbar = () => {
                 </small>
               </p>
               <Avatar className="w-10 h-10">
-                <AvatarImage
-                  src={
-                    data?.profile_image
-                      ? data?.profile_image
-                      : "https://images.pexels.com/photos/29366225/pexels-photo-29366225/free-photo-of-silhouette-of-cyclist-against-illuminated-shop-window.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load"
-                  }
-                />
+                <AvatarImage src={data?.profile_image} />
                 <AvatarFallback>
                   {data?.first_name?.charAt(0)}
                   {data?.last_name?.charAt(0)}

@@ -9,7 +9,7 @@ import CountUp from "react-countup";
 const AgentInfo = ({
   withdrawal_req,
   agent_ref,
-  ref,
+  referral,
   earning_overview,
   profile,
   loading,
@@ -72,8 +72,8 @@ const AgentInfo = ({
                       </span>
                     </div>
                   </div>
-                  <div className="flex justify-between">
-                    <div className="flex flex-col">
+                  <div className="flex justify-between w-full">
+                    <div className="flex flex-col w-[60%]">
                       <span className="font-normal text-xs text-gray-500">
                         Address
                       </span>
@@ -222,11 +222,11 @@ const AgentInfo = ({
               <div className="py-4 flex gap-x-3 items-center">
                 <h2 className="text-base font-bold">Referral performance</h2>
                 <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-                  {agent_ref?.length}
+                  {referral?.length}
                 </div>
               </div>
               <Referral
-                data={agent_ref}
+                data={referral}
                 loading={loading}
                 isFetching={isFetching}
               />

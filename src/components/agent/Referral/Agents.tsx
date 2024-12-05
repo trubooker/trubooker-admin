@@ -22,9 +22,9 @@ const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
   // } = useGetStudentReportQuery(page);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userData: any = [];
-  const users = userData;
-  const totalPages = users?.data?.instructors?.last_page;
+
+  const users: any = [];
+  const totalPages = SingleAgentListData?.data?.meta?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -40,31 +40,24 @@ const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
               <Table className="">
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
-                    <TableHead className="text-left font-bold w-1/6">
-                      Trip Id
-                    </TableHead>
-                    <TableHead className="font-bold w-1/6">Departure</TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
-                      Destination
+                    <TableHead className="font-bold w-1/6 text-left">
+                      Name
                     </TableHead>
                     <TableHead className="font-bold w-1/6 text-center">
-                      Date
+                      Date referred
                     </TableHead>
                     <TableHead className="font-bold w-1/6 text-center">
                       Status
                     </TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
-                      Amount paid
-                    </TableHead>
                     <TableHead className="text-center font-bold w-1/6">
-                      Actions
+                      Earning status
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                     <TableRow key={i}>
-                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      {[1, 2, 3, 4].map((i) => (
                         <TableCell key={i}>
                           <div>
                             <div className="w-full rounded-md">

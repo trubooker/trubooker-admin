@@ -2,8 +2,6 @@
 
 import React, { FC, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefKinProfileTable } from "@/components/Passenger/RefKinProfileTable";
-import { SinglePassengerReferalData } from "@/constants";
 import Pagination from "@/components/Pagination";
 import {
   Table,
@@ -15,29 +13,12 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import MapComponent from "@/components/Driver/Trip/Maps";
+import MapComponent from "@/components/Driver/Trip/GoogleMaps";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
 import Image from "next/image";
 
-const Slug = ({ ref, nok, profile }: any) => {
-  const routeData = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [7.49508, 9.07226], // Start
-            [7.64526, 9.15411], // Stop
-            [7.73594, 8.93754], // End
-          ],
-        },
-      },
-    ],
-  };
-
+const Slug = ({ nok, profile }: any) => {
   const stops = [
     {
       name: "Abuja Bus Terminal",
@@ -64,6 +45,7 @@ const Slug = ({ ref, nok, profile }: any) => {
       latitude: 8.84345,
     },
   ];
+
   const info: any = {};
   const [page, setPage] = useState(1);
   const totalPages = info?.data?.active_trips?.last_page;
@@ -96,8 +78,7 @@ const Slug = ({ ref, nok, profile }: any) => {
                           Departure
                         </span>
                         <span className="font-medium text-sm capitalize">
-                          {!profile?.first_name ||
-                          profile?.last_name ? (
+                          {!profile?.first_name || profile?.last_name ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
                             <div className="flex gap-x-2">
@@ -279,7 +260,7 @@ const Slug = ({ ref, nok, profile }: any) => {
           </div>
         </div>
         <div className="xl:w-[60%] h-full bg-white rounded-lg w-full p-5">
-          <div className="grid xl:grid-cols-3 grid-cols-1 gap-4 p-4">
+          <div className="grid xl:grid-cols-3 grid-cols-1 gap-4 ">
             <div className="col-span-2 h-[500px]">
               <MapComponent busStops={stops} />
             </div>

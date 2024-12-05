@@ -1,6 +1,5 @@
 import { api } from "../apiSlice";
 
-
 const passengersApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Passengers"],
 });
@@ -22,12 +21,12 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Passengers"],
     }),
 
-    togglePassengerStatus: builder.query({
+    togglePassengerStatus: builder.mutation({
       query: (passenger) => ({
         url: `/admin/passengers/toggle-status/${passenger}`,
         method: "PATCH",
       }),
-      providesTags: ["Passengers"],
+      invalidatesTags: ["Passengers"],
     }),
   }),
 });
@@ -35,5 +34,5 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 export const {
   useGetPassengersQuery,
   useGetOnePassengerQuery,
-  useTogglePassengerStatusQuery,
+  useTogglePassengerStatusMutation,
 } = passengersApi;

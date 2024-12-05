@@ -18,6 +18,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 export function DriverTable({
   data: DriverTableData,
@@ -93,7 +94,7 @@ export function DriverTable({
                   </TableCell>
 
                   <TableCell className="w-1/7 py-5 text-center">
-                    ₦ {data.amount}
+                    {formatCurrency(data?.amount)}
                   </TableCell>
                   <TableCell>
                     {data.status === "active" ? (

@@ -864,18 +864,18 @@ export const Referall = [
 ];
 
 export const chartDataLine = [
-  { month: "Jan", revenue: 186 },
-  { month: "Feb", revenue: 305 },
-  { month: "March", revenue: 237 },
-  { month: "April", revenue: 73 },
-  { month: "May", revenue: 209 },
-  { month: "June", revenue: 214 },
-  { month: "July", revenue: 214 },
-  { month: "Aug", revenue: 119 },
-  { month: "Sept", revenue: 100 },
-  { month: "Oct", revenue: 100 },
-  { month: "Nov", revenue: 111 },
-  { month: "Dec", revenue: 104 },
+  { month: "Jan", revenue: 0.6 },
+  { month: "Feb", revenue: 0.6 },
+  { month: "March", revenue: 0.6 },
+  { month: "April", revenue: 0.6 },
+  { month: "May", revenue: 0.6 },
+  { month: "June", revenue: 0.6 },
+  { month: "July", revenue: 0.6 },
+  { month: "Aug", revenue: 0.9 },
+  { month: "Sept", revenue: 0.6 },
+  { month: "Oct", revenue: 0.6 },
+  { month: "Nov", revenue: 0.6 },
+  { month: "Dec", revenue: 0.6 },
 ];
 
 export const chartConfigLine = {
