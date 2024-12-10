@@ -21,6 +21,14 @@ const driversApi = driversApiConfig.injectEndpoints({
       providesTags: ["Drivers"],
     }),
 
+    getTripDetails: builder.query({
+      query: (trip) => ({
+        url: `/admin/drivers/trip/${trip}`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
+
     toggleDriverStatus: builder.mutation({
       query: (driver) => ({
         url: `/admin/drivers/toggle-status/${driver}`,
@@ -35,4 +43,5 @@ export const {
   useGetDriversQuery,
   useGetOneDriverQuery,
   useToggleDriverStatusMutation,
+  useGetTripDetailsQuery,
 } = driversApi;

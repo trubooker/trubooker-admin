@@ -14,10 +14,11 @@ interface BusStop {
   latitude: number;
   longitude: number;
   name: string;
+  time_of_arrival: string;
 }
 
 interface MapComponentProps {
-  busStops: BusStop[];
+  busStops: BusStop[] | [];
 }
 
 const MapComponent = ({ busStops }: MapComponentProps) => {
@@ -55,10 +56,10 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
   }, [currentLocation]);
 
   useEffect(() => {
-    if (isLoaded && busStops.length > 1) {
+    if (isLoaded && busStops?.length > 1) {
       const directionsService = new window.google.maps.DirectionsService();
 
-      const waypoints = busStops.slice(1, -1).map((stop) => ({
+      const waypoints = busStops?.slice(1, -1).map((stop) => ({
         location: { lat: stop.latitude, lng: stop.longitude },
         stopover: true,
       }));
@@ -67,8 +68,8 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
         {
           origin: { lat: busStops[0].latitude, lng: busStops[0].longitude },
           destination: {
-            lat: busStops[busStops.length - 1].latitude,
-            lng: busStops[busStops.length - 1].longitude,
+            lat: busStops[busStops?.length - 1].latitude,
+            lng: busStops[busStops?.length - 1].longitude,
           },
           waypoints: waypoints,
           travelMode: window.google.maps.TravelMode.DRIVING,
@@ -95,7 +96,7 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
 
   const driverIcon = {
     url: "/car.svg",
-    scaledSize: new google.maps.Size(40, 40),
+    scaledSize: new google.maps.Size(80, 80),
   };
 
   return (
@@ -127,7 +128,7 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
         )}
 
         {/* Bus Stops */}
-        {busStops.map((stop, index) => (
+        {busStops?.map((stop, index) => (
           <Marker
             key={index}
             position={{ lat: stop.latitude, lng: stop.longitude }}

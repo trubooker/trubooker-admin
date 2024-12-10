@@ -10,8 +10,7 @@ export const formatCurrency = (
   currencySymbol: string = "₦"
 ): string => {
   // Convert the amount to a number if it's a string
-  const numericAmount =
-    typeof amount === "string" ? parseFloat(amount) : amount;
+  const numericAmount = typeof amount === "string" ? Number(amount) : amount;
 
   // Format the number with commas
   const formattedAmount = numericAmount.toLocaleString("en-NG", {
