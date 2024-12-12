@@ -6,17 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatCurrency = (
-  amount: number | string,
+  amount: number | string | null,
   currencySymbol: string = "₦"
 ): string => {
   // Convert the amount to a number if it's a string
   const numericAmount = typeof amount === "string" ? Number(amount) : amount;
 
   // Format the number with commas
-  const formattedAmount = numericAmount.toLocaleString("en-NG", {
+  const formattedAmount = numericAmount?.toLocaleString("en-NG", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
 
-  return `${currencySymbol} ${formattedAmount}`;
+  return `${currencySymbol} ${amount != null ? formattedAmount : 0}`;
+};
+
+export const formatSnakeCase = (input: string): string => {
+  return input.replace(/_/g, ' ');
 };

@@ -1208,7 +1208,7 @@ export const roles = [
   {
     id: "2",
     users: 5,
-    role: "Super admin",
+    role: "Super_admin",
     images: [
       {
         profile_image:

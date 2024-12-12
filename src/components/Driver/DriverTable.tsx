@@ -97,26 +97,24 @@ export function DriverTable({
                     {formatCurrency(data?.amount)}
                   </TableCell>
                   <TableCell>
-                    {data.status === "active" ? (
-                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                        <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                        <span className="font-semibold text-xs">Active</span>
-                      </div>
-                    ) : data.status === "completed" ? (
+                    {data.status === "completed" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
                         <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
                         <span className="font-semibold text-xs">Completed</span>
                       </div>
-                    ) : data.status === "pending" ? (
+                    ) : data.status === "pending" ||
+                      data.status === "upcoming" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
                         <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                        <span className="font-semibold text-xs">Pending</span>
+                        <span className="font-semibold text-xs">Upcoming</span>
                       </div>
-                    ) : (
+                    ) : data.status === "cancelled" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
                         <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                         <span className="font-semibold text-xs">Cancelled</span>
                       </div>
+                    ) : (
+                      ""
                     )}
                   </TableCell>
                   <TableCell className="w-1/7 py-5 text-center w-[100px]">

@@ -600,20 +600,43 @@ const Slug = () => {
                             </TableCell>
 
                             <TableCell className=" py-5 w-1/7">
-                              {data.status === "active" ? (
+                              {data.status === "verified" ? (
                                 <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                                   <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                                   <span className="font-semibold text-xs">
-                                    {data?.status}
+                                    Verified
+                                  </span>
+                                </div>
+                              ) : data.status === "completed" ? (
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
+                                  <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
+                                  <span className="font-semibold text-xs">
+                                    Completed
+                                  </span>
+                                </div>
+                              ) : data.status === "paid" ? (
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-auto bg-[#FFE6E6] text-[#B3261E]">
+                                  <span className="w-2 h-2 bg-[#B3261E] rounded-full"></span>
+                                  <span className="font-semibold text-xs">
+                                    Not Validated
+                                  </span>
+                                </div>
+                              ) : data.status === "cancelled" ? (
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                  <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                                  <span className="font-semibold text-xs">
+                                    Cancelled
+                                  </span>
+                                </div>
+                              ) : data.status === "pending" ? (
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                  <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                                  <span className="font-semibold text-xs">
+                                    Pending
                                   </span>
                                 </div>
                               ) : (
-                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#FFE6E6] text-[#FF4500]">
-                                  <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                  <span className="font-semibold text-xs">
-                                    {data.status}
-                                  </span>
-                                </div>
+                                ""
                               )}
                             </TableCell>
                             <TableCell className="w-1/7 h-full py-5 flex mt-2 items-center justify-center text-center mx-auto gap-x-2">
