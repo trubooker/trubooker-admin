@@ -37,6 +37,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useUpdateProfileMutation } from "@/redux/services/Slices/userApiSlice";
 import UpdatePassword from "@/components/Settings/UpdatePassword";
+import ImageUploader from "@/components/ImageUploader";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import Image from "next/image";
 
 const FormSchema = z.object({
   first_name: z.any().optional(),
@@ -49,6 +52,11 @@ const FormSchema = z.object({
   gender: z.enum(["male", "female"]).optional(),
 });
 
+interface ImagePreview {
+  file: File;
+  url: string;
+}
+
 const Settings = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -56,46 +64,52 @@ const Settings = () => {
   });
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [previewSrc, setPreviewSrc] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [openLog, setOpenLog] = React.useState(false);
+  const [images, setImages] = useState<ImagePreview[]>([]);
   const [dobError, setDobError] = useState("");
   const [imageChange, setImageChange] = useState(false);
   const { userData, userRefetching } = useLoggedInUser();
   const [update, { isLoading }] = useUpdateProfileMutation();
 
-  const handleFileChange = async (e: any) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
-
-      if (validImageTypes.includes(file.type)) {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          setPreviewSrc(reader.result as string);
-          setImageChange(true);
-        };
-
-        reader.readAsDataURL(file);
-        setSelectedFile(file);
-      } else {
-        toast.error("Please upload a valid image file (JPEG, JPG, or PNG)");
-        setPreviewSrc("");
-      }
-    } else {
-      setPreviewSrc("");
-    }
+  const handleRemoveImage = (url: string) => {
+    setImages((prevImages) => prevImages.filter((image) => image.url !== url));
   };
+
+  // const handleFileChange = async (e: any) => {
+  //   const file = e.target.files?.[0];
+
+  //   if (file) {
+  //     const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+  //     if (validImageTypes.includes(file.type)) {
+  //       const reader = new FileReader();
+
+  //       reader.onloadend = () => {
+  //         setPreviewSrc(reader.result as string);
+  //         setImageChange(true);
+  //       };
+
+  //       reader.readAsDataURL(file);
+  //       setSelectedFile(file);
+  //     } else {
+  //       toast.error("Please upload a valid image file (JPEG, JPG, or PNG)");
+  //       setPreviewSrc("");
+  //     }
+  //   } else {
+  //     setPreviewSrc("");
+  //   }
+  // };
 
   const handleUploadPicture = async () => {
     setLoading(true);
 
     try {
-      if (selectedFile) {
+      if (images) {
         const formdata = new FormData();
-        selectedFile && formdata.append("profile_image", selectedFile);
+        images &&
+          images.forEach((image) => {
+            formdata.append("profile_image", image.file);
+          });
 
         const token = await fetchToken();
         const headers = {
@@ -116,6 +130,7 @@ const Settings = () => {
           toast.success(`Profile Image Updated!! ✅`);
           setLoading(false);
           userRefetching();
+          setImages([]);
           setImageChange(false);
         }
       }
@@ -186,6 +201,10 @@ const Settings = () => {
     setOpenLog(true);
   };
 
+  const handleImageChange = () => {
+    setImageChange(true);
+  };
+
   return (
     <div>
       <LogoutModal open={openLog} setOpen={setOpenLog} />
@@ -201,46 +220,62 @@ const Settings = () => {
         </div>
         <div className="bg-white rounded-xl p-5">
           <div className="flex flex-col lg:flex-row items-center p-5 gap-3">
-            <Avatar className="w-40 h-40">
-              <AvatarImage
-                src={previewSrc ? previewSrc : userData?.profile_image}
-              />
-              <AvatarFallback>
-                <IoPersonOutline className="h-14 w-14" />
-              </AvatarFallback>
-            </Avatar>
-            <span className="flex flex-col lg:flex-row gap-2">
-              <label
-                htmlFor="fileInput"
-                className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
-              >
-                Upload new
-                <input
-                  type="file"
-                  id="fileInput"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
+            <>
+              <Avatar className="w-40 h-40">
+                {imageChange ? (
+                  <>
+                    {images?.map((image, index: number) => (
+                      <>
+                        <AvatarImage src={image.url} />
+                      </>
+                    ))}
+                  </>
+                ) : (
+                  <AvatarImage src={userData?.profile_image} />
+                )}
+                <AvatarFallback>
+                  <IoPersonOutline className="h-14 w-14" />
+                </AvatarFallback>
+              </Avatar>
+            </>
+
+            <span className="flex flex-col lg:flex-row items-center gap-4">
+              {images.length === 0 && !imageChange ? (
+                <ImageUploader
+                  setImages={setImages}
+                  onImageChange={handleImageChange}
+                  classname={
+                    "bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn] py-2 px-5 rounded-lg text-[13px] text-center cursor-pointer"
+                  }
+                  trigger={"Upload New"}
+                  multiple={false}
                 />
-              </label>
-              {imageChange ? (
+              ) : (
+                <div
+                  onClick={() => {
+                    setImages([]);
+                    setImageChange(false);
+                  }}
+                  className="bg-red-500 text-white hover:bg-red-600 py-2 px-5 rounded-lg text-[13px] cursor-pointer"
+                >
+                  Delete Image
+                </div>
+              )}
+
+              {images.length > 0 && (
                 <div
                   onClick={handleUploadPicture}
                   className="py-2 px-5 rounded-lg text-[13px] cursor-pointer border hover:bg-gray-100"
                 >
                   {loading ? (
-                    <>
-                      <FaSpinner
-                        className="animate-spin w-4 h-4 text-gray-400 mx-auto"
-                        size={24}
-                      />
-                    </>
+                    <FaSpinner
+                      className="animate-spin w-4 h-4 text-gray-400 mx-auto"
+                      size={24}
+                    />
                   ) : (
                     "Upload Picture"
                   )}
                 </div>
-              ) : (
-                ""
               )}
             </span>
           </div>

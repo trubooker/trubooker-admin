@@ -16,7 +16,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
-import { AgentList } from "@/components/agent/agentList";
+import { AgentList } from "@/components/connector/agentList";
 import { useGetAgentsQuery } from "@/redux/services/Slices/agentApiSlice";
 
 const Agent = () => {
@@ -62,7 +62,7 @@ const Agent = () => {
       {/* <div className="py-4">
       </div> */}
       <div className="flex gap-x-3 items-center ps-3 mb-5">
-        <h2 className="text-2xl font-bold">Agents</h2>
+        <h2 className="text-2xl font-bold">Connectors</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
           {AgentListData?.length}
         </div>

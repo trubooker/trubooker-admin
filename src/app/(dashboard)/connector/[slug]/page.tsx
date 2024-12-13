@@ -7,7 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { FaMoneyBillWave } from "react-icons/fa";
-import AgentInfo from "@/components/agent/agentInfo";
+import AgentInfo from "@/components/connector/agentInfo";
 import {
   useGetOneAgentQuery,
   useToggleAgentStatusMutation,
@@ -87,7 +87,9 @@ const ViewAgent = () => {
                 </div>
                 <div className="lg:mt-3 mt-1 ms-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
-                    {profile?.role || profile?.type}
+                    {profile?.role === "agent" || profile?.type === "agent"
+                      ? "Connector"
+                      : profile?.role || profile?.type}
                   </span>
                   <span className="text-gray-400 text-xs">#{profile?.id}</span>
                 </div>

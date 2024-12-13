@@ -35,9 +35,9 @@ export const NavLinks: LinkItem[] = [
   },
   {
     id: 4,
-    title: "Agent",
+    title: "Connectors",
     icon: TbUserStar,
-    link: "/agent",
+    link: "/connector",
   },
   {
     id: 5,

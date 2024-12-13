@@ -132,7 +132,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <span className="text-sm text-white font-normal">
-                    Total Agents
+                    Total Connectors
                   </span>
                 </CardContent>
               </Card>
