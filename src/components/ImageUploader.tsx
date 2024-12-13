@@ -136,13 +136,7 @@ const ImageUploader: FC<ImageProp> = ({
               onCropComplete={onCropComplete}
             />
           </div>
-          <div
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className="mt-[20px] flex justify-between">
             <input
               type="range"
               min={1}
@@ -151,13 +145,15 @@ const ImageUploader: FC<ImageProp> = ({
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
             />
-            <button
-              onClick={saveCroppedImage}
-              className="bg-zinc-800 px-6 rounded py-1 text-white text-sm"
-            >
-              Save
-            </button>
-            <button onClick={() => setCropModalOpen(false)}>Cancel</button>
+            <div className="flex flex-col lg:flex-row gap-4">
+              <button
+                onClick={saveCroppedImage}
+                className="bg-zinc-800 px-6 rounded py-1 text-white text-sm"
+              >
+                Save
+              </button>
+              <button className="text-sm" onClick={() => setCropModalOpen(false)}>Cancel</button>
+            </div>
           </div>
         </Modal>
       )}

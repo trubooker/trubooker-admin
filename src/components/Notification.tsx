@@ -10,14 +10,27 @@ import Link from "next/link";
 import { Notification } from "@/constants";
 import Logo from "@/public/trubookerNotification.svg";
 import Spinner from "./Spinner";
+import { useFetchNotificationsQuery } from "@/redux/services/Slices/notificationApiSlice";
 
 const Notifications = () => {
   const router = useRouter();
-  const isFetching: boolean = false;
+
+  const {
+    data: unreadData,
+    isLoading: unreadLoading,
+    isFetching: unreadFetching,
+  } = useFetchNotificationsQuery({ type: "unread" });
+
+  const {
+    data: readData,
+    isLoading: readLoading,
+    isFetching: readFetching,
+  } = useFetchNotificationsQuery({ type: "read" });
+
   return (
     // <div className="mb-10 xl:mb-5">
     <div className="">
-      <Card className="w-full overflow-auto h-[500px]">
+      <Card className="w-full overflow-y-auto overflow-x-hidden h-[500px]">
         <CardHeader className="sticky pt-5 pb-3 bg-white text-left text-lg font-bold">
           Notifications
         </CardHeader>
@@ -48,12 +61,12 @@ const Notifications = () => {
             </>
           ) : (
             <>
-              {isFetching ? (
-                <div className="h-[400px]">
+              {unreadFetching || readFetching ? (
+                <div className="h-[390px] w-full">
                   <Spinner />
                 </div>
               ) : (
-                <div className="flex items-center w-full h-[400px] flex-col justify-center">
+                <div className="flex items-center w-full h-[390px] flex-col justify-center">
                   <Image
                     src={"/nodata.svg"}
                     alt=""

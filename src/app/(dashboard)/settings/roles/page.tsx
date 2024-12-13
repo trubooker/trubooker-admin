@@ -14,6 +14,7 @@ import {
   useGetPermissionsQuery,
   useGetRolesByIdQuery,
   useGetRolesQuery,
+  useGroupUserByRolesQuery,
 } from "@/redux/services/Slices/settings/rolesApiSlice";
 import { AddStaffRoles } from "@/components/Settings/Roles/AddStaffRoles";
 import { formatSnakeCase } from "@/lib/utils";
@@ -41,6 +42,13 @@ const Roles = () => {
     isFetching: permissionsFetching,
   } = useGetPermissionsQuery(null);
   console.log("permissions: ", permissions);
+
+  const {
+    data: groupUsers,
+    isLoading: groupUsersLoading,
+    isFetching: groupUsersFetching,
+  } = useGroupUserByRolesQuery(null);
+  console.log("groupUsers: ", groupUsers);
 
   const {
     data: permissionsById,
@@ -83,7 +91,7 @@ const Roles = () => {
           </div>
         ) : (
           <div className="grid grid-rows-1 lg:grid-rows-none gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            {role?.map((tot: any, index: number) => (
+            {groupUsers?.data?.map((tot: any, index: number) => (
               <Card
                 key={index}
                 className={`w-full border-none my-auto bg-white`}
@@ -92,10 +100,10 @@ const Roles = () => {
                   <div className="grid grid-cols-2">
                     <div className="flex flex-col items-start gap-y-3 me-auto">
                       <span className="text-sm text-black font-normal">
-                        Total {tot?.users} Users
+                        Total {tot?.users?.length} User(s)
                       </span>
                       <span className="text-lg font-bold text-black capitalize">
-                        {formatSnakeCase(String(tot?.name) || "")}
+                        {formatSnakeCase(String(tot?.role) || "")}
                       </span>
                       <Modal
                         trigger={
@@ -112,9 +120,9 @@ const Roles = () => {
                         content={<EditRoles id={tot?.id} />}
                       />
                     </div>
-                    {/* <div className="flex ms-auto gap-x-3 text-black items-center">
-                    <StackedImages images={tot?.images} />
-                  </div> */}
+                    <div className="flex ms-auto gap-x-3 text-black items-center">
+                      <StackedImages images={tot?.users} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
