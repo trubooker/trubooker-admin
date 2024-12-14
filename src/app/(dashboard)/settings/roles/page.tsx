@@ -79,9 +79,9 @@ const Roles = () => {
         </span>
       </div>
       <div className="w-full mb-5 lg:mb-8">
-        {roleLoading || roleFetching ? (
+        {groupUsersLoading || groupUsersFetching ? (
           <div className="w-full grid lg:grid-cols-3 grid-cols-1 pt-5  mt-5 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div className="w-full rounded-md" key={i}>
                 <div className="flex flex-col space-y-3">
                   <Skeleton className="bg-gray-200 h-[125px] w-full rounded-xl" />

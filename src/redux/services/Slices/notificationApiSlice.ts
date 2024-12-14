@@ -17,30 +17,44 @@ const notificationApi = notificationApiConfig.injectEndpoints({
       providesTags: ["Notification"],
     }),
 
-    // getOneDriver: builder.query({
-    //   query: (driver) => ({
-    //     url: `/admin/notification/${driver}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["Notification"],
-    // }),
+    markAllAsRead: builder.mutation({
+      query: () => ({
+        url: `/notifications/mark-all-as-read`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
 
-    // getTripDetails: builder.query({
-    //   query: (trip) => ({
-    //     url: `/admin/notification/trip/${trip}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["Notification"],
-    // }),
+    markOneAsRead: builder.mutation({
+      query: (id: any) => ({
+        url: `/notifications/mark-as-read/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
 
-    // togglenotificationtatus: builder.mutation({
-    //   query: (driver) => ({
-    //     url: `/admin/notification/toggle-status/${driver}`,
-    //     method: "PATCH",
-    //   }),
-    //   invalidatesTags: ["Notification"],
-    // }),
+    deleteAllNotifications: builder.mutation({
+      query: () => ({
+        url: `/notifications/clear`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
+
+    deleteOneNotification: builder.mutation({
+      query: ({ id }: any) => ({
+        url: `/notifications/clear/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
   }),
 });
 
-export const { useFetchNotificationsQuery } = notificationApi;
+export const {
+  useFetchNotificationsQuery,
+  useDeleteAllNotificationsMutation,
+  useDeleteOneNotificationMutation,
+  useMarkAllAsReadMutation,
+  useMarkOneAsReadMutation,
+} = notificationApi;
