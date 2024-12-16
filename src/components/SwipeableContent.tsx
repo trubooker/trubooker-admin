@@ -4,11 +4,11 @@ import clsx from "clsx";
 import { Separator } from "./ui/separator";
 
 const SwipeableNotification: React.FC<{
-  id: string;
+  index: string;
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
   content: ReactNode;
-}> = ({ id, onMarkAsRead, onDelete, content }) => {
+}> = ({ index, onMarkAsRead, onDelete, content }) => {
   const [isActionsVisible, setIsActionsVisible] = useState(false);
 
   const handlers = useSwipeable({
@@ -32,13 +32,13 @@ const SwipeableNotification: React.FC<{
       >
         <button
           className="text-red-600 hover:bg-red-100 bg-red-200 py-4 rounded-xl"
-          onClick={() => onDelete(id)}
+          onClick={() => onDelete(index)}
         >
           Delete
         </button>
         <button
           className="text-green-600 hover:bg-green-100 bg-green-200 py-4 rounded-xl"
-          onClick={() => onMarkAsRead(id)}
+          onClick={() => onMarkAsRead(index)}
         >
           Mark as Read
         </button>
