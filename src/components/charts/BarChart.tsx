@@ -64,7 +64,7 @@ export const BarCharts: FC<Props> = ({
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="desktop" fill="#FD8C00" radius={8}>
+            <Bar dataKey="revenue" fill="#FD8C00" radius={8}>
               <LabelList
                 position="top"
                 offset={12}

@@ -56,7 +56,11 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-  		keyframes: {
+		  keyframes: {
+			bounceX: {
+				"0%, 100%": { transform: "translateX(0)" },
+				"50%": { transform: "translateX(20px)" },
+			  },
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -74,10 +78,11 @@ export default {
   				}
   			}
   		},
-  		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
-  		}
+		  animation: {
+			bounceX: "bounceX 1.5s ease-in-out infinite",
+			"accordion-down": "accordion-down 0.2s ease-out",
+			"accordion-up": "accordion-up 0.2s ease-out",
+		  },
   	}
   },
   plugins: [require("tailwindcss-animate")],

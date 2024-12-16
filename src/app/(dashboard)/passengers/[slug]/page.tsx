@@ -9,7 +9,10 @@ import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import PassengerTripTable from "@/components/Passenger/PassengerTrip";
 import RefKinProfile from "@/components/Passenger/RefKinProfile";
-import { useGetOnePassengerQuery } from "@/redux/services/Slices/passenger.ApiSlice";
+import {
+  useGetOnePassengerQuery,
+  useTogglePassengerStatusMutation,
+} from "@/redux/services/Slices/passenger.ApiSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -19,6 +22,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Modal } from "@/components/Modal";
+import ToggleStatus from "@/components/ToggleStatus";
+import { DialogClose } from "@/components/ui/dialog";
 
 const ViewPassenger = () => {
   const params = useParams();
@@ -33,8 +39,15 @@ const ViewPassenger = () => {
   console.log("SinglePassenger", userData);
   const profile = userData?.data?.profile;
   const nok = userData?.data?.next_of_kin;
-  const ref = userData?.data?.refferals;
+  const referrals = userData?.data?.refferals;
   const th = userData?.data?.trip_history;
+
+  const [mutate, { isLoading: loadingToggle }] =
+    useTogglePassengerStatusMutation();
+
+  const togglePassengerStatus = async () => {
+    await mutate(id).unwrap().then();
+  };
 
   return (
     <>
@@ -54,21 +67,21 @@ const ViewPassenger = () => {
               </Avatar>
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                 <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
-                  <span className="text-xl font-extrabold  text-start">
+                  <span className="text-xl font-extrabold capitalize text-start">
                     {profile?.first_name} {profile?.last_name}
                   </span>
                   <>
                     {profile?.status === "active" ? (
                       <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                        <span className="font-semibold text-xs">
+                        <span className="font-semibold text-xs capitalize">
                           {profile?.status}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
-                        <span className="font-semibold text-xs">
+                        <span className="font-semibold text-xs capitalize">
                           {profile?.status}
                         </span>
                       </div>
@@ -79,19 +92,55 @@ const ViewPassenger = () => {
                   <span className="font-extrabold text-sm capitalize">
                     {profile?.type || profile?.role}
                   </span>
-                  <span className="text-gray-400 text-xs">
-                    #{profile?.referral}
-                  </span>
+                  <span className="text-gray-400 text-xs">#{profile?.id}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto">
-              <Button
-                variant={"outline"}
-                className="bg-[--danger] hover:bg-[--danger-btn] hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
-              >
-                Deactivate account
-              </Button>
+              {profile?.status == "active" ? (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-[--danger] hover:bg-[--danger-btn] hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Deactivate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={togglePassengerStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              ) : (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-green-800 hover:bg-green-700 hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Activate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={togglePassengerStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              )}
+
               <span className="text-left lg:text-right lg:me-5 text-sm">
                 Joined{" "}
                 {new Date(profile?.created_at).toLocaleDateString("en-US", {
@@ -102,8 +151,8 @@ const ViewPassenger = () => {
               </span>
             </div>
           </div>
-          <RefKinProfile ref={ref} nok={nok} profile={profile} />
-          <PassengerTripTable data={th} />
+          <RefKinProfile ref={referrals} nok={nok} profile={profile} />
+          <PassengerTripTable data={profile?.status === "active" ? th : []} />
         </div>
       ) : (
         <div>

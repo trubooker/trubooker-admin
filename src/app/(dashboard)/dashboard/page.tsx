@@ -132,7 +132,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <span className="text-sm text-white font-normal">
-                    Total Agents
+                    Total Connectors
                   </span>
                 </CardContent>
               </Card>
@@ -147,7 +147,9 @@ const Dashboard = () => {
                   graph_data={
                     data?.chartDataLine.length > 0
                       ? data?.chartDataLine
-                      : revenue?.graph_data
+                      : Array.isArray(revenue?.graph_data)
+                      ? revenue?.graph_data
+                      : [revenue?.graph_data]
                   }
                 />
               </div>
@@ -285,10 +287,18 @@ const Dashboard = () => {
 
                       <TableCell className="w-1/7 py-5 text-left ">
                         <div className="flex flex-col">
-                          <span> {data.arrival_location || "Benin City"}</span>
+                          <span> {data.arrival_location?.address}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
                             {data.arrival_date}, {data?.arrival_time}
+                          </small>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Latitude:</span>{" "}
+                            {data.arrival_location?.latitude}
+                          </small>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">Longitude:</span>{" "}
+                            {data.arrival_location?.longitude}
                           </small>
                         </div>
                       </TableCell>

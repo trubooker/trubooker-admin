@@ -26,7 +26,7 @@ export const Modal: FC<Props> = ({ trigger, title, description, content }) => {
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="py-4">{content}</div>
+        <div>{content}</div>
       </DialogContent>
     </Dialog>
   );

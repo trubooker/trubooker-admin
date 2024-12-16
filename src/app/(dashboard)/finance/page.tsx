@@ -151,7 +151,7 @@ const Finance = () => {
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Agent Payout
+                          Pending Connector Payout
                         </span>
                       </CardContent>
                     </Card>

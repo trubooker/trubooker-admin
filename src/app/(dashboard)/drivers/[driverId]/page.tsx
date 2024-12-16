@@ -6,9 +6,12 @@ import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
+import ProfileVehicleDocs_Info from "@/components/Driver/ProfileVehicleDocs_Info";
 import { FaMoneyBillWave } from "react-icons/fa";
-import AgentInfo from "@/components/agent/agentInfo";
-import { useGetOneAgentQuery } from "@/redux/services/Slices/agentApiSlice";
+import {
+  useGetOneDriverQuery,
+  useToggleDriverStatusMutation,
+} from "@/redux/services/Slices/driverApiSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -18,28 +21,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Modal } from "@/components/Modal";
+import ToggleStatus from "@/components/ToggleStatus";
 
-const ViewAgent = () => {
+const ViewDriver = () => {
   const params = useParams();
-  const id = String(params.slug);
+  const id = String(params.driverId);
   const router = useRouter();
+  const status = "active";
   const {
     isLoading: loading,
     data: userData,
     isFetching,
-  } = useGetOneAgentQuery(id);
-  console.log("SingleAgent", userData);
-  const profile = userData?.data?.profile; // object
-  const agent_ref = userData?.data?.agent_referrals; // array
-  const ref = userData?.data?.refferals; // array
-  const earning_overview = userData?.data?.earning_overview; // object
-  const withdrawal_req = userData?.data?.withdrawal_request; // array
+  } = useGetOneDriverQuery(id);
+
+  const [mutate, { isLoading: loadingToggle }] =
+    useToggleDriverStatusMutation();
+
+  const toggleDriverStatus = async () => {
+    await mutate(id).unwrap().then();
+  };
+  console.log("SingleDriver", userData);
+  const profile = userData?.data?.profile; //object
+  const vehicle = userData?.data?.vehicles; //array
+  const feedback = userData?.data?.reviews; //array
+  const th = userData?.data?.trip_history; //array
+
   return (
     <>
       {!isFetching || !loading ? (
         <div>
           <Goback
-            formerPage={"Agents"}
+            formerPage={"Drivers"}
             presentPage={`${profile?.first_name} ${profile?.last_name}`}
           />
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
@@ -59,27 +72,25 @@ const ViewAgent = () => {
                     {profile?.status === "active" ? (
                       <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                        <span className="font-semibold text-xs">
+                        <span className="font-semibold text-xs capitalize">
                           {profile?.status}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
-                        <span className="font-semibold text-xs">
+                        <span className="font-semibold text-xs capitalize">
                           {profile?.status}
                         </span>
                       </div>
                     )}
                   </>
                 </div>
-                <div className="lg:mt-3 mt-1 ms-1 flex flex-col">
+                <div className="lg:mt-3 mt-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
                     {profile?.role || profile?.type}
                   </span>
-                  <span className="text-gray-400 text-xs">
-                    #{profile?.referral}
-                  </span>
+                  <span className="text-gray-400 text-xs">#{profile?.id}</span>
                 </div>
               </div>
             </div>
@@ -90,12 +101,49 @@ const ViewAgent = () => {
                   ? "0.00"
                   : profile?.current_balance}
               </div>
-              <Button
-                variant={"outline"}
-                className="bg-[--danger] hover:bg-[--danger-btn] hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
-              >
-                Deactivate account
-              </Button>
+              {profile?.status == "active" ? (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-[--danger] hover:bg-[--danger-btn] hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Deactivate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={toggleDriverStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              ) : (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-green-800 hover:bg-green-700 hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Activate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={toggleDriverStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              )}
               <span className="text-left lg:text-right lg:me-5 text-sm">
                 Joined{" "}
                 {new Date(profile?.created_at).toLocaleDateString("en-US", {
@@ -112,11 +160,10 @@ const ViewAgent = () => {
                 : profile?.current_balance}
             </div>
           </div>
-          <AgentInfo
-            agent_ref={agent_ref}
-            ref={ref}
-            earning_overview={earning_overview}
-            withdrawal={withdrawal_req}
+          <ProfileVehicleDocs_Info
+            th={profile?.status === "active" ? th : []}
+            feedback={feedback}
+            vehicle={vehicle}
             profile={profile}
             loading={loading}
             isFetching={isFetching}
@@ -162,4 +209,4 @@ const ViewAgent = () => {
   );
 };
 
-export default ViewAgent;
+export default ViewDriver;

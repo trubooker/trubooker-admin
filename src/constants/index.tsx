@@ -35,9 +35,9 @@ export const NavLinks: LinkItem[] = [
   },
   {
     id: 4,
-    title: "Agent",
+    title: "Connectors",
     icon: TbUserStar,
-    link: "/agent",
+    link: "/connector",
   },
   {
     id: 5,
@@ -440,146 +440,146 @@ export const countries: Country[] = [
 ];
 
 export const Notification = [
-  // {
-  //   index: "1",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "2",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "3",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "4",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "5",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "6",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "7",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "8",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "9",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "10",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "11",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "12",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "13",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "14",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "15",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "16",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "17",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "18",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "19",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
-  // {
-  //   index: "20",
-  //   image:
-  //     "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-  //   message: "Sandy Jay requested access the admin dashboard as an admin",
-  //   date: "59 minutes ago",
-  // },
+  {
+    index: "1",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "2",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "3",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "4",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "5",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "6",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "7",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "8",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "9",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "10",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "11",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "12",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "13",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "14",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "15",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "16",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "17",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "18",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "19",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
+  {
+    index: "20",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    message: "Sandy Jay requested access the admin dashboard as an admin",
+    date: "59 minutes ago",
+  },
 ];
 
 export const PassengerFeedback = [
@@ -864,12 +864,18 @@ export const Referall = [
 ];
 
 export const chartDataLine = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
+  { month: "Jan", revenue: 0.6 },
+  { month: "Feb", revenue: 0.6 },
+  { month: "March", revenue: 0.6 },
+  { month: "April", revenue: 0.6 },
+  { month: "May", revenue: 0.6 },
+  { month: "June", revenue: 0.6 },
+  { month: "July", revenue: 0.6 },
+  { month: "Aug", revenue: 0.9 },
+  { month: "Sept", revenue: 0.6 },
+  { month: "Oct", revenue: 0.6 },
+  { month: "Nov", revenue: 0.6 },
+  { month: "Dec", revenue: 0.6 },
 ];
 
 export const chartConfigLine = {
@@ -1202,7 +1208,7 @@ export const roles = [
   {
     id: "2",
     users: 5,
-    role: "Super admin",
+    role: "Super_admin",
     images: [
       {
         profile_image:

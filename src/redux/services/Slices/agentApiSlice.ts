@@ -21,12 +21,12 @@ const agentsApi = agentsApiConfig.injectEndpoints({
       providesTags: ["Agents"],
     }),
 
-    toggleAgentStatus: builder.query({
+    toggleAgentStatus: builder.mutation({
       query: (agent) => ({
         url: `/admin/agents/toggle-status/${agent}`,
         method: "PATCH",
       }),
-      providesTags: ["Agents"],
+      invalidatesTags: ["Agents"],
     }),
   }),
 });
@@ -34,5 +34,5 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 export const {
   useGetAgentsQuery,
   useGetOneAgentQuery,
-  useToggleAgentStatusQuery,
+  useToggleAgentStatusMutation,
 } = agentsApi;

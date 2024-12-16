@@ -81,7 +81,7 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                       {data.email}
                     </TableCell>
                     <TableCell className="capitalize py-5 text-center">
-                      {data.role}
+                      {data.role === "agent" ? "connector" : data.role}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (

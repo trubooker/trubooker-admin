@@ -21,6 +21,14 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Roles"],
     }),
 
+    groupUserByRoles: builder.query({
+      query: () => ({
+        url: `/admin/group-users-by-role`,
+        method: "GET",
+      }),
+      providesTags: ["Roles"],
+    }),
+
     getRolesById: builder.query({
       query: (id) => ({
         url: `/admin/get-role-by-id/${id}`,
@@ -71,4 +79,5 @@ export const {
   useGetPermissionsQuery,
   useGetUsersByRoleQuery,
   useGetRolesByIdQuery,
+  useGroupUserByRolesQuery,
 } = passengersApi;

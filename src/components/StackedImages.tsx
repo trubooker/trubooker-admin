@@ -4,7 +4,7 @@ import { IoPersonOutline } from "react-icons/io5";
 
 interface StackedImagesProps {
   images: {
-    profile_image: string;
+    profile_picture: string;
   }[];
   limit?: number ; 
 }
@@ -20,7 +20,7 @@ const StackedImages: React.FC<StackedImagesProps> = ({ images, limit }) => {
           style={{ zIndex: images.length + index }}
         >
           <Avatar className="w-8 h-8">
-            <AvatarImage src={image.profile_image} />
+            <AvatarImage src={image.profile_picture} />
             <AvatarFallback>
               <IoPersonOutline />
             </AvatarFallback>

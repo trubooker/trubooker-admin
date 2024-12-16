@@ -111,7 +111,9 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
                           className="cursor-pointer"
                         >
                           <DropdownMenuItem
-                            onClick={() => router.push(`/agent/${data?.id}`)}
+                            onClick={() =>
+                              router.push(`/connector/${data?.id}`)
+                            }
                             className="w-full text-center cursor-pointer"
                           >
                             View
