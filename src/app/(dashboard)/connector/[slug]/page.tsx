@@ -51,7 +51,7 @@ const ViewAgent = () => {
       {!isFetching || !loading ? (
         <div>
           <Goback
-            formerPage={"Agents"}
+            formerPage={"Connectors"}
             presentPage={`${profile?.first_name} ${profile?.last_name}`}
           />
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
