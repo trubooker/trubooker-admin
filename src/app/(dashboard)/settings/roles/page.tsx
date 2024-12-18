@@ -10,9 +10,6 @@ import { roles } from "@/constants";
 import { Modal } from "@/components/DualModal";
 import { EditRoles } from "@/components/Settings/Roles/EditRoles";
 import {
-  useGetPermissionsByIdQuery,
-  useGetPermissionsQuery,
-  useGetRolesByIdQuery,
   useGetRolesQuery,
   useGroupUserByRolesQuery,
 } from "@/redux/services/Slices/settings/rolesApiSlice";
@@ -30,32 +27,11 @@ const Roles = () => {
   console.log("roles: ", role);
 
   const {
-    data: rolesById,
-    isLoading: roleByIdLoading,
-    isFetching: roleByIdFetching,
-  } = useGetRolesByIdQuery(1);
-  console.log("rolesById: ", rolesById);
-
-  const {
-    data: permissions,
-    isLoading: permissionsLoading,
-    isFetching: permissionsFetching,
-  } = useGetPermissionsQuery(null);
-  console.log("permissions: ", permissions);
-
-  const {
     data: groupUsers,
     isLoading: groupUsersLoading,
     isFetching: groupUsersFetching,
   } = useGroupUserByRolesQuery(null);
   console.log("groupUsers: ", groupUsers);
-
-  const {
-    data: permissionsById,
-    isLoading: permissionsByIdLoading,
-    isFetching: permissionsByIdFetching,
-  } = useGetPermissionsByIdQuery(1);
-  console.log("permissionsById: ", permissionsById);
 
   return (
     <div>
@@ -74,7 +50,7 @@ const Roles = () => {
             }
             title={"Add Staff to Role"}
             description={"Set role permissions"}
-            content={<AddStaffRoles />}
+            content={<AddStaffRoles role={role} />}
           />
         </span>
       </div>
@@ -115,9 +91,11 @@ const Roles = () => {
                             Edit Role
                           </Button>
                         }
-                        title={"Edit Role"}
-                        description={"Set role permissions"}
-                        content={<EditRoles id={tot?.id} />}
+                        title={`Edit Role - ${formatSnakeCase(
+                          String(tot?.role)
+                        )}`}
+                        description={`Set role permissions`}
+                        content={<EditRoles allRoles={role} role={tot?.role} />}
                       />
                     </div>
                     <div className="flex ms-auto gap-x-3 text-black items-center">

@@ -49,7 +49,7 @@ export const Modal: FC<Props> = ({
         <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle className="capitalize">{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <div className="">
@@ -73,7 +73,7 @@ export const Modal: FC<Props> = ({
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerTitle className="capitalize">{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <ScrollArea className="px-5 pt-2 max-h-[500px] overflow-y-auto">
