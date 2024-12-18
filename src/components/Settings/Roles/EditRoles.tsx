@@ -12,10 +12,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "../../ui/separator";
-import { DialogClose } from "../../ui/dialog";
+import {
+  useGetPermissionsByIdQuery,
+  useGetPermissionsQuery,
+  useGetRolesByIdQuery,
+} from "@/redux/services/Slices/settings/rolesApiSlice";
+import React, { useEffect } from "react";
 
 const permissions = [
   {
@@ -33,6 +37,7 @@ const permissions = [
 ];
 
 const FormSchema = z.object({
+  name: z.string().min(1, { message: "Required Field" }),
   permissions: z
     .array(
       z.object({
@@ -45,21 +50,39 @@ const FormSchema = z.object({
     }),
 });
 
-export function EditRoles({ id }: any) {
+export function EditRoles({ role, allRoles }: { role: string; allRoles: any[] }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      permissions: permissions.map((perm) => ({
-        category: perm.category,
-        options: [],
-      })),
+      name: "",
+      permissions: [],
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // alert(JSON.stringify(data, null, 2));
-    alert(id)
-  }
+  // Find the exact role data
+  const selectedRoleData = allRoles.find((r) => r.name === role);
+
+  // Log the selected role for debugging
+  console.log("Selected Role Data: ", selectedRoleData);
+
+  useEffect(() => {
+    if (selectedRoleData) {
+      // Pre-fill the form with the selected role's name and permissions
+      form.setValue("name", selectedRoleData.name);
+      form.setValue("permissions", selectedRoleData.permissions || []);
+    }
+  }, [selectedRoleData, form]);
+
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    const formData = {
+      name: data.name,
+      role: selectedRoleData?.id,
+      permissions: data.permissions,
+    };
+
+    console.log("Updated Role Data: ", formData);
+    // Perform API request or other actions here
+  };
 
   const handleGlobalSelectAll = (checked: boolean) => {
     form.setValue(
@@ -78,7 +101,6 @@ export function EditRoles({ id }: any) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 lg:space-y-6 max-w-screen lg:max-w-full"
         >
-          {/* Global Select All */}
           <div className="flex justify-between items-center">
             <FormLabel className="font-bold">Administrator Access</FormLabel>
             <div className="flex items-center space-x-2">
@@ -94,11 +116,8 @@ export function EditRoles({ id }: any) {
 
           {/* Permissions Grid */}
           {permissions.map((perm) => (
-            <>
-              <div
-                key={perm.category}
-                className=" lg:flex lg:justify-between items-center"
-              >
+            <React.Fragment key={perm.category}>
+              <div className="lg:flex lg:justify-between items-center">
                 <div className="flex justify-between lg:w-[40%] mb-3 lg:mb-0 items-center">
                   <FormLabel>{perm.category}</FormLabel>
                 </div>
@@ -145,10 +164,9 @@ export function EditRoles({ id }: any) {
                 </div>
               </div>
               <Separator />
-            </>
+            </React.Fragment>
           ))}
 
-          {/* Submit Button */}
           <div className="w-full">
             <Button
               type="submit"

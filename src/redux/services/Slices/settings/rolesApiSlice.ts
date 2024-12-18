@@ -6,9 +6,10 @@ const passengersApiConfig = api.enhanceEndpoints({
 const passengersApi = passengersApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     assignRoleToUser: builder.mutation({
-      query: () => ({
+      query: (body) => ({
         url: `/admin/assign-role-to-user`,
         method: "POST",
+        body,
       }),
       invalidatesTags: ["Roles"],
     }),
@@ -62,9 +63,10 @@ const passengersApi = passengersApiConfig.injectEndpoints({
     }),
 
     updateRoles: builder.mutation({
-      query: (id) => ({
+      query: ({id, body}: any) => ({
         url: `/admin/update-roles/${id}`,
         method: "PUT",
+        body
       }),
       invalidatesTags: ["Roles"],
     }),
