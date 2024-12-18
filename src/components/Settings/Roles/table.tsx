@@ -45,14 +45,11 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                 Email
               </TableHead>
               <TableHead className="font-bold w-1/5 text-center">
-                Roles
+                Phone Number
               </TableHead>
               <TableHead className="font-bold w-1/5 text-center">
-                Status
+                Roles
               </TableHead>
-              {/* <TableHead className="text-center font-bold w-[200px]">
-                Actions
-              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -60,9 +57,6 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
               <>
                 {Data?.map((data: any) => (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    {/* <TableCell className="py-5 font-medium w-[100px] text-left">
-                      {data.id}
-                    </TableCell> */}
                     <TableCell className=" py-5 text-center text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
@@ -80,54 +74,12 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                     <TableCell className=" py-5 text-center text-[--primary]">
                       {data.email}
                     </TableCell>
+                    <TableCell className=" py-5 text-center">
+                      {data?.phone}
+                    </TableCell>
                     <TableCell className="capitalize py-5 text-center">
                       {data.role === "agent" ? "connector" : data.role}
                     </TableCell>
-                    <TableCell>
-                      {data.status === "active" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                          <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                          <span className="font-semibold text-xs">Active</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
-                          <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Suspended
-                          </span>
-                        </div>
-                      )}
-                    </TableCell>
-                    {/* <TableCell className=" py-5 text-center w-[100px]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="center"
-                          className="cursor-pointer"
-                        >
-                          <DropdownMenuItem
-                            onClick={() =>
-                              router.push(`/passengers/${data?.id}`)
-                            }
-                            className="w-full text-center cursor-pointer"
-                          >
-                            View
-                          </DropdownMenuItem>
-                          <Separator />
-                          <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.id)}
-                          >
-                            Suspend
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell> */}
                   </TableRow>
                 ))}
               </>

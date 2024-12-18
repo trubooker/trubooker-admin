@@ -29,7 +29,7 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
   const [directionsResponse, setDirectionsResponse] = useState<any>(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API || "",
     libraries: ["places"],
   });
 
