@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardHeader,
@@ -36,82 +37,92 @@ const Notifications = () => {
   const [markOne, { isLoading: markOneLoading }] = useMarkOneAsReadMutation();
 
   const handleMarkAllAsRead = async () => {
-    // try {
-    //   await markAllAsRead(null);
-    // } catch (error) {
-    //   console.error("Failed to mark all notifications as read:", error);
-    // }
-    alert("Marked all notifications");
+    try {
+      await markAllAsRead(null)
+        .unwrap()
+        .then((res) => {
+          console.log("Marked all notifications ", res);
+        });
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
   };
 
   const handleDeleteAll = async () => {
-    // try {
-    //   await deleteAll(null);
-    // } catch (error) {
-    //   console.error("Failed to delete all notifications:", error);
-    // }
-    alert("Deleted all notifications");
+    try {
+      await deleteAll(null)
+        .unwrap()
+        .then((res) => {
+          console.log("deleted all notifications ", res);
+        });
+    } catch (error) {
+      console.error("Failed to delete all notifications:", error);
+    }
   };
 
   const handleDeleteOne = async (id: string) => {
-    // try {
-    //   await deleteOne(id)
-    //     .unwrap()
-    //     .then((res) => {
-    //       console.log("delete one response ", res);
-    //     });
-    // } catch (error) {
-    //   console.error("Failed to delete notification:", error);
-    // }
-    alert(`Deleted a single notification ${id}`);
+    try {
+      await deleteOne(id)
+        .unwrap()
+        .then((res) => {
+          console.log("delete one response ", res);
+        });
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
   };
 
   const handleMarkOne = async (id: string) => {
-    // try {
-    //   await markOne(id)
-    //     .unwrap()
-    //     .then((res) => {
-    //       console.log("Markone response ", res);
-    //     });
-    // } catch (error) {
-    //   console.error("Failed to delete notification:", error);
-    // }
-    alert(`Marked one notifications ${id}`);
+    try {
+      await markOne(id)
+        .unwrap()
+        .then((res) => {
+          console.log("Markone response ", res);
+        });
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
   };
 
   return (
     <div>
       <div className="">
         <Card className="w-full overflow-y-auto overflow-x-hidden max-h-[500px]">
-          <CardHeader className="sticky pt-4 pb-2 px-5 bg-white shadow-lg top-0 z-50 border-b text-left text-lg font-bold ">
+          <CardHeader className="sticky pt-4 pb-2 px-5 bg-white shadow-lg top-0 z-30 border-b text-left text-lg font-bold ">
             <span className="flex flex-row justify-between items-start">
               Notifications
               <div>
-                {viewType === "unread" ? (
-                  <Badge
-                    onClick={() => setViewType("read")}
-                    variant="outline"
-                    className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
-                  >
-                    Unread
-                  </Badge>
+                {data?.length > 0 ? (
+                  <>
+                    {viewType === "unread" ? (
+                      <Badge
+                        onClick={() => setViewType("read")}
+                        variant="outline"
+                        className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
+                      >
+                        Unread
+                      </Badge>
+                    ) : (
+                      <Badge
+                        onClick={() => setViewType("unread")}
+                        variant="outline"
+                        className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
+                      >
+                        Unread
+                      </Badge>
+                    )}
+                  </>
                 ) : (
-                  <Badge
-                    onClick={() => setViewType("unread")}
-                    variant="outline"
-                    className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
-                  >
-                    Unread
-                  </Badge>
+                  ""
                 )}
               </div>
             </span>
           </CardHeader>
           <CardContent className="py-3 px-2">
             <>
-              {Notification?.length > 0 ? (
+              {data?.length > 0 ? (
                 <>
-                  {Notification?.map((notification: any) => (
+                  {data?.map((notification: any) => (
                     <SwipeableNotification
                       key={notification.index}
                       index={notification.index}
@@ -164,25 +175,31 @@ const Notifications = () => {
               )}
             </>
           </CardContent>
-          <CardFooter className="sticky z-50 bottom-0 bg-white border-t px-5 py-3">
-            <div className="flex justify-between w-full">
-              <Badge
-                className="cursor-pointer text-[--primary] shadow-none flex gap-x-1"
-                onClick={handleMarkAllAsRead}
-              >
-                <BsCheckAll className="w-4 h-4" />
-                <span>Mark all as read</span>
-              </Badge>
+          {data?.length > 0 ? (
+            <>
+              <CardFooter className="sticky z-30 bottom-0 bg-white border-t px-5 py-3">
+                <div className="flex justify-between w-full">
+                  <Badge
+                    className="cursor-pointer text-[--primary] shadow-none flex gap-x-1"
+                    onClick={handleMarkAllAsRead}
+                  >
+                    <BsCheckAll className="w-4 h-4" />
+                    <span>Mark all as read</span>
+                  </Badge>
 
-              <Badge
-                className="cursor-pointer text-red-500 shadow-none flex gap-x-1"
-                onClick={handleDeleteAll}
-              >
-                <MdDeleteForever className="w-4 h-4" />
-                <span>Delete all</span>
-              </Badge>
-            </div>
-          </CardFooter>
+                  <Badge
+                    className="cursor-pointer text-red-500 shadow-none flex gap-x-1"
+                    onClick={handleDeleteAll}
+                  >
+                    <MdDeleteForever className="w-4 h-4" />
+                    <span>Delete all</span>
+                  </Badge>
+                </div>
+              </CardFooter>
+            </>
+          ) : (
+            ""
+          )}
         </Card>
       </div>
     </div>

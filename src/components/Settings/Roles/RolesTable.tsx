@@ -25,7 +25,7 @@ const RolesTable = () => {
     isFetching: userByRoleFetching,
   } = useGetUsersByRoleQuery({ page, search: searchQuery });
 
-  const usersByRole = data?.data?.data;
+  const usersByRole = data?.data;
   console.log("UserByRole: ", usersByRole);
 
   const totalPages = data?.data?.last_page;
@@ -48,7 +48,7 @@ const RolesTable = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
     debounce((query: string) => {
-      setSearchQuery(query);
+      setSearchQuery(query === "agent" ? "connector" : query);
       setPage(1);
     }, 300),
     []
@@ -62,7 +62,7 @@ const RolesTable = () => {
       <div className="w-full">
         <div className="bg-white rounded-lg w-full p-5 mt-5">
           <Search
-            placeholder={"Search..."}
+            placeholder={"Search by role, name or email"}
             onSearch={handleSearch}
             classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
           />

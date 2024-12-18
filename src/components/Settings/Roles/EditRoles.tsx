@@ -57,7 +57,8 @@ export function EditRoles({ id }: any) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    alert(JSON.stringify(data, null, 2));
+    // alert(JSON.stringify(data, null, 2));
+    alert(id)
   }
 
   const handleGlobalSelectAll = (checked: boolean) => {
