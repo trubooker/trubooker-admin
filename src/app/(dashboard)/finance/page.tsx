@@ -34,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { Modal } from "@/components/DualModal";
 import { TransactionDetails } from "@/components/finance/transactionDetails";
 import {
+  useGetDriversEarningsQuery,
   useGetFinancialReportQuery,
   useGetTransactionHistoryQuery,
 } from "@/redux/services/Slices/financeApiSlice";
@@ -57,8 +58,15 @@ const Finance = () => {
     isFetching: historyFetching,
   } = useGetTransactionHistoryQuery({ page, search: searchQuery });
 
+  const {
+    data: driverEarnings,
+    isLoading: driverEarningsLoading,
+    isFetching: driverEarningsFetching,
+  } = useGetDriversEarningsQuery(null);
+
   console.log("history: ", history);
   console.log("report: ", report);
+  console.log("driverEarnings: ", driverEarnings);
 
   const totalPages = history?.meta?.last_page;
   const revenue = report?.data;
