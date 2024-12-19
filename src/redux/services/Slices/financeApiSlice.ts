@@ -21,8 +21,16 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       }),
       providesTags: ["Finance"],
     }),
+
+    getDriversEarnings: builder.query({
+      query: () => ({
+        url: `/admin/finance/drivers-earnings`,
+        method: "GET",
+      }),
+      providesTags: ["Finance"],
+    }),
   }),
 });
 
-export const { useGetFinancialReportQuery, useGetTransactionHistoryQuery } =
+export const { useGetFinancialReportQuery, useGetTransactionHistoryQuery, useGetDriversEarningsQuery } =
   passengersApi;

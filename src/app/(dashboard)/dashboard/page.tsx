@@ -27,6 +27,7 @@ import { VscCircleFilled } from "react-icons/vsc";
 import Overview from "@/components/TripOverview";
 import { FaArrowUp } from "react-icons/fa";
 import Pagination from "@/components/Pagination";
+import Link from "next/link";
 
 const Dashboard = () => {
   const [page, setPage] = useState(1);
@@ -77,65 +78,71 @@ const Dashboard = () => {
         <div className="grid grid-rows-1 lg:grid-cols-1 w-full">
           <div className="w-full">
             <div className="grid grid-rows-1 gap-4 lg:grid-cols-3">
-              <Card
-                className={`w-full h-32 border-none my-auto  bg-[--primary]`}
-              >
-                <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
-                  <div className="flex gap-x-3 text-white items-center">
-                    <HiOutlineUserGroup className="w-8 h-8" />
-                    <span className="flex gap-x-2 items-center">
-                      {loading ? (
-                        <Skeleton className="h-8 w-[50px] bg-gray-200" />
-                      ) : (
-                        <CountUp end={Number(revenue?.total_passengers)} />
-                      )}
+              <Link href="/passengers" className="hover:shadow-xl transition-all ease-in-out duration-300">
+                <Card
+                  className={`w-full h-32 border-none my-auto  bg-[--primary]`}
+                >
+                  <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                    <div className="flex gap-x-3 text-white items-center">
+                      <HiOutlineUserGroup className="w-8 h-8" />
+                      <span className="flex gap-x-2 items-center">
+                        {loading ? (
+                          <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                        ) : (
+                          <CountUp end={Number(revenue?.total_passengers)} />
+                        )}
+                      </span>
+                    </div>
+                    <span className="text-sm text-white font-normal">
+                      Total Passengers
                     </span>
-                  </div>
-                  <span className="text-sm text-white font-normal">
-                    Total Passengers
-                  </span>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card
-                className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
-              >
-                <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
-                  <div className="flex gap-x-3 text-white items-center">
-                    <IoCarOutline className="w-8 h-8" />
-                    <span className="flex gap-x-2 items-center">
-                      {loading ? (
-                        <Skeleton className="h-8 w-[50px] bg-gray-200" />
-                      ) : (
-                        <CountUp end={Number(revenue?.total_drivers)} />
-                      )}
+              <Link href="/drivers" className="hover:shadow-xl transition-all ease-in-out duration-300">
+                <Card
+                  className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
+                >
+                  <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                    <div className="flex gap-x-3 text-white items-center">
+                      <IoCarOutline className="w-8 h-8" />
+                      <span className="flex gap-x-2 items-center">
+                        {loading ? (
+                          <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                        ) : (
+                          <CountUp end={Number(revenue?.total_drivers)} />
+                        )}
+                      </span>
+                    </div>
+                    <span className="text-sm text-white font-normal">
+                      Total Drivers
                     </span>
-                  </div>
-                  <span className="text-sm text-white font-normal">
-                    Total Drivers
-                  </span>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card
-                className={`w-full h-32 border-none my-auto  bg-[--primary]`}
-              >
-                <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
-                  <div className="flex gap-x-3 text-white items-center">
-                    <TbUserStar className="w-8 h-8" />
-                    <span className="flex gap-x-2 items-center">
-                      {loading ? (
-                        <Skeleton className="h-8 w-[50px] bg-gray-200" />
-                      ) : (
-                        <CountUp end={Number(revenue?.total_agents)} />
-                      )}
+              <Link href="/connector" className="hover:shadow-xl transition-all ease-in-out duration-300">
+                <Card
+                  className={`w-full h-32 border-none my-auto  bg-[--primary]`}
+                >
+                  <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                    <div className="flex gap-x-3 text-white items-center">
+                      <TbUserStar className="w-8 h-8" />
+                      <span className="flex gap-x-2 items-center">
+                        {loading ? (
+                          <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                        ) : (
+                          <CountUp end={Number(revenue?.total_agents)} />
+                        )}
+                      </span>
+                    </div>
+                    <span className="text-sm text-white font-normal">
+                      Total Connectors
                     </span>
-                  </div>
-                  <span className="text-sm text-white font-normal">
-                    Total Connectors
-                  </span>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
           <div className="grid xl:grid-cols-2 grid-rows-1 my-5 gap-3">

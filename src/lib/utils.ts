@@ -21,6 +21,18 @@ export const formatCurrency = (
   return `${currencySymbol} ${amount != null ? formattedAmount : 0}`;
 };
 
+export const AppendToSnakeCase = (input: string): string => {
+  if (!input) return "";
+  return input
+    .trim() // Remove extra spaces at the start and end
+    .replace(/\s+/g, "_") // Replace all spaces with underscores
+    .toLowerCase(); // Convert the entire string to lowercase
+};
+
 export const formatSnakeCase = (input: string): string => {
-  return input.replace(/_/g, ' ');
+  if (!input) return "";
+  return input
+    .split("_") // Split the string by underscores
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(" "); // Join with a space
 };

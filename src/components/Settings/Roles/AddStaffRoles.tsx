@@ -30,6 +30,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { debounce } from "lodash";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import toast from "react-hot-toast";
 
 export function AddStaffRoles({ role }: { role: [] }) {
   const FormSchema = z.object({
@@ -115,10 +116,10 @@ export function AddStaffRoles({ role }: { role: [] }) {
     await assign(formData)
       .unwrap()
       .then((res) => {
-        console.log(res);
+        toast.success("Successful");
       })
       .catch((res) => {
-        console.log(res);
+        toast.error("Error occured");
       });
   };
 
@@ -141,6 +142,7 @@ export function AddStaffRoles({ role }: { role: [] }) {
                       <Input
                         id="name"
                         type="text"
+                        placeholder="Search Staff name, or email"
                         value={userSearch}
                         onChange={(e) => {
                           setUserSearch(e.target.value);
@@ -212,7 +214,10 @@ export function AddStaffRoles({ role }: { role: [] }) {
                     <FormLabel>Role</FormLabel>
                     <FormControl>
                       <SelectTrigger className="py-6">
-                        <SelectValue placeholder="" />
+                        <SelectValue
+                          className="text-gray-400"
+                          placeholder="Enter role"
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
