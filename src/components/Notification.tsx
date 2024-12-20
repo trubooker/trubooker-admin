@@ -17,7 +17,7 @@ import {
 import { MdDeleteForever } from "react-icons/md";
 import { BsCheckAll } from "react-icons/bs";
 import { Badge } from "@/components/ui/badge";
-import { notification } from "@/constants";
+// import { notification } from "@/constants";
 import SwipeableNotification from "./SwipeableContent";
 import { truncateText } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ const Notifications = () => {
   const { data, isLoading, isFetching } = useFetchNotificationsQuery({
     type: viewType,
   });
-  // const notification = data?.data;
+  const notification = data?.data;
 
   const [markAllAsRead, { isLoading: markAllLoading }] =
     useMarkAllAsReadMutation();

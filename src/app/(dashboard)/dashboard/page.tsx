@@ -78,7 +78,10 @@ const Dashboard = () => {
         <div className="grid grid-rows-1 lg:grid-cols-1 w-full">
           <div className="w-full">
             <div className="grid grid-rows-1 gap-4 lg:grid-cols-3">
-              <Link href="/passengers" className="hover:shadow-xl transition-all ease-in-out duration-300">
+              <Link
+                href="/passengers"
+                className="hover:shadow-xl transition-all ease-in-out duration-300"
+              >
                 <Card
                   className={`w-full h-32 border-none my-auto  bg-[--primary]`}
                 >
@@ -100,7 +103,10 @@ const Dashboard = () => {
                 </Card>
               </Link>
 
-              <Link href="/drivers" className="hover:shadow-xl transition-all ease-in-out duration-300">
+              <Link
+                href="/drivers"
+                className="hover:shadow-xl transition-all ease-in-out duration-300"
+              >
                 <Card
                   className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
                 >
@@ -122,7 +128,10 @@ const Dashboard = () => {
                 </Card>
               </Link>
 
-              <Link href="/connector" className="hover:shadow-xl transition-all ease-in-out duration-300">
+              <Link
+                href="/connector"
+                className="hover:shadow-xl transition-all ease-in-out duration-300"
+              >
                 <Card
                   className={`w-full h-32 border-none my-auto  bg-[--primary]`}
                 >
@@ -152,9 +161,7 @@ const Dashboard = () => {
                   chartConfig={data?.chartConfigLine}
                   total_revenue={revenue?.total_revenue}
                   graph_data={
-                    data?.chartDataLine.length > 0
-                      ? data?.chartDataLine
-                      : Array.isArray(revenue?.graph_data)
+                    Array.isArray(revenue?.graph_data)
                       ? revenue?.graph_data
                       : [revenue?.graph_data]
                   }
