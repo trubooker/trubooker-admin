@@ -30,28 +30,6 @@ const handler = async (req: Request) => {
         socket.emit("driverLocation", fakeDriverLocation);
       }, 2000);
 
-      // // Fetch data from an external server
-      // const fetchDriverLocation = async () => {
-      //   try {
-      //     const response = await fetch(
-      //       "https://api.example.com/driver-location"
-      //     ); // Replace with your actual API endpoint
-      //     if (response.ok) {
-      //       const driverLocation = await response.json();
-      //       socket.emit("driverLocation", driverLocation);
-      //     } else {
-      //       console.error("Failed to fetch driver location:", response.status);
-      //     }
-      //   } catch (error) {
-      //     console.error("Error fetching driver location:", error);
-      //   }
-      // };
-
-      // // Simulate fetching driver location every 2 seconds
-      // const interval = setInterval(() => {
-      //   fetchDriverLocation();
-      // }, 2000);
-
       // Clean up when the client disconnects
       socket.on("disconnect", () => {
         clearInterval(interval);

@@ -10,21 +10,31 @@ import {
 import { io } from "socket.io-client";
 import BouncingBall from "@/components/BounceXanimation";
 
+type Coord = {
+  latitude: string;
+  longitude: string;
+};
 interface BusStop {
-  latitude: number;
-  longitude: number;
   name: string;
   time_of_arrival: string;
 }
 
 interface MapComponentProps {
   busStops: BusStop[] | [];
+  busstop_latlong: Coord[] | [];
+  departure: Coord;
+  arrival: Coord;
 }
 
-const MapComponent = ({ busStops }: MapComponentProps) => {
+const MapComponent = ({
+  busStops,
+  busstop_latlong,
+  departure,
+  arrival,
+}: MapComponentProps) => {
   const [currentLocation, setCurrentLocation] = useState({
-    lat: 9.07226,
-    lng: 7.49508,
+    lat: Number(departure.latitude),
+    lng: Number(departure.longitude),
   });
   const [directionsResponse, setDirectionsResponse] = useState<any>(null);
 
@@ -43,8 +53,8 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
       "driverLocation",
       (newLocation: { latitude: number; longitude: number }) => {
         setCurrentLocation({
-          lat: newLocation.latitude,
-          lng: newLocation.longitude,
+          lat: Number(newLocation.latitude),
+          lng: Number(newLocation.longitude),
         });
       }
     );
@@ -56,20 +66,26 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
   }, [currentLocation]);
 
   useEffect(() => {
-    if (isLoaded && busStops?.length > 1) {
+    if (isLoaded && busstop_latlong?.length > 1) {
       const directionsService = new window.google.maps.DirectionsService();
 
-      const waypoints = busStops?.slice(1, -1).map((stop) => ({
-        location: { lat: stop.latitude, lng: stop.longitude },
+      const waypoints = busstop_latlong?.slice(1, -1).map((stop) => ({
+        location: {
+          lat: Number(stop.latitude),
+          lng: Number(stop.longitude),
+        },
         stopover: true,
       }));
 
       directionsService.route(
         {
-          origin: { lat: busStops[0].latitude, lng: busStops[0].longitude },
+          origin: {
+            lat: Number(departure.latitude),
+            lng: Number(departure.longitude),
+          },
           destination: {
-            lat: busStops[busStops?.length - 1].latitude,
-            lng: busStops[busStops?.length - 1].longitude,
+            lat: Number(arrival.latitude),
+            lng: Number(arrival.longitude),
           },
           waypoints: waypoints,
           travelMode: window.google.maps.TravelMode.DRIVING,
@@ -83,7 +99,7 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
         }
       );
     }
-  }, [isLoaded, busStops]);
+  }, [isLoaded, busStops, busstop_latlong, departure, arrival]);
 
   if (!isLoaded)
     return (
@@ -128,10 +144,13 @@ const MapComponent = ({ busStops }: MapComponentProps) => {
         )}
 
         {/* Bus Stops */}
-        {busStops?.map((stop, index) => (
+        {busstop_latlong?.map((stop, index) => (
           <Marker
             key={index}
-            position={{ lat: stop.latitude, lng: stop.longitude }}
+            position={{
+              lat: Number(stop.latitude),
+              lng: Number(stop.longitude),
+            }}
           />
         ))}
       </GoogleMap>
