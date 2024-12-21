@@ -16,8 +16,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import debounce from "lodash/debounce";
 import Pagination from "@/components/Pagination";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { DriverList } from "@/components/Driver/DriverList";
 import { useGetDriversQuery } from "@/redux/services/Slices/driverApiSlice";
+import { Button } from "@/components/ui/button";
+import { FaSort } from "react-icons/fa";
 
 const Drivers = () => {
   const [page, setPage] = useState(1);
@@ -57,10 +65,20 @@ const Drivers = () => {
   const handleSearch = (query: string) => {
     debounceSearch(query);
   };
+
+  // Step 1: Add a state for the selected status filter
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  // Step 2: Filter data based on the selected status filter
+  const statusFilteredData =
+    statusFilter === "all"
+      ? filteredStudents
+      : filteredStudents?.filter(
+          (driver: any) => driver.status === statusFilter
+        );
+
   return (
     <div className="flex flex-col h-fit w-full">
-      {/* <div className="py-4">
-      </div> */}
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Drivers</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
@@ -70,19 +88,54 @@ const Drivers = () => {
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">
           <div className="bg-white rounded-lg w-full p-5 mt-5">
-            <Search
-              placeholder={"Search..."}
-              onSearch={handleSearch}
-              classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
-            />
+            <div className="flex flex-col lg:flex-row gap-x-3 lg:justify-between text-left lg:text-center lg:items-center">
+              <Search
+                placeholder={"Search..."}
+                onSearch={handleSearch}
+                classname="mb-5 max-w-[300px] "
+              />
+              <div className="mb-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      {statusFilter === "all" ? (
+                        <div className="flex gap-x-2 items-center">
+                          Sort by status <FaSort />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-x-2">
+                          Sort by status :{" "}
+                          <span className="capitalize">{statusFilter}</span>
+                        </div>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[180px]">
+                    <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+                      All
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("active")}>
+                      Active
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setStatusFilter("inactive")}
+                    >
+                      Inactive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setStatusFilter("deleted")}
+                    >
+                      Deleted
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
             {isFetching || loading ? (
               <>
                 <Table className="">
                   <TableHeader>
                     <TableRow className="text-xs lg:text-sm">
-                      {/* <TableHead className="text-left font-bold w-1/6">
-                        Id
-                      </TableHead> */}
                       <TableHead className="font-bold w-1/6">Name</TableHead>
                       <TableHead className="font-bold w-1/6 text-center">
                         Email
@@ -119,7 +172,7 @@ const Drivers = () => {
               </>
             ) : (
               <DriverList
-                data={filteredStudents}
+                data={statusFilteredData}
                 isFetching={isFetching}
                 loading={loading}
               />

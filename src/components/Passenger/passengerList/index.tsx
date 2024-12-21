@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
-import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
 import {
@@ -17,11 +16,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "../../ui/separator";
 import { Button } from "../../ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 
 export function PassengerList({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
@@ -32,14 +29,10 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
 
   return (
     <div>
-      {/* <ScrollArea className="w-full"> */}
       {Data?.length > 0 ? (
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              {/* <TableHead className="text-left font-bold w-[200px]">
-                Id
-              </TableHead> */}
               <TableHead className="font-bold w-1/5">Name</TableHead>
               <TableHead className="font-bold w-1/5 text-center">
                 Email
@@ -60,9 +53,6 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
               <>
                 {Data?.map((data: any) => (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    {/* <TableCell className="py-5 font-medium w-[100px] text-left">
-                      {data.id}
-                    </TableCell> */}
                     <TableCell className=" py-5 text-center text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
@@ -71,7 +61,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
+                        <span className="w-full flex flex-col xl:flex-row text-start gap-x-2 gap-y-1 text-gray-500">
                           <span>{data.name} </span>
                         </span>
                       </div>
@@ -88,12 +78,17 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                           <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                           <span className="font-semibold text-xs">Active</span>
                         </div>
-                      ) : (
+                      ) : data.status === "inactive" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                           <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                           <span className="font-semibold text-xs">
                             Suspended
                           </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#fc9c95] text-[--danger]">
+                          <span className="w-2 h-2 bg-[--danger] rounded-full"></span>
+                          <span className="font-semibold text-xs">Deleted</span>
                         </div>
                       )}
                     </TableCell>
