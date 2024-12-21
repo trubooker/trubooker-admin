@@ -70,13 +70,12 @@ const SwipeableNotification: React.FC<{
               Open
             </Button>
           }
-          title={""}
+          title={content?.title}
           description={""}
           content={
             <NotificationOpenModal
               body={content?.body}
               created_at={content?.created_at}
-              title={content?.title}
             />
           }
         />
@@ -107,18 +106,26 @@ const SwipeableNotification: React.FC<{
         <div className="">
           <div className="flex w-full  items-start space-x-4">
             <Image src={Logo} width="40" alt="Logo" className=" flex " />
-            <div className=" flex flex-col h-auto min-h-[130px] justify-between">
+            <div className=" flex flex-col h-auto min-h-[130px]">
               <div>
-                <p className="text-gray-800 font-semibold text-sm lg:text-xs">
+                <p className="text-gray-800 font-semibold text-sm lg:text-base">
                   {content?.title}
                 </p>
-                <p className="text-xs lg:text-[11px] mt-4 lg:mt-0 w-full">
-                  {truncateText(content?.body, 80)}
-                </p>
+                <small className="my-5 text-[11px] text-gray-500">
+                  {new Date(content?.created_at).toLocaleString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                  })}
+                </small>
               </div>
-              <small className="mt-5 text-gray-500">
-                {content?.created_at}
-              </small>
+              <p className="text-xs sm:text-base lg:text-xs mt-4 w-full">
+                {truncateText(content?.body, 80)}
+              </p>
             </div>
           </div>
         </div>

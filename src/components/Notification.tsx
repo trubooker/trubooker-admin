@@ -24,7 +24,7 @@ import toast from "react-hot-toast";
 
 const Notifications = () => {
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
-  const { data, isLoading, isFetching } = useFetchNotificationsQuery({
+  const { data, isLoading, isFetching, refetch } = useFetchNotificationsQuery({
     type: viewType,
   });
   const notification = data?.data;
@@ -43,6 +43,7 @@ const Notifications = () => {
         .unwrap()
         .then((res) => {
           toast.success(res?.message);
+          refetch();
         });
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
@@ -55,6 +56,7 @@ const Notifications = () => {
         .unwrap()
         .then((res) => {
           toast.success(res?.message);
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete all notifications:", error);
@@ -67,6 +69,7 @@ const Notifications = () => {
         .unwrap()
         .then((res) => {
           toast.success("Deleted Successfully");
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete notification:", error);
@@ -80,6 +83,7 @@ const Notifications = () => {
         .unwrap()
         .then((res) => {
           toast.success("Success");
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete notification:", error);
@@ -95,33 +99,29 @@ const Notifications = () => {
             <span className="flex flex-row justify-between items-start">
               Notifications
               <div>
-                {notification?.length > 0 ? (
-                  <>
-                    {viewType === "unread" ? (
-                      <Badge
-                        onClick={() => setViewType("read")}
-                        variant="outline"
-                        className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
-                      >
-                        Unread
-                      </Badge>
-                    ) : (
-                      <Badge
-                        onClick={() => setViewType("unread")}
-                        variant="outline"
-                        className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
-                      >
-                        Unread
-                      </Badge>
-                    )}
-                  </>
-                ) : (
-                  ""
-                )}
+                <>
+                  {viewType === "unread" ? (
+                    <Badge
+                      onClick={() => setViewType("read")}
+                      variant="outline"
+                      className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
+                    >
+                      Unread
+                    </Badge>
+                  ) : (
+                    <Badge
+                      onClick={() => setViewType("unread")}
+                      variant="outline"
+                      className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
+                    >
+                      Unread
+                    </Badge>
+                  )}
+                </>
               </div>
             </span>
           </CardHeader>
-          <CardContent className="py-3 px-2">
+          <CardContent className="py-3 px-2 min-h-[390px]">
             <>
               {notification?.length > 0 ? (
                 <>
