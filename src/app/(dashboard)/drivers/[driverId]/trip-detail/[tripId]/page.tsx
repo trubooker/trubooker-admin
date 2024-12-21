@@ -464,7 +464,12 @@ const Slug = () => {
               </CardTitle>
               <div className="grid xl:grid-cols-3 grid-cols-1 mt-3 gap-4 ">
                 <div className="col-span-2 h-[500px]">
-                  <MapComponent busStops={details?.bus_stop} />
+                  <MapComponent
+                    busStops={details?.bus_stop}
+                    busstop_latlong={details?.busstop_latlong}
+                    departure={details?.departure_latlong}
+                    arrival={details?.arrival_destination}
+                  />
                 </div>
                 <div>
                   <Timeline stops={details?.bus_stop} station={details} />
