@@ -38,9 +38,6 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
         <Table className=" min-w-[900px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              {/* <TableHead className="text-left font-bold w-[200px]">
-                Id
-              </TableHead> */}
               <TableHead className="font-bold w-1/5">Name</TableHead>
               <TableHead className="font-bold w-1/5 text-center">
                 Email
@@ -61,9 +58,6 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
               <>
                 {Data?.map((data: any) => (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    {/* <TableCell className="py-5 font-medium w-[100px] text-left">
-                      {data.id}
-                    </TableCell> */}
                     <TableCell className=" py-5 text-center text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
@@ -72,7 +66,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
+                        <span className="w-full flex flex-col text-start xl:flex-row gap-x-2 gap-y-1 text-gray-500">
                           <span>{data.name} </span>
                         </span>
                       </div>
@@ -89,12 +83,17 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                           <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                           <span className="font-semibold text-xs">Active</span>
                         </div>
-                      ) : (
+                      ) : data.status === "inactive" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                           <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                           <span className="font-semibold text-xs">
                             Suspended
                           </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#fc9c95] text-[--danger]">
+                          <span className="w-2 h-2 bg-[--danger] rounded-full"></span>
+                          <span className="font-semibold text-xs">Deleted</span>
                         </div>
                       )}
                     </TableCell>
@@ -116,12 +115,6 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                           >
                             View
                           </DropdownMenuItem>
-                          {/* <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleSuspend(data?.id)}
-                          >
-                            Suspend
-                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

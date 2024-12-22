@@ -1,4 +1,3 @@
-"use client";
 import {
   Card,
   CardHeader,
@@ -8,7 +7,6 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 import Spinner from "./Spinner";
-import Logo from "@/public/trubookerNotification.svg";
 import {
   useDeleteAllNotificationsMutation,
   useDeleteOneNotificationMutation,
@@ -19,16 +17,17 @@ import {
 import { MdDeleteForever } from "react-icons/md";
 import { BsCheckAll } from "react-icons/bs";
 import { Badge } from "@/components/ui/badge";
-import { Notification } from "@/constants";
+// import { notification } from "@/constants";
 import SwipeableNotification from "./SwipeableContent";
+import { truncateText } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const Notifications = () => {
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
-  const { data, isLoading, isFetching } = useFetchNotificationsQuery({
+  const { data, isLoading, isFetching, refetch } = useFetchNotificationsQuery({
     type: viewType,
   });
   const notification = data?.data;
-  console.log(notification);
 
   const [markAllAsRead, { isLoading: markAllLoading }] =
     useMarkAllAsReadMutation();
@@ -43,7 +42,8 @@ const Notifications = () => {
       await markAllAsRead(null)
         .unwrap()
         .then((res) => {
-          console.log("Marked all notifications ", res);
+          toast.success(res?.message);
+          refetch();
         });
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
@@ -55,7 +55,8 @@ const Notifications = () => {
       await deleteAll(null)
         .unwrap()
         .then((res) => {
-          console.log("deleted all notifications ", res);
+          toast.success(res?.message);
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete all notifications:", error);
@@ -67,10 +68,12 @@ const Notifications = () => {
       await deleteOne(id)
         .unwrap()
         .then((res) => {
-          console.log("delete one response ", res);
+          toast.success("Deleted Successfully");
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete notification:", error);
+      toast.error("Error occured");
     }
   };
 
@@ -79,10 +82,12 @@ const Notifications = () => {
       await markOne(id)
         .unwrap()
         .then((res) => {
-          console.log("Markone response ", res);
+          toast.success("Success");
+          refetch();
         });
     } catch (error) {
       console.error("Failed to delete notification:", error);
+      toast.error("Error occured");
     }
   };
 
@@ -94,62 +99,41 @@ const Notifications = () => {
             <span className="flex flex-row justify-between items-start">
               Notifications
               <div>
-                {notification?.length > 0 ? (
-                  <>
-                    {viewType === "unread" ? (
-                      <Badge
-                        onClick={() => setViewType("read")}
-                        variant="outline"
-                        className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
-                      >
-                        Unread
-                      </Badge>
-                    ) : (
-                      <Badge
-                        onClick={() => setViewType("unread")}
-                        variant="outline"
-                        className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
-                      >
-                        Unread
-                      </Badge>
-                    )}
-                  </>
-                ) : (
-                  ""
-                )}
+                <>
+                  {viewType === "unread" ? (
+                    <Badge
+                      onClick={() => setViewType("read")}
+                      variant="outline"
+                      className="cursor-pointer text-[white] bg-[--primary] border-[--primary] rounded-xl mb-1"
+                    >
+                      Unread
+                    </Badge>
+                  ) : (
+                    <Badge
+                      onClick={() => setViewType("unread")}
+                      variant="outline"
+                      className="cursor-pointer text-[--primary] border-[--primary] rounded-xl mb-1"
+                    >
+                      Unread
+                    </Badge>
+                  )}
+                </>
               </div>
             </span>
           </CardHeader>
-          <CardContent className="py-3 px-2">
+          <CardContent className="py-3 px-2 min-h-[390px]">
             <>
               {notification?.length > 0 ? (
                 <>
                   {notification?.map((notification: any) => (
                     <SwipeableNotification
-                      key={notification.index}
-                      index={notification.index}
+                      key={notification?.id}
+                      index={notification?.id}
                       onMarkAsRead={handleMarkOne}
                       onDelete={handleDeleteOne}
-                      content={
-                        <div className="h-[99px] min-h-[100px]">
-                          <div className="flex w-full items-start h-full space-x-4">
-                            <Image
-                              src={Logo}
-                              width="40"
-                              alt="Logo"
-                              className=" flex "
-                            />
-                            <div className="h-full flex flex-col justify-between">
-                              <p className="text-gray-800 font-medium text-xs">
-                                {notification.message}
-                              </p>
-                              <small className="text-gray-500">
-                                {notification.date}
-                              </small>
-                            </div>
-                          </div>
-                        </div>
-                      }
+                      content={notification}
+                      deleteOneLoading={deleteOneLoading}
+                      markOneLoading={markOneLoading}
                     />
                   ))}
                 </>

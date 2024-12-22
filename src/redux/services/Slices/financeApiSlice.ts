@@ -1,4 +1,3 @@
-// /admin/transactions/reportimport { api } from "../apiSlice";
 import { api } from "../apiSlice";
 
 const passengersApiConfig = api.enhanceEndpoints({
@@ -14,17 +13,17 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Finance"],
     }),
 
-    getTransactionHistory: builder.query({
-      query: ({ page, search }) => ({
-        url: `/admin/transactions/histories?page=${page}&search=${search}`,
+    getDriversEarnings: builder.query({
+      query: ({ page, search }: any) => ({
+        url: `/admin/finance/drivers-earnings?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
     }),
 
-    getDriversEarnings: builder.query({
-      query: () => ({
-        url: `/admin/finance/drivers-earnings`,
+    getAgentsEarnings: builder.query({
+      query: ({ page, search }: any) => ({
+        url: `/admin/finance/agents-earnings?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
@@ -32,5 +31,8 @@ const passengersApi = passengersApiConfig.injectEndpoints({
   }),
 });
 
-export const { useGetFinancialReportQuery, useGetTransactionHistoryQuery, useGetDriversEarningsQuery } =
-  passengersApi;
+export const {
+  useGetFinancialReportQuery,
+  useGetDriversEarningsQuery,
+  useGetAgentsEarningsQuery,
+} = passengersApi;

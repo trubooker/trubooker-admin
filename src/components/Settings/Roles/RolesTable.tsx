@@ -48,7 +48,7 @@ const RolesTable = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
     debounce((query: string) => {
-      setSearchQuery(query === "agent" ? "connector" : query);
+      setSearchQuery(query === "connector" ? "agent" : query);
       setPage(1);
     }, 300),
     []

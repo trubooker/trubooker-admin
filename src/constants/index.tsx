@@ -439,149 +439,48 @@ export const countries: Country[] = [
   },
 ];
 
-export const Notification = [
+export const notification = [
   {
     index: "1",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
   },
   {
     index: "2",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
   },
   {
     index: "3",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
   },
   {
     index: "4",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
   },
   {
     index: "5",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "6",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "7",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "8",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "9",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "10",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "11",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "12",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "13",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "14",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "15",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "16",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "17",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "18",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "19",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
-  },
-  {
-    index: "20",
-    image:
-      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
-    message: "Sandy Jay requested access the admin dashboard as an admin",
-    date: "59 minutes ago",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
   },
 ];
-
 export const PassengerFeedback = [
   {
     index: "1",

@@ -12,6 +12,8 @@ type Station = {
   drop_off_station: string;
   booking_closing_date: string;
   booking_closing_time: string;
+  departure_location: string;
+  arrival_location: string;
 };
 
 type BusStopsProps = {
@@ -27,7 +29,7 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
         <div className="flex flex-col justify-between items-center">
           <div>
             <h4 className="text-gray-900 text-sm font-bold">
-              {station?.pick_station || "Wuse, Abuja"}
+              {station?.pick_station || station?.departure_location}
             </h4>
             {/* <p className="text-xs text-gray-500">10:00AM</p> */}
           </div>
@@ -39,7 +41,7 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
           </div>
           <div>
             <h4 className="text-gray-900 text-sm flex-wrap font-bold text-right">
-              {station?.drop_off_station || "Oganimana, Kogi state"}
+              {station?.drop_off_station || station?.arrival_location}
             </h4>
             {/* <p className="text-xs text-gray-500 text-end">12:50PM</p> */}
           </div>
@@ -51,7 +53,10 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
         {/* Stops */}
         <ul className="pb-5">
           {stops?.map((stop, index) => (
-            <li key={index} className="flex items-start justify-between w-full space-x-4">
+            <li
+              key={index}
+              className="flex items-start justify-between w-full space-x-4"
+            >
               {/* Time */}
               <small className="w-[50%] lg:w-[50px] text-sm text-gray-500">
                 {stop?.time_of_arrival}
@@ -70,7 +75,7 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
 
                 {/* Line Connector */}
                 {index < stops?.length - 1 && (
-                  <div className="w-[2px] h-10 bg-gray-300"></div>
+                  <div className="w-[2px] min-h-10 h-12 bg-gray-300"></div>
                 )}
               </div>
 
