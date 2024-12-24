@@ -35,6 +35,9 @@ import {
 const FormSchema = z.object({
   coupon: z.string().min(1, { message: "Required" }),
   validity: z.string().min(1, { message: "Required" }),
+  tripFare: z.string().min(1, { message: "Required" }),
+  driverPercentage: z.string().min(1, { message: "Required" }),
+  agentPercentage: z.string().min(1, { message: "Required" }),
   referrals: z.string().min(1, { message: "Required" }),
   usageLimit: z.enum(["One-Time", "Multiple"], {
     required_error: "You need to select one.",
@@ -104,11 +107,7 @@ const ReferralProgram = () => {
                       <FormItem>
                         <FormLabel>Number of referrals required</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            {...field}
-                          />
+                          <Input type="number" placeholder="0" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -123,11 +122,7 @@ const ReferralProgram = () => {
                       <FormItem>
                         <FormLabel>Coupon Value (%)</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="0%"
-                            {...field}
-                          />
+                          <Input type="number" placeholder="0%" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -142,11 +137,52 @@ const ReferralProgram = () => {
                       <FormItem>
                         <FormLabel>Validity Period</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            {...field}
-                          />
+                          <Input type="number" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="tripFare"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Base Trip Fare</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="driverPercentage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Driver Earning Percentage</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0%" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="agentPercentage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Connector Earning Percentage</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0%" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

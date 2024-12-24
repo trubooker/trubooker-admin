@@ -283,7 +283,7 @@ const Dashboard = () => {
                             </AvatarFallback>
                           </Avatar>
                           <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                            <span>{data.driver} </span>
+                            <span className="capitalize">{data.driver} </span>
                             {/* <span>{data.last_name}</span> */}
                           </span>
                         </div>
@@ -291,10 +291,10 @@ const Dashboard = () => {
 
                       <TableCell className="w-1/7 py-5 text-left">
                         <div className="flex flex-col">
-                          <span> {data.departure_location || "Kogi"}</span>
+                          <span> {data.departure_location}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
-                            {data.departure_date || "2022-01-01"}
+                            {data.departure_date}
                           </small>
                         </div>
                       </TableCell>
