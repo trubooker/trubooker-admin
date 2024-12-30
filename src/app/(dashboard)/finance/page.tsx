@@ -233,9 +233,9 @@ const Finance = () => {
                         chartConfig={data?.chartConfigLine}
                         total_revenue={revenue?.total_revenue}
                         graph_data={
-                          revenue?.revenue_graph > 0
+                          Array.isArray(revenue?.revenue_graph)
                             ? revenue?.revenue_graph
-                            : data?.chartDataLine
+                            : [revenue?.revenue_graph]
                         }
                       />
                     </div>
