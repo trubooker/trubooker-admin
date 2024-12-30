@@ -44,7 +44,7 @@ const Dashboard = () => {
   const totalPages = info?.data?.active_trips?.last_page;
   const userData = info?.data?.active_trips?.data || [];
   const overview = info?.data?.overviews;
-  const revenue = info?.data;
+  const revenue = info?.data?.revenue;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
