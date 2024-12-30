@@ -3,7 +3,7 @@ import { FaSpinner } from "react-icons/fa";
 
 const Spinner = () => {
   return (
-    <div className="flex justify-center flex-col text-center my-auto h-full w-full">
+    <div className="flex justify-center flex-col text-center my-auto h-[300px] w-full">
       <FaSpinner
         className="animate-spin h-full my-auto mx-auto text-gray-500"
         size={24}

@@ -42,7 +42,7 @@ const notificationApi = notificationApiConfig.injectEndpoints({
     }),
 
     deleteOneNotification: builder.mutation({
-      query: ({ id }: any) => ({
+      query: (id: any) => ({
         url: `/notifications/clear/${id}`,
         method: "DELETE",
       }),

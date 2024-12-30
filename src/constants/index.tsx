@@ -76,12 +76,12 @@ export const NavLinks: LinkItem[] = [
       // },
     ],
   },
-  // {
-  //   id: 7,
-  //   title: "Notification",
-  //   icon: MdOutlineNotificationsActive,
-  //   link: "/notification",
-  // },
+  {
+    id: 7,
+    title: "Notification",
+    icon: MdOutlineNotificationsActive,
+    link: "/notification",
+  },
   // {
   //   id: 8,
   //   title: "Report",
@@ -474,6 +474,14 @@ export const notification = [
   },
   {
     index: "5",
+    image:
+      "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
+    title: "Sandy Jay requested access the admin dashboard as an admin",
+    body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate iure alias eos officia fuga rem quo deleniti, corporis ipsum suscipit!",
+    created_at: "59 minutes ago",
+  },
+  {
+    index: "6",
     image:
       "https://images.pexels.com/photos/20594698/pexels-photo-20594698/free-photo-of-raised-arm-with-tattoo-over-antenna.png?auto=compress&cs=tinysrgb&w=400&lazy=load",
     title: "Sandy Jay requested access the admin dashboard as an admin",

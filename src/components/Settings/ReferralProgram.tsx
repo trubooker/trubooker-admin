@@ -23,23 +23,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import Link from "next/link";
+import { useSetReferralProgramMutation } from "@/redux/services/Slices/settings/referralProgramApiSlice";
+import toast from "react-hot-toast";
 
 const FormSchema = z.object({
-  coupon: z.string().min(1, { message: "Required" }),
-  validity: z.string().min(1, { message: "Required" }),
-  tripFare: z.string().min(1, { message: "Required" }),
-  driverPercentage: z.string().min(1, { message: "Required" }),
-  agentPercentage: z.string().min(1, { message: "Required" }),
-  referrals: z.string().min(1, { message: "Required" }),
-  usageLimit: z.enum(["One-Time", "Multiple"], {
+  coupon_value: z.string().min(1, { message: "Required" }),
+  validity_period: z.string().min(1, { message: "Required" }),
+  no_of_referrals: z.string().min(1, { message: "Required" }),
+  usage_limit: z.enum(["once", "multiple"], {
     required_error: "You need to select one.",
   }),
 });
@@ -50,9 +41,23 @@ const ReferralProgram = () => {
     defaultValues: {},
   });
 
-  const isLoading: boolean = false;
-
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {};
+  const [setPrice, { isLoading }] = useSetReferralProgramMutation();
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const formdata = {
+      coupon_value: Number(data.coupon_value),
+      validity_period: Number(data.validity_period),
+      no_of_referrals: Number(data.no_of_referrals),
+      usage_limit: data.usage_limit,
+    };
+    await setPrice(formdata)
+      .unwrap()
+      .then((res) => {
+        toast.success("Success");
+      })
+      .catch((err) => {
+        toast.error("Error occured");
+      });
+  };
   return (
     <div className=" rounded-3xl">
       <Form {...form}>
@@ -65,44 +70,10 @@ const ReferralProgram = () => {
             </CardHeader>
             <CardContent className="border-none px-0 rounded-lg">
               <div className="grid gap-4">
-                {/* <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a verified email to display" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="m@example.com">
-                              m@example.com
-                            </SelectItem>
-                            <SelectItem value="m@google.com">
-                              m@google.com
-                            </SelectItem>
-                            <SelectItem value="m@support.com">
-                              m@support.com
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div> */}
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="referrals"
+                    name="no_of_referrals"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Number of referrals required</FormLabel>
@@ -117,7 +88,7 @@ const ReferralProgram = () => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="coupon"
+                    name="coupon_value"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Coupon Value (%)</FormLabel>
@@ -132,7 +103,7 @@ const ReferralProgram = () => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="validity"
+                    name="validity_period"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Validity Period</FormLabel>
@@ -144,55 +115,11 @@ const ReferralProgram = () => {
                     )}
                   />
                 </div>
+
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="tripFare"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Base Trip Fare</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="driverPercentage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Driver Earning Percentage</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0%" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="agentPercentage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Connector Earning Percentage</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0%" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="usageLimit"
+                    name="usage_limit"
                     render={({ field }) => (
                       <FormItem className="">
                         <FormLabel>Usage Limit</FormLabel>
@@ -206,7 +133,7 @@ const ReferralProgram = () => {
                               <FormControl>
                                 <RadioGroupItem
                                   className="border-muted-foreground h-5 w-5"
-                                  value="One-Time"
+                                  value="once"
                                 />
                               </FormControl>
                               <FormLabel className="font-normal text-base text-muted-foreground">
@@ -217,7 +144,7 @@ const ReferralProgram = () => {
                               <FormControl>
                                 <RadioGroupItem
                                   className="border-muted-foreground h-5 w-5"
-                                  value="Multiple"
+                                  value="multiple"
                                 />
                               </FormControl>
                               <FormLabel className="font-normal text-base text-muted-foreground">
@@ -234,7 +161,7 @@ const ReferralProgram = () => {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-[--primary] hover:bg-[--primary-hover] text-white py-2 px-4 rounded-md"
+                  className="bg-[--primary] hover:bg-[--primary-btn] text-white py-2 px-4 rounded-md"
                 >
                   {isLoading ? "Activating..." : "Activate"}
                 </Button>

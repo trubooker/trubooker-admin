@@ -28,6 +28,8 @@ import Overview from "@/components/TripOverview";
 import { FaArrowUp } from "react-icons/fa";
 import Pagination from "@/components/Pagination";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const [page, setPage] = useState(1);
@@ -48,6 +50,7 @@ const Dashboard = () => {
       setPage(pageNumber);
     }
   };
+  const router = useRouter();
 
   // const [sortConfig, setSortConfig] = useState<{
   //   column: string;
@@ -265,6 +268,9 @@ const Dashboard = () => {
                     <TableHead className="font-bold w-1/4 text-center">
                       Status
                     </TableHead>
+                    <TableHead className="font-bold w-1/4 text-center">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -283,7 +289,9 @@ const Dashboard = () => {
                             </AvatarFallback>
                           </Avatar>
                           <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                            <span className="capitalize">{data.driver} </span>
+                            <span className="capitalize">
+                              {data.driver?.name}{" "}
+                            </span>
                             {/* <span>{data.last_name}</span> */}
                           </span>
                         </div>
@@ -333,6 +341,18 @@ const Dashboard = () => {
                             </span>
                           </div>
                         )}
+                      </TableCell>
+                      <TableCell className=" py-5">
+                        <Button
+                          onClick={() =>
+                            router.push(
+                              `/drivers/${data.driver?.id}/trip-detail/${data.id}`
+                            )
+                          }
+                          className="rounded-xl  text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs"
+                        >
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
