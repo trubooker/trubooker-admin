@@ -51,7 +51,7 @@ const Referral_program = () => {
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 w-full gap-4">
 
-          <div className="flex flex-col gap-y-10 col-span-2 w-full ">
+          <div className="flex flex-col gap-y-10 lg:col-span-2 w-full ">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <Card
