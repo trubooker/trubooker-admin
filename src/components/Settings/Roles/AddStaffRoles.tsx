@@ -221,15 +221,22 @@ export function AddStaffRoles({ role }: { role: [] }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {role?.map((category: any, i: number) => (
-                        <SelectItem
-                          key={i}
-                          value={category?.name}
-                          className="capitalize"
-                        >
-                          {formatSnakeCase(category?.name)}
-                        </SelectItem>
-                      ))}
+                      {role
+                        ?.filter(
+                          (category: any) =>
+                            category?.name !== "driver" &&
+                            category?.name !== "agent" &&
+                            category?.name !== "passenger"
+                        )
+                        .map((category: any, i: number) => (
+                          <SelectItem
+                            key={i}
+                            value={category?.name}
+                            className="capitalize"
+                          >
+                            {formatSnakeCase(category?.name)}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

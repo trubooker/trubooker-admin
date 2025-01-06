@@ -38,7 +38,7 @@ export const LineChartDisplay: FC<Props> = ({
           <div className="flex flex-col gap-y-3">
             <CardTitle className="text-xl">Total Revenue</CardTitle>
             <CardDescription className="text-xs">
-              Earnings for the Month
+              Earnings for the Week
             </CardDescription>
           </div>
           <span className="text-xl">

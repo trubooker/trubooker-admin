@@ -27,7 +27,10 @@ export async function POST(req: Request, res: NextRequest) {
   });
 
   if (data?.status == "success") {
-    if (data?.data?.user?.role === "admin") {
+    if (
+      data?.data?.user?.role === "admin" ||
+      data?.data?.user?.role === "super_admin"
+    ) {
       const response = {
         data: data?.data?.user,
       };
@@ -36,9 +39,12 @@ export async function POST(req: Request, res: NextRequest) {
         headers: { "Set-cookie": serialized },
       });
     } else {
-      return new Response(JSON.stringify({ message: "Unauthorized!! Admin only" }), {
-        status: 401,
-      });
+      return new Response(
+        JSON.stringify({ message: "Unauthorized!! Admin only" }),
+        {
+          status: 401,
+        }
+      );
     }
   } else {
     const response = {

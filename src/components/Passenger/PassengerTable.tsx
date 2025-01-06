@@ -41,19 +41,19 @@ export function PassengerTable({
               {/* <TableHead className="text-left font-bold w-1/7">
                 Trip Id
               </TableHead> */}
-              <TableHead className="font-bold w-1/7">Departure</TableHead>
-              <TableHead className="font-bold w-1/7 text-left">
+              <TableHead className="font-bold w-1/4">Departure</TableHead>
+              <TableHead className="font-bold w-1/4 text-left">
                 Destination
               </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
+              <TableHead className="font-bold w-1/4 text-center">
                 Status
               </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
+              <TableHead className="font-bold w-1/4 text-center">
                 Amount paid
               </TableHead>
-              <TableHead className="text-center font-bold w-1/7">
+              {/* <TableHead className="text-center font-bold w-1/4">
                 Actions
-              </TableHead>
+              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -93,10 +93,12 @@ export function PassengerTable({
                     </TableCell>
 
                     <TableCell>
-                      {data.status === "active" ? (
+                      {data.status === "verified" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                           <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                          <span className="font-semibold text-xs">Active</span>
+                          <span className="font-semibold text-xs">
+                            Verified
+                          </span>
                         </div>
                       ) : data.status === "completed" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
@@ -123,7 +125,7 @@ export function PassengerTable({
                     <TableCell className="w-1/7 py-5 text-center">
                       {formatCurrency(data?.amount)}
                     </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center w-[100px]">
+                    {/* <TableCell className="w-1/7 py-5 text-center w-[100px]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -141,16 +143,9 @@ export function PassengerTable({
                           >
                             Delete
                           </DropdownMenuItem>
-                          {/* <Separator />
-                          <DropdownMenuItem
-                            className="w-full text-center cursor-pointer"
-                            onClick={() => handleNotify(data?.id)}
-                          >
-                            Send Notifications
-                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
               </>

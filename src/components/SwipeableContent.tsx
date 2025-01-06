@@ -45,7 +45,7 @@ const SwipeableNotification: React.FC<{
       {/* Action Buttons */}
       <div
         className={clsx(
-          "absolute right-0 top-0 h-full flex flex-col text-xs py-2 text-end  justify-around z-10 transition-transform ps-4 ",
+          "absolute right-0 top-0 h-full flex flex-col text-xs py-2 text-end gap-y-3 justify-center z-10 transition-transform ps-4 ",
           isActionsVisible ? "translate-x-0" : "translate-x-full"
         )}
         style={{ width: "40%" }}
@@ -64,7 +64,7 @@ const SwipeableNotification: React.FC<{
             "Delete"
           )}
         </Button>
-        <Modal
+        {/* <Modal
           trigger={
             <Button className="rounded-xl text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs">
               Open
@@ -78,7 +78,7 @@ const SwipeableNotification: React.FC<{
               created_at={content?.created_at}
             />
           }
-        />
+        /> */}
 
         <Button
           className="rounded-xl text-green-600 hover:bg-green-100 bg-green-200 py-3 text-xs"

@@ -28,6 +28,8 @@ import Overview from "@/components/TripOverview";
 import { FaArrowUp } from "react-icons/fa";
 import Pagination from "@/components/Pagination";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const [page, setPage] = useState(1);
@@ -42,12 +44,14 @@ const Dashboard = () => {
   const totalPages = info?.data?.active_trips?.last_page;
   const userData = info?.data?.active_trips?.data || [];
   const overview = info?.data?.overviews;
-  const revenue = info?.data;
+  const revenue = info?.data?.revenue;
+  const users = info?.data;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
+  const router = useRouter();
 
   // const [sortConfig, setSortConfig] = useState<{
   //   column: string;
@@ -92,7 +96,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_passengers)} />
+                          <CountUp end={Number(users?.total_passengers)} />
                         )}
                       </span>
                     </div>
@@ -117,7 +121,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_drivers)} />
+                          <CountUp end={Number(users?.total_drivers)} />
                         )}
                       </span>
                     </div>
@@ -142,7 +146,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_agents)} />
+                          <CountUp end={Number(users?.total_agents)} />
                         )}
                       </span>
                     </div>
@@ -265,6 +269,9 @@ const Dashboard = () => {
                     <TableHead className="font-bold w-1/4 text-center">
                       Status
                     </TableHead>
+                    <TableHead className="font-bold w-1/4 text-center">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -283,7 +290,9 @@ const Dashboard = () => {
                             </AvatarFallback>
                           </Avatar>
                           <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                            <span>{data.driver} </span>
+                            <span className="capitalize">
+                              {data.driver?.name}{" "}
+                            </span>
                             {/* <span>{data.last_name}</span> */}
                           </span>
                         </div>
@@ -291,10 +300,10 @@ const Dashboard = () => {
 
                       <TableCell className="w-1/7 py-5 text-left">
                         <div className="flex flex-col">
-                          <span> {data.departure_location || "Kogi"}</span>
+                          <span> {data.departure_location}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
-                            {data.departure_date || "2022-01-01"}
+                            {data.departure_date}
                           </small>
                         </div>
                       </TableCell>
@@ -333,6 +342,18 @@ const Dashboard = () => {
                             </span>
                           </div>
                         )}
+                      </TableCell>
+                      <TableCell className=" py-5">
+                        <Button
+                          onClick={() =>
+                            router.push(
+                              `/drivers/${data.driver?.id}/trip-detail/${data.id}`
+                            )
+                          }
+                          className="rounded-xl  text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs"
+                        >
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

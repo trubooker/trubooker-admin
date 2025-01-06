@@ -21,6 +21,7 @@ import { IoPersonOutline } from "react-icons/io5";
 // import { Button } from "../../ui/button";
 // import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { formatSnakeCase } from "@/lib/utils";
 // import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 
 export function Roles_Table({ data: Data, isFetching, loading }: any) {
@@ -78,7 +79,8 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                       {data?.phone}
                     </TableCell>
                     <TableCell className="capitalize py-5 text-center">
-                      {data.role === "agent" ? "connector" : data.role}
+                      {formatSnakeCase(data.role === "agent" ? "connector" : data.role)}
+
                     </TableCell>
                   </TableRow>
                 ))}

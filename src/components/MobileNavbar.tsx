@@ -36,6 +36,7 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import LogoutModal from "./LogoutModal";
 import { useLoggedInUser } from "@/hooks/useLoggedUser";
+import { formatSnakeCase } from "@/lib/utils";
 
 const MobileNavbar = () => {
   const pathname = usePathname();
@@ -168,7 +169,7 @@ const MobileNavbar = () => {
                   {data?.first_name} {data?.last_name}
                 </span>
                 <small className="text-[13px] mt-1 font-normal capitalize">
-                  {data?.role}
+                  {formatSnakeCase(data?.role)}
                 </small>
               </p>
               <Avatar className="w-10 h-10">

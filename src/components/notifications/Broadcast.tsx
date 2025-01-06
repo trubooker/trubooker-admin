@@ -8,134 +8,79 @@
 
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-// import QuickActions from "@/components/(admin)/quick-action";
-// import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import Search from "@/components/SearchBar";
-import { PassengerListData } from "@/constants";
+import React from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import debounce from "lodash/debounce";
-import Pagination from "@/components/Pagination";
-import { PassengerList } from "@/components/Passenger/passengerList";
-import { useGetPassengersQuery } from "@/redux/services/Slices/passenger.ApiSlice";
+  useGetAnnouncementsQuery,
+  useGetSystemSettingsQuery,
+} from "@/redux/services/Slices/settings/referralProgramApiSlice";
+import { useRouter } from "next/navigation";
+import { formatSnakeCase } from "@/lib/utils";
+import { Separator } from "../ui/separator";
+import Spinner from "../Spinner";
 
 const Broadcast = () => {
-  const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
   const {
     isLoading: loading,
     data: userData,
     isFetching,
-  } = useGetPassengersQuery({ page, search: searchQuery });
+  } = useGetSystemSettingsQuery(null);
 
-  console.log("Passenger", userData);
+  const { data, isLoading } = useGetAnnouncementsQuery(null);
+  const router = useRouter();
+  console.log("SystemSettings", userData);
+  console.log(data);
 
-  const PassengerListData = userData?.data;
-  const totalPages = userData?.meta?.last_page;
-  const onPageChange = (pageNumber: number) => {
-    if (!isFetching && pageNumber !== page) {
-      setPage(pageNumber);
-    }
-  };
-  const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
+  const SystemSettingsListData = userData?.data;
 
-  useEffect(() => {
-    if (PassengerListData) {
-      setFilteredStudents(PassengerListData);
-    }
-  }, [PassengerListData]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debounceSearch = useCallback(
-    debounce((query: string) => {
-      setSearchQuery(query);
-      setPage(1);
-    }, 300),
-    []
-  );
-
-  const handleSearch = (query: string) => {
-    debounceSearch(query);
-  };
   return (
-    <div className="flex flex-col h-fit w-full">
-      <div className="flex flex-col xl:flex-row w-full">
-        <div className="w-full">
-          <div className="bg-white rounded-lg w-full p-5">
-            <Search
-              placeholder={"Search..."}
-              onSearch={handleSearch}
-              classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
-            />
-            {isFetching || loading ? (
-              <>
-                <Table className="">
-                  <TableHeader>
-                    <TableRow className="text-xs lg:text-sm">
-                      {/* <TableHead className="text-left font-bold w-1/6">
-                        Id
-                      </TableHead> */}
-                      <TableHead className="font-bold w-1/6">Name</TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Email
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Phone Number
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-center font-bold w-1/6">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                      <TableRow key={i}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                          <TableCell key={i}>
-                            <div>
-                              <div className="w-full rounded-md">
-                                <div>
-                                  <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </>
-            ) : (
-              <PassengerList
-                data={filteredStudents}
-                isFetching={isFetching}
-                loading={loading}
-              />
-            )}
-            {totalPages > 1 && (
-              <div className="pt-10">
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={onPageChange}
-                />
+    <div className="lg:w-8/12 w-full px-4 pt-4 bg-white rounded-xl shadow-sm">
+      {/* <h2 className="text-2xl font-bold mb-5">System Settings</h2> */}
+      {SystemSettingsListData?.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4">
+          {SystemSettingsListData?.map((setting: any) => (
+            <>
+              <div key={setting.id} className="p-4">
+                <h3 className="text-lg font-semibold">
+                  {formatSnakeCase(setting.key)}
+                </h3>
+                <div className="mt-2">
+                  {Object.entries(setting.value).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between items-center py-1"
+                    >
+                      <span className="font-medium">
+                        {formatSnakeCase(
+                          key === "agent_earning_percentage"
+                            ? "Connector Earning Percentage"
+                            : key
+                        )}
+                        :
+                      </span>
+                      <span className="text-gray-600 capitalize">
+                        {typeof value === "object"
+                          ? JSON.stringify(value)
+                          : String(value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
+              <Separator />
+            </>
+          ))}
         </div>
-      </div>
+      ) : (
+        <>
+          {loading || isFetching ? (
+            <Spinner />
+          ) : (
+            <div className="flex justify-center items-center h-40">
+              <p className="text-gray-400">No system settings found</p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
