@@ -231,11 +231,11 @@ const Finance = () => {
                     <div className="">
                       <BarCharts
                         chartConfig={data?.chartConfigLine}
-                        total_revenue={revenue?.total_revenue}
+                        total_revenue={revenue?.revenue?.total_revenue}
                         graph_data={
-                          Array.isArray(revenue?.revenue_graph)
-                            ? revenue?.revenue_graph
-                            : [revenue?.revenue_graph]
+                          Array.isArray(revenue?.revenue?.revenue_graph)
+                            ? revenue?.revenue?.revenue_graph
+                            : [revenue?.revenue?.revenue_graph]
                         }
                       />
                     </div>
@@ -543,7 +543,9 @@ const Finance = () => {
                               <TableCell className="w-1/6  py-5 font-medium text-left me-4">
                                 <div className="w-full flex gap-x-3 items-center">
                                   <Avatar className="w-8 h-8">
-                                    <AvatarImage src={data?.profile_picture} />
+                                    <AvatarImage
+                                      src={data?.driver?.profile_picture}
+                                    />
                                     <AvatarFallback>
                                       <IoPersonOutline />
                                     </AvatarFallback>
@@ -624,7 +626,7 @@ const Finance = () => {
                                   }
                                   title={"Transaction details"}
                                   description={""}
-                                  content={<TransactionDetails />}
+                                  content={<TransactionDetails data={data} />}
                                   classname="hidden"
                                 />
                               </TableCell>

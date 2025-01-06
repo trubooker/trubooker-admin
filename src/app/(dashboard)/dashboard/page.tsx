@@ -45,6 +45,7 @@ const Dashboard = () => {
   const userData = info?.data?.active_trips?.data || [];
   const overview = info?.data?.overviews;
   const revenue = info?.data?.revenue;
+  const users = info?.data;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -95,7 +96,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_passengers)} />
+                          <CountUp end={Number(users?.total_passengers)} />
                         )}
                       </span>
                     </div>
@@ -120,7 +121,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_drivers)} />
+                          <CountUp end={Number(users?.total_drivers)} />
                         )}
                       </span>
                     </div>
@@ -145,7 +146,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(revenue?.total_agents)} />
+                          <CountUp end={Number(users?.total_agents)} />
                         )}
                       </span>
                     </div>

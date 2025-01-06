@@ -37,6 +37,28 @@ export const formatSnakeCase = (input: string): string => {
     .join(" "); // Join with a space
 };
 
+export function formatDateTime(DATE: string, TIME: string): string {
+  // Create a Date object using the date and time
+  const date = new Date(`${DATE}T${TIME}`);
+
+  // Format the date as MM/DD/YYYY
+  const formattedDate = date.toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  });
+
+  // Format the time as hh:mm AM/PM
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  return `${formattedDate}, ${formattedTime}`;
+}
+
+
 export const truncateText = (text: string, maxLength: number = 20) => {
   if (text.length > maxLength) {
     return text.slice(0, maxLength) + "...";
