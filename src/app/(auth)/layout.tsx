@@ -5,7 +5,7 @@ import StoreProvider from "@/redux/providers";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Admin | truBooker",
+  title: "Admin | TruBooker",
   icons: "/logo.svg",
 };
 
