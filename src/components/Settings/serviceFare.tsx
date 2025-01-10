@@ -49,7 +49,7 @@ const PriceControl = () => {
   // State for toggling between "percentage" and "amount"
   const [agentEarningType, setAgentEarningType] = useState<
     "percentage" | "amount"
-  >("percentage");
+  >("amount");
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const formdata = {
@@ -129,14 +129,14 @@ const PriceControl = () => {
                           >
                             <SelectTrigger className="w-20">
                               <span>
-                                {agentEarningType === "percentage" ? "%" : "₦"}
+                                {agentEarningType === "amount" ? "₦" : "%"}
                               </span>
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="amount">Amount</SelectItem>
                               <SelectItem value="percentage">
                                 Percentage
                               </SelectItem>
-                              <SelectItem value="amount">Amount</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
