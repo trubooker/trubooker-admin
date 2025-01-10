@@ -98,8 +98,8 @@ export function DriverTable({
                   </TableCell>
                   <TableCell>
                     {data.status === "completed" ? (
-                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
-                        <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-green-100 text-green-500">
+                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                         <span className="font-semibold text-xs">Completed</span>
                       </div>
                     ) : data.status === "pending" ||
@@ -112,6 +112,11 @@ export function DriverTable({
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
                         <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                         <span className="font-semibold text-xs">Cancelled</span>
+                      </div>
+                    ) : data.status === "past" ? (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
+                        <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
+                        <span className="font-semibold text-xs">Past</span>
                       </div>
                     ) : (
                       ""

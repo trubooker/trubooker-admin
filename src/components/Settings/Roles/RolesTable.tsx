@@ -15,8 +15,12 @@ import { Skeleton } from "../../ui/skeleton";
 import Pagination from "../../Pagination";
 import { Roles_Table } from "./table";
 import { useGetUsersByRoleQuery } from "@/redux/services/Slices/settings/rolesApiSlice";
+import { Modal } from "@/components/DualModal";
+import { Button } from "@/components/ui/button";
+import { FaPlus } from "react-icons/fa";
+import CreateStaff from "./CreateStaff";
 
-const RolesTable = () => {
+const RolesTable = ({ role }: any) => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const {
@@ -61,10 +65,23 @@ const RolesTable = () => {
     <div className="flex flex-col xl:flex-row w-full">
       <div className="w-full">
         <div className="bg-white rounded-lg w-full p-5 mt-5">
+          <Modal
+            trigger={
+              <Button
+                size={"sm"}
+                className="bg-white border border-[--primary] text-[--primary]"
+              >
+                <FaPlus /> Create Account
+              </Button>
+            }
+            title={"Create New Account"}
+            description={""}
+            content={<CreateStaff role={role} />}
+          />
           <Search
             placeholder={"Search by role, name or email"}
             onSearch={handleSearch}
-            classname="mb-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
+            classname="my-5 max-w-[300px] lg:w-[400px] lg:max-w-[1000px]"
           />
           {userByRoleFetching || userByRoleLoading ? (
             <>
