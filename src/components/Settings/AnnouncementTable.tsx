@@ -13,9 +13,14 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Modal } from "../DualModal";
+import UpdateBroadcastMessage from "../UpdateBroadcastMessage";
 
-
-const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
+const AnnouncementTable = ({
+  refetch,
+  notifications,
+  isFetching,
+  loading,
+}: any) => {
   return (
     <>
       <div>
@@ -63,10 +68,10 @@ const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
                           }
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center flex gap-x-5">
                         <Modal
                           trigger={
-                            <button className="text-indigo-600 text-center mx-auto hover:underline">
+                            <button className="text-indigo-600 text-center mx-auto">
                               View
                             </button>
                           }
@@ -111,6 +116,23 @@ const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
                                 )}
                               </div>
                             </>
+                          }
+                        />
+                        {/* </TableCell>
+                      <TableCell className="text-center"> */}
+                        <Modal
+                          trigger={
+                            <button className="text-indigo-600 text-center mx-auto">
+                              Update
+                            </button>
+                          }
+                          title={notification?.title}
+                          description={`ID: ${notification?.id} `}
+                          content={
+                            <UpdateBroadcastMessage
+                              notification={notification}
+                              refetch={refetch}
+                            />
                           }
                         />
                       </TableCell>

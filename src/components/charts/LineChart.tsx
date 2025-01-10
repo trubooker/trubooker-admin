@@ -53,8 +53,7 @@ export const LineChartDisplay: FC<Props> = ({
             accessibilityLayer
             data={graph_data}
             margin={{
-              left: 12,
-              right: 12,
+              bottom: 10, // Add bottom margin to create space between the x-axis and the chart
             }}
           >
             <CartesianGrid vertical={false} />
@@ -62,14 +61,16 @@ export const LineChartDisplay: FC<Props> = ({
               dataKey="day"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={20}
               tickFormatter={(value) => value.slice(0, 3)}
+             
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               tickCount={3}
+              padding={{ top: 20 }} // Add padding to the top of the Y-axis to create space between the x-axis and the chart line
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
