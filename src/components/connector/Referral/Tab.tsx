@@ -22,7 +22,7 @@ export function Tab({ data: AgentTableData, isFetching, loading }: any) {
     alert(`Account id ${id} suspended!!`);
   };
 
-  const denom_amount: number = 1000;
+  const denom_amount: number = 2500;
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
