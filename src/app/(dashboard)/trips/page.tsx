@@ -136,8 +136,8 @@ const Trips = () => {
           <TabsTrigger className="me-auto lg:w-full" value="upcoming">
             Upcoming Trips
           </TabsTrigger>
-          <TabsTrigger className="me-auto lg:w-full" value="active">
-            Active Trips
+          <TabsTrigger className="me-auto lg:w-full" value="past">
+            Past Trips
           </TabsTrigger>
           <TabsTrigger className="me-auto lg:w-full" value="completed">
             Completed Trips
@@ -351,7 +351,7 @@ const Trips = () => {
             )}
           </div>
         </TabsContent>
-        <TabsContent value="active">
+        <TabsContent value="past">
           <div className="bg-white rounded-xl p-5">
             <div className="flex gap-x-3 items-center ps-3 mb-5">
               <Search

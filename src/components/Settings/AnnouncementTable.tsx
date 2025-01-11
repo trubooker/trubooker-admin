@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -103,14 +104,19 @@ const AnnouncementTable = ({
                                   <strong>Attachment:</strong>
                                 </p>
                                 {notification?.attachment ? (
-                                  <div className="relative w-full object-cover h-[200px]">
-                                    <Image
-                                      src={notification?.attachment}
-                                      alt="Attachment"
-                                      className="mt-4 rounded-lg w-full"
-                                      fill
-                                    />
-                                  </div>
+                                  // <div className="relative w-full object-cover h-[200px]">
+                                  //   <Image
+                                  //     src={notification?.attachment}
+                                  //     alt="Attachment"
+                                  //     className="mt-4 rounded-lg w-full"
+                                  //     fill
+                                  //   />
+                                  // </div>
+                                  <img
+                                    src={notification?.attachment}
+                                    alt={""}
+                                    className="w-full h-96 object-cover rounded-md mb-4"
+                                  />
                                 ) : (
                                   "No attachment"
                                 )}
