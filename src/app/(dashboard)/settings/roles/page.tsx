@@ -109,7 +109,7 @@ const Roles = () => {
         )}
       </div>
 
-      <RolesTable />
+      <RolesTable role={role} />
     </div>
   );
 };

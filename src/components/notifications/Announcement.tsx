@@ -18,6 +18,7 @@ const Announcement = () => {
     isLoading: loading,
     data: data,
     isFetching,
+    refetch,
   } = useGetAnnouncementsQuery(null);
 
   console.log("Announcement", data);
@@ -72,6 +73,7 @@ const Announcement = () => {
                 notifications={announcement}
                 isFetching={isFetching}
                 loading={loading}
+                refetch={refetch}
               />
             )}
           </div>

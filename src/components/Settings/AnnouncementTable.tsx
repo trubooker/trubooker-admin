@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -13,9 +14,14 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Modal } from "../DualModal";
+import UpdateBroadcastMessage from "../UpdateBroadcastMessage";
 
-
-const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
+const AnnouncementTable = ({
+  refetch,
+  notifications,
+  isFetching,
+  loading,
+}: any) => {
   return (
     <>
       <div>
@@ -63,10 +69,10 @@ const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
                           }
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center flex gap-x-5">
                         <Modal
                           trigger={
-                            <button className="text-indigo-600 text-center mx-auto hover:underline">
+                            <button className="text-indigo-600 text-center mx-auto">
                               View
                             </button>
                           }
@@ -98,19 +104,41 @@ const AnnouncementTable = ({ notifications, isFetching, loading }: any) => {
                                   <strong>Attachment:</strong>
                                 </p>
                                 {notification?.attachment ? (
-                                  <div className="relative w-full object-cover h-[200px]">
-                                    <Image
-                                      src={notification?.attachment}
-                                      alt="Attachment"
-                                      className="mt-4 rounded-lg w-full"
-                                      fill
-                                    />
-                                  </div>
+                                  // <div className="relative w-full object-cover h-[200px]">
+                                  //   <Image
+                                  //     src={notification?.attachment}
+                                  //     alt="Attachment"
+                                  //     className="mt-4 rounded-lg w-full"
+                                  //     fill
+                                  //   />
+                                  // </div>
+                                  <img
+                                    src={notification?.attachment}
+                                    alt={""}
+                                    className="w-full h-96 object-cover rounded-md mb-4"
+                                  />
                                 ) : (
                                   "No attachment"
                                 )}
                               </div>
                             </>
+                          }
+                        />
+                        {/* </TableCell>
+                      <TableCell className="text-center"> */}
+                        <Modal
+                          trigger={
+                            <button className="text-indigo-600 text-center mx-auto">
+                              Update
+                            </button>
+                          }
+                          title={notification?.title}
+                          description={`ID: ${notification?.id} `}
+                          content={
+                            <UpdateBroadcastMessage
+                              notification={notification}
+                              refetch={refetch}
+                            />
                           }
                         />
                       </TableCell>

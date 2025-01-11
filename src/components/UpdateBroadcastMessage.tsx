@@ -43,136 +43,111 @@ const FormSchema = z.object({
   }),
 });
 
-// Helper function to format duration for API submission
-const formatDurationForAPI = (duration: string): string => {
-  return duration
-    .replace(/\b(\d+)\s*minutes\b/g, "$1min")
-    .replace(/\b(\d+)\s*minute\b/g, "$1min")
-    .replace(/\b(\d+)\s*hours\b/g, "$1hrs")
-    .replace(/\b(\d+)\s*hour\b/g, "$1hr")
-    .replace(/\b(\d+)\s*days\b/g, "$1days")
-    .replace(/\b(\d+)\s*day\b/g, "$1day");
-};
-
-
-const SendBroadcastMessage = () => {
+const UpdateBroadcastMessage = ({ notification, refetch }: any) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {},
+    defaultValues: {
+      target: notification?.target || "",
+    },
   });
   const [imageUrl, setImageUrl] = React.useState<AcceptedFile[]>([]);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [dobError, setDobError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [reasonError, setReasonError] = useState("");
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
-  const [selectedEndTime, setSelectedEndTime] = useState<string>("");
-  const [calculatedDuration, setCalculatedDuration] = useState<string>("");
-  // Helper function to calculate duration
-  const calculateDuration = () => {
-    if (!selectedEndDate || !selectedEndTime) {
-      setCalculatedDuration("");
-      return;
-    }
-  
-    try {
-      // Extract hours and minutes from the time string (assuming HH:mm format)
-      const [hours, minutes] = selectedEndTime.split(":").map(Number);
-  
-      // Create the end DateTime from the selected date and time
-      const endDateTime = new Date(selectedEndDate);
-      endDateTime.setHours(hours, minutes || 0);
-  
-      // Get the current date and time
-      const currentDateTime = new Date();
-  
-      // Calculate the difference in milliseconds
-      const diffInMs = endDateTime.getTime() - currentDateTime.getTime();
-  
-      if (diffInMs <= 0) {
-        setCalculatedDuration("End date/time must be in the future.");
-        return;
-      }
-  
-      // Convert the difference to total minutes
-      const diffInMinutes = Math.ceil(diffInMs / (1000 * 60)); // Round up to the next minute
-      const totalDays = Math.ceil(diffInMinutes / (24 * 60)); // Total days rounded up
-  
-      // Format the output based on the largest rounded unit
-      if (totalDays > 1) {
-        setCalculatedDuration(`${totalDays} days`);
-      } else if (diffInMinutes >= 60) {
-        const totalHours = Math.ceil(diffInMinutes / 60); // Total hours rounded up
-        setCalculatedDuration(`${totalHours} hours`);
-      } else {
-        setCalculatedDuration(`${diffInMinutes} minutes`);
-      }
-    } catch (error) {
-      console.error("Error calculating duration:", error);
-      setCalculatedDuration("Invalid date or time.");
-    }
-  };
-  
-  // Recalculate whenever end date or time changes
+  const trimmedTime = selectedTime.replace(/AM|PM|undefined/, "").trim();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   useEffect(() => {
-    calculateDuration();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEndDate, selectedEndTime]);
+    if (notification) {
+      // Populate form fields
+      form.reset({
+        title: notification?.title,
+        body: notification?.body,
+      });
+
+      // Populate date
+      if (notification?.created_at) {
+        const date = new Date(notification?.created_at).toLocaleString(
+          "en-GB",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }
+        );
+        setSelectedDate(new Date(date));
+      }
+
+      // Populate time
+      if (notification?.created_at) {
+        const time = new Date(notification?.created_at).toLocaleString(
+          "en-GB",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }
+        );
+        setSelectedTime(time);
+      }
+
+      // Populate image
+      if (notification?.attachment) {
+        setImageUrl([
+          {
+            file: null as unknown as File, // Placeholder since the file is not available
+            preview: notification.attachment,
+          },
+        ]);
+      }
+    }
+  }, [notification, form]);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     setIsLoading(true);
+    if (selectedDate) {
+      const dateString = selectedDate?.toISOString().split("T")[0];
 
-    if (!selectedEndDate || !selectedEndTime) {
-      toast.error("Please select both end date and time");
-      return;
-    }
+      const formData = new FormData();
+      formData.append("title", data?.title);
+      formData.append("body", data?.body);
+      formData.append("date", dateString);
+      formData.append("time", trimmedTime);
+      formData.append("target", data?.target);
 
-    if (
-      !calculatedDuration ||
-      calculatedDuration.includes("must be in the future")
-    ) {
-      toast.error("End date/time must be in the future.");
-      return;
-    }
-
-    const formattedDuration = formatDurationForAPI(calculatedDuration);
-
-    const formData = new FormData();
-    formData.append("title", data?.title);
-    formData.append("body", data?.body);
-    formData.append("duration", formattedDuration);
-    formData.append("target", data?.target);
-    if (imageUrl.length > 0 && imageUrl[0].file) {
-      // If a new file is added, append it
-      formData.append("attachment", imageUrl[0].file);
-    } else {
-      ("");
-    }
-
-    console.log(formattedDuration)
-
-    const token = await fetchToken();
-    const headers = {
-      Authorization: `Bearer ${token?.data?.token}`,
-      Accept: "application/json",
-    };
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/anoucements/create`,
-      {
-        method: "POST",
-        headers,
-        body: formData,
+      if (imageUrl.length > 0 && imageUrl[0].file) {
+        // If a new file is added, append it
+        formData.append("attachment", imageUrl[0].file);
+      } else {
+        ("");
       }
-    );
 
-    const resdata = await res.json();
-    if (resdata?.status == "success") {
-      setIsLoading(false);
-      toast.success("Success");
-    }
-    if (resdata?.status == "error") {
-      setIsLoading(false);
-      toast.error("Error Occured");
+      const token = await fetchToken();
+      const headers = {
+        Authorization: `Bearer ${token?.data?.token}`,
+        Accept: "application/json",
+      };
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/anoucements/${notification?.id}/update`,
+        {
+          method: "POST",
+          headers,
+          body: formData,
+        }
+      );
+
+      const resdata = await res.json();
+      if (resdata?.status == "success") {
+        setIsLoading(false);
+        toast.success("Success");
+        refetch();
+      }
+      if (resdata?.status == "error") {
+        setIsLoading(false);
+        toast.error("Error Occured");
+      }
     }
   };
 
@@ -297,12 +272,12 @@ const SendBroadcastMessage = () => {
 
             <div className="grid gap-2">
               <FormItem>
-                <FormLabel htmlFor="dateInput">Select End date:</FormLabel>
+                <FormLabel htmlFor="dateInput">Select a date:</FormLabel>
 
                 <div className="border border-gray-200 p-2 rounded-lg flex flex-col">
                   <DatePicker
-                    selected={selectedEndDate}
-                    onChange={(date: Date | null) => setSelectedEndDate(date)}
+                    selected={selectedDate}
+                    onChange={(date: Date | null) => setSelectedDate(date)}
                     dateFormat="yyyy-MM-dd"
                     placeholderText="YYYY-MM-DD"
                     id="dateInput"
@@ -322,21 +297,9 @@ const SendBroadcastMessage = () => {
 
             <div>
               <FormItem>
-                <FormLabel>Choose End time</FormLabel>
+                <FormLabel>Choose time</FormLabel>
                 <div className="border border-gray-300 pt-2 rounded-lg flex flex-col w-full">
-                  <TimeInput
-                    value={selectedEndTime}
-                    onChange={setSelectedEndTime}
-                  />
-                </div>
-              </FormItem>
-            </div>
-
-            <div>
-              <FormItem>
-                <FormLabel>Duration</FormLabel>
-                <div className="border w-full p-3 rounded-md bg-gray-100">
-                  {calculatedDuration || "No duration calculated"}
+                  <TimeInput value={trimmedTime} onChange={setSelectedTime} />
                 </div>
               </FormItem>
             </div>
@@ -399,4 +362,4 @@ const SendBroadcastMessage = () => {
   );
 };
 
-export default SendBroadcastMessage;
+export default UpdateBroadcastMessage;

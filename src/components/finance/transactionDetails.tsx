@@ -170,7 +170,7 @@ export function TransactionDetails({ data }: any) {
                             <p className="text-sm">
                               Extra Luggage:{" "}
                               <span className="font-medium">
-                                {data.extra_luggage || "None"}
+                                {ticket.extra_luggage || "None"}
                               </span>
                             </p>
                             <p className="text-sm">
@@ -184,10 +184,12 @@ export function TransactionDetails({ data }: any) {
                           <div>
                             <h2 className="text-sm font-bold">QR Code</h2>
                             <div className="flex justify-center mt-4">
-                              <img
-                                src={data?.qr_code}
+                              <Image
+                                src={ticket?.qr_code}
                                 alt="QR Code"
-                                className="w-32 h-32 object-cover"
+                                width={300}
+                                height={300}
+                                // className="w-32 h-32 object-cover"
                               />
                             </div>
                           </div>

@@ -16,6 +16,7 @@ const SwipeableNotification: React.FC<{
   onDelete: (id: string) => void;
   deleteOneLoading: boolean;
   markOneLoading: boolean;
+  refetch: () => void;
   content: {
     title: string;
     body: string;
@@ -26,6 +27,7 @@ const SwipeableNotification: React.FC<{
   onMarkAsRead,
   onDelete,
   content,
+  refetch,
   deleteOneLoading,
   markOneLoading,
 }) => {
@@ -45,13 +47,13 @@ const SwipeableNotification: React.FC<{
       {/* Action Buttons */}
       <div
         className={clsx(
-          "absolute right-0 top-0 h-full flex flex-col text-xs py-2 text-end gap-y-3 justify-center z-10 transition-transform ps-4 ",
+          "absolute right-0 top-0 h-full flex flex-col text-xs py-2 text-end gap-y-2 justify-center z-10 transition-transform ps-4 ",
           isActionsVisible ? "translate-x-0" : "translate-x-full"
         )}
         style={{ width: "40%" }}
       >
         <Button
-          className="rounded-xl text-red-600 hover:bg-red-100 bg-red-200 py-3 text-xs"
+          className="rounded-xl text-red-600 hover:bg-red-100 bg-red-200 py-2 text-xs"
           disabled={deleteOneLoading}
           onClick={() => onDelete(index)}
         >
@@ -64,9 +66,9 @@ const SwipeableNotification: React.FC<{
             "Delete"
           )}
         </Button>
-        {/* <Modal
+        <Modal
           trigger={
-            <Button className="rounded-xl text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs">
+            <Button className="rounded-xl text-blue-600 hover:bg-blue-100 bg-blue-200 py-2 text-xs">
               Open
             </Button>
           }
@@ -74,14 +76,16 @@ const SwipeableNotification: React.FC<{
           description={""}
           content={
             <NotificationOpenModal
+              id={index}
               body={content?.body}
+              refetch={refetch}
               created_at={content?.created_at}
             />
           }
-        /> */}
+        />
 
         <Button
-          className="rounded-xl text-green-600 hover:bg-green-100 bg-green-200 py-3 text-xs"
+          className="rounded-xl text-green-600 hover:bg-green-100 bg-green-200 py-2 text-xs"
           disabled={markOneLoading}
           onClick={() => onMarkAsRead(index)}
         >

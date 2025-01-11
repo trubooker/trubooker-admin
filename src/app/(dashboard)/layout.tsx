@@ -11,7 +11,7 @@ const montserrat = Montserrat({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Admin | truBooker",
+  title: "Admin | TruBooker",
   icons: "/logo.svg",
 };
 

@@ -12,6 +12,7 @@ import { LuCircleDollarSign } from "react-icons/lu";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { TbUserStar } from "react-icons/tb";
 import { MdErrorOutline } from "react-icons/md";
+import { BiTrip } from "react-icons/bi";
 import { LinkItem } from "@/types";
 
 export const NavLinks: LinkItem[] = [
@@ -32,6 +33,12 @@ export const NavLinks: LinkItem[] = [
     title: "Drivers",
     icon: IoCarOutline,
     link: "/drivers",
+  },
+  {
+    id: 9,
+    title: "Trips",
+    icon: BiTrip,
+    link: "/trips",
   },
   {
     id: 4,

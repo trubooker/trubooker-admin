@@ -308,6 +308,7 @@ const Notifications = () => {
           ) : displayNotifications.length > 0 ? (
             displayNotifications.map((notification: any) => (
               <SwipeableNotification
+                refetch={refetch}
                 key={notification?.id}
                 index={notification?.id}
                 onMarkAsRead={handleMarkOne}
