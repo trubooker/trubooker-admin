@@ -76,14 +76,14 @@ export function TransactionDetails({ data }: any) {
               {formatCurrency(data?.platform_earning)}
             </span>
           </div>
-          <div className="flex justify-between text-sm">
+          {/* <div className="flex justify-between text-sm">
             <span>Net payout</span>
             <span className="font-medium text-gray-900">
               {formatCurrency(
                 Number(data?.driver_earning) - Number(data?.platform_earning)
               )}
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
 
