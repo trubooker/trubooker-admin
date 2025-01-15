@@ -14,6 +14,15 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       invalidatesTags: ["Roles"],
     }),
 
+    inviteAdmin: builder.mutation({
+      query: (body) => ({
+        url: `/admin/invite-admin`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Roles"],
+    }),
+
     getRoles: builder.query({
       query: () => ({
         url: `/admin/get-roles`,
@@ -75,6 +84,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
 export const {
   useAssignRoleToUserMutation,
+  useInviteAdminMutation,
   useGetRolesQuery,
   useUpdateRolesMutation,
   useGetPermissionsByIdQuery,

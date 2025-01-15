@@ -36,7 +36,7 @@ const FormSchema = z
       .min(6, { message: "Password must be 6 characters or more" }),
     new_password_confirmation: z.string(),
   })
-  .refine((data) => data.password === data.new_password_confirmation, {
+  .refine((data) => data.new_password === data.new_password_confirmation, {
     message: "Passwords must match",
     path: ["new_password_confirmation"],
   });

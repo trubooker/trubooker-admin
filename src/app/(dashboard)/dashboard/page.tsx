@@ -160,7 +160,7 @@ const Dashboard = () => {
           </div>
           <div className="grid xl:grid-cols-2 grid-rows-1 my-5 gap-3">
             <ScrollArea className="w-full">
-              <div className="">
+              <div>
                 <LineChartDisplay
                   chartConfig={data?.chartConfigLine}
                   total_revenue={revenue?.total_revenue}

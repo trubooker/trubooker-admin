@@ -76,14 +76,12 @@ export function TransactionDetails({ data }: any) {
               {formatCurrency(data?.platform_earning)}
             </span>
           </div>
-          {/* <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm">
             <span>Net payout</span>
             <span className="font-medium text-gray-900">
-              {formatCurrency(
-                Number(data?.driver_earning) - Number(data?.platform_earning)
-              )}
+              {formatCurrency(Number(data?.net_earning))}
             </span>
-          </div> */}
+          </div>
         </div>
       </div>
 
@@ -145,55 +143,71 @@ export function TransactionDetails({ data }: any) {
         <div>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value={`item-1`} className="">
-              <AccordionTrigger className="border-black rounded-full p-5">
+              <AccordionTrigger className="border-black text-[--primary] rounded-full p-5">
                 <h2 className="text-sm">Verified Tickets</h2>
               </AccordionTrigger>
+              <Separator />
               <AccordionContent>
                 {data?.verified_tickets?.length > 0 ? (
                   <>
                     {data?.verified_tickets.map(
                       (ticket: any, index: number) => (
-                        <div key={ticket.id} className="mt-2 space-y-4">
-                          <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
-                            <p className="text-sm">
-                              Ticket Number:{" "}
-                              <span className="font-medium">
+                        <Accordion
+                          key={index}
+                          type="single"
+                          collapsible
+                          className="w-full"
+                        >
+                          <AccordionItem value={`item-1`} className=" ms-5">
+                            <Separator />
+                            <AccordionTrigger className="border-black rounded-full p-5">
+                              <h2 className="text-sm">
                                 {ticket.ticket_number}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Amount:{" "}
-                              <span className="font-medium">
-                                {formatCurrency(ticket.amount)}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Extra Luggage:{" "}
-                              <span className="font-medium">
-                                {ticket.extra_luggage || "None"}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Status:{" "}
-                              <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">
-                                {ticket.status}
-                              </span>
-                            </p>
-                          </div>
-                          {/* QR Code */}
-                          <div>
-                            <h2 className="text-sm font-bold">QR Code</h2>
-                            <div className="flex justify-center mt-4">
-                              <Image
-                                src={ticket?.qr_code}
-                                alt="QR Code"
-                                width={300}
-                                height={300}
-                                // className="w-32 h-32 object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
+                              </h2>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <>
+                                <div key={index} className="mt-2 space-y-4">
+                                  <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
+                                    <p className="text-sm">
+                                      Amount:{" "}
+                                      <span className="font-medium">
+                                        {formatCurrency(ticket.amount)}
+                                      </span>
+                                    </p>
+                                    <p className="text-sm">
+                                      Extra Luggage:{" "}
+                                      <span className="font-medium">
+                                        {ticket.extra_luggage || "None"}
+                                      </span>
+                                    </p>
+                                    <p className="text-sm">
+                                      Status:{" "}
+                                      <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">
+                                        {ticket.status}
+                                      </span>
+                                    </p>
+                                  </div>
+                                  {/* QR Code */}
+                                  <div>
+                                    <h2 className="text-sm font-bold">
+                                      QR Code
+                                    </h2>
+                                    <div className="flex justify-center my-4">
+                                      <Image
+                                        src={ticket?.qr_code}
+                                        alt="QR Code"
+                                        width={300}
+                                        height={300}
+                                        // className="w-32 h-32 object-cover"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       )
                     )}
                   </>
@@ -219,7 +233,7 @@ export function TransactionDetails({ data }: any) {
         <div>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value={`item-1`} className="">
-              <AccordionTrigger className="border-black rounded-full p-5">
+              <AccordionTrigger className="border-black text-[--primary] rounded-full p-5">
                 <h2 className="text-sm">Unverified Tickets</h2>
               </AccordionTrigger>
               <AccordionContent>
@@ -227,54 +241,77 @@ export function TransactionDetails({ data }: any) {
                   <>
                     {data?.unverified_tickets.map(
                       (ticket: any, index: number) => (
-                        <div key={ticket.id} className="mt-2 space-y-4">
-                          <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
-                            <p className="text-sm">
-                              Ticket Number:{" "}
-                              <span className="font-medium">
+                        <Accordion
+                          key={index}
+                          type="single"
+                          collapsible
+                          className="w-full"
+                        >
+                          <AccordionItem value={`item-1`} className=" ms-5">
+                            <AccordionTrigger className="border-black rounded-full p-5">
+                              <h2 className="text-sm">
                                 {ticket.ticket_number}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Amount:{" "}
-                              <span className="font-medium">
-                                {formatCurrency(ticket.amount)}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Extra Luggage:{" "}
-                              <span className="font-medium">
-                                {data.extra_luggage || "None"}
-                              </span>
-                            </p>
-                            <p className="text-sm">
-                              Status:{" "}
-                              <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">
-                                {ticket.status}
-                              </span>
-                            </p>
-                          </div>
-                          {/* QR Code */}
-                          <div>
-                            <h2 className="text-sm font-bold">QR Code</h2>
-                            <div className="flex justify-center mt-4">
-                              <img
-                                src={data?.qr_code}
-                                alt="QR Code"
-                                className="w-32 h-32 object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
+                              </h2>
+                            </AccordionTrigger>
+                            <Separator />
+                            <AccordionContent>
+                              <>
+                                <div key={index} className="mt-2 space-y-4">
+                                  <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
+                                    <p className="text-sm">
+                                      Ticket Number:{" "}
+                                      <span className="font-medium">
+                                        {ticket.ticket_number}
+                                      </span>
+                                    </p>
+                                    <p className="text-sm">
+                                      Amount:{" "}
+                                      <span className="font-medium">
+                                        {formatCurrency(ticket.amount)}
+                                      </span>
+                                    </p>
+                                    <p className="text-sm">
+                                      Extra Luggage:{" "}
+                                      <span className="font-medium">
+                                        {ticket.extra_luggage || "None"}
+                                      </span>
+                                    </p>
+                                    <p className="text-sm">
+                                      Status:{" "}
+                                      <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">
+                                        {ticket.status}
+                                      </span>
+                                    </p>
+                                  </div>
+                                  {/* QR Code */}
+                                  <div>
+                                    <h2 className="text-sm font-bold">
+                                      QR Code
+                                    </h2>
+                                    <div className="flex justify-center mt-4">
+                                      <Image
+                                        src={ticket?.qr_code}
+                                        alt="QR Code"
+                                        width={300}
+                                        height={300}
+                                        // className="w-32 h-32 object-cover"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       )
                     )}
                   </>
                 ) : (
-                  <div className="flex items-center w-full h-[300px] flex-col justify-center">
+                  <div className="flex items-center w-full h-[400px] flex-col justify-center">
                     <Image
                       src={"/nodata.svg"}
                       alt=""
-                      width={100}
+                      width={200}
                       height={200}
                       className="object-cover me-5"
                     />

@@ -21,7 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatSnakeCase } from "@/lib/utils";
-import { useAssignRoleToUserMutation } from "@/redux/services/Slices/settings/rolesApiSlice";
+import {
+  useAssignRoleToUserMutation,
+  useInviteAdminMutation,
+} from "@/redux/services/Slices/settings/rolesApiSlice";
 import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -35,9 +38,9 @@ const CreateStaff = ({ role }: { role: [] }) => {
       .string()
       .email({ message: "Email is invalid" })
       .min(1, { message: "Email is required" }),
-    gender: z.enum(["male", "female"], {
-      required_error: "You need to select a gender.",
-    }),
+    // gender: z.enum(["male", "female"], {
+    //   required_error: "You need to select a gender.",
+    // }),
     role: z.string().min(1, { message: "Role is required" }),
   });
 
@@ -46,37 +49,37 @@ const CreateStaff = ({ role }: { role: [] }) => {
     defaultValues: {},
   });
 
-  const [assign, { isLoading }] = useAssignRoleToUserMutation();
+  const [invite, { isLoading }] = useInviteAdminMutation();
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const formData = {
       role: data.role,
       first_name: data.first_name,
       last_name: data.last_name,
-      gender: data.gender,
+      // gender: data.gender,
       email: data.email,
     };
 
     console.log("data: ", formData);
-    // await assign(formData)
-    //   .unwrap()
-    //   .then((res: any) => {
-    //     toast.success("Successful");
-    //   })
-    //   .catch((error: any) => {
-    //     toast.error("Error occured");
-    //     setEmailError(
-    //       error.response?.data?.message?.email?.map(
-    //         (err: any, index: number) => (
-    //           <div key={index}>
-    //             <ul className="list-disc list-inside">
-    //               <li>{err}</li>
-    //             </ul>
-    //           </div>
-    //         )
-    //       )
-    //     );
-    //   });
+    await invite(formData)
+      .unwrap()
+      .then((res: any) => {
+        toast.success("Successful");
+      })
+      .catch((error: any) => {
+        toast.error("Error occured");
+        setEmailError(
+          error.response?.data?.message?.email?.map(
+            (err: any, index: number) => (
+              <div key={index}>
+                <ul className="list-disc list-inside">
+                  <li>{err}</li>
+                </ul>
+              </div>
+            )
+          )
+        );
+      });
   };
   return (
     <div>
@@ -151,7 +154,7 @@ const CreateStaff = ({ role }: { role: [] }) => {
                 )}
               />
             </div>
-            <div className="">
+            {/* <div className="">
               <FormField
                 control={form.control}
                 name="gender"
@@ -194,7 +197,7 @@ const CreateStaff = ({ role }: { role: [] }) => {
                   </FormItem>
                 )}
               />
-            </div>
+            </div> */}
             <div className="">
               <FormField
                 control={form.control}
