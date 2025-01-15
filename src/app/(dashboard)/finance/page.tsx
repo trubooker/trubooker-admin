@@ -222,7 +222,7 @@ const Finance = () => {
                     </Card>
                   </div>
                 </div>
-                <div className="mb-5 mt-10 gap-3">
+                <div className="mb-5 grid grid-cols-1 mt-10 w-full gap-3">
                   <div className="flex justify-end gap-3 mb-4">
                     {["daily", "monthly", "yearly"].map((filter) => (
                       <button
@@ -239,7 +239,7 @@ const Finance = () => {
                     ))}
                   </div>
                   <ScrollArea className="w-full">
-                    <div className="">
+                    <div>
                       <BarCharts
                         chartConfig={data?.chartConfigLine}
                         total_revenue={revenue?.revenue?.total_revenue}

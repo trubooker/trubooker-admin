@@ -51,6 +51,7 @@ export const BarCharts: FC<Props> = ({
             margin={{
               top: 20,
             }}
+            className="min-w-[400px]"
           >
             <CartesianGrid vertical={false} />
             <XAxis

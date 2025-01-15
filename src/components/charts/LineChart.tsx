@@ -49,7 +49,7 @@ export const LineChartDisplay: FC<Props> = ({
       <CardContent className="">
         <ChartContainer className="p-0 m-0" config={chartConfig}>
           <AreaChart
-            className="m-0 p-0 h-[400px]"
+            className="m-0 p-0 min-w-[400px] h-[400px]"
             accessibilityLayer
             data={graph_data}
             margin={{
@@ -62,7 +62,7 @@ export const LineChartDisplay: FC<Props> = ({
               tickLine={false}
               axisLine={false}
               tickMargin={20}
-              interval={0} 
+              interval={0}
               tickFormatter={(value) => value.slice(0, 3)}
               padding={{ left: 0, right: 20 }}
             />
