@@ -133,9 +133,9 @@ const Finance = () => {
           <TabsTrigger className="me-auto lg:w-full" value="report">
             Financial Report
           </TabsTrigger>
-          {/* <TabsTrigger className="me-auto lg:w-full" value="refund">
+          <TabsTrigger className="me-auto lg:w-full" value="refund">
             Refund Requests
-          </TabsTrigger> */}
+          </TabsTrigger>
           <TabsTrigger className="me-auto lg:w-full" value="driver">
             Drivers Earnings
           </TabsTrigger>
@@ -260,7 +260,7 @@ const Finance = () => {
             </div>
           </div>
         </TabsContent>
-        {/* <TabsContent value="refund">
+        <TabsContent value="refund">
           <div className="bg-white rounded-xl p-5">
             <div className="flex gap-x-3 items-center ps-3 mb-5">
               <Search
@@ -466,7 +466,7 @@ const Finance = () => {
               </div>
             )}
           </div>
-        </TabsContent> */}
+        </TabsContent>
         <TabsContent value="driver">
           <div className="bg-white rounded-xl p-5">
             <div className="flex gap-x-3 items-center ps-3 mb-5">

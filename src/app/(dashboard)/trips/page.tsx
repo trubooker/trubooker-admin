@@ -43,15 +43,27 @@ const Trips = () => {
   const [completedPage, setCompletedPage] = useState(1);
   const [completedSearchQuery, setCompletedSearchQuery] = useState("");
 
-  const { data: upcoming, isLoading: upcomingLoading } = useGetAllTripsQuery({
+  const {
+    data: upcoming,
+    isLoading: upcomingLoading,
+    isFetching: upcomingFetching,
+  } = useGetAllTripsQuery({
     type: "upcoming",
     page: upcomingPage,
   });
-  const { data: past, isLoading: pastLoading } = useGetAllTripsQuery({
+  const {
+    data: past,
+    isLoading: pastLoading,
+    isFetching: pastFetching,
+  } = useGetAllTripsQuery({
     type: "past",
     page: pastPage,
   });
-  const { data: completed, isLoading: completedLoading } = useGetAllTripsQuery({
+  const {
+    data: completed,
+    isLoading: completedLoading,
+    isFetching: completedFetching,
+  } = useGetAllTripsQuery({
     type: "completed",
     page: completedPage,
   });
@@ -154,7 +166,7 @@ const Trips = () => {
         <TabsContent value="upcoming">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
-              {upcomingLoading ? (
+              {upcomingFetching || upcomingLoading ? (
                 <>
                   <Table className=" min-w-[700px] py-2">
                     <TableHeader>
@@ -287,28 +299,12 @@ const Trips = () => {
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                {data.status === "completed" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Completed
-                                    </span>
-                                  </div>
-                                ) : data.status === "pending" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                    <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Pending
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                    <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Cancelled
-                                    </span>
-                                  </div>
-                                )}
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                  <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                                  <span className="font-semibold capitalize text-xs">
+                                    {data?.status}
+                                  </span>
+                                </div>
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>
@@ -374,7 +370,7 @@ const Trips = () => {
         <TabsContent value="past">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
-              {pastLoading ? (
+              {pastFetching || pastLoading ? (
                 <>
                   <Table className=" min-w-[700px] py-2">
                     <TableHeader>
@@ -426,22 +422,22 @@ const Trips = () => {
                         <TableHeader>
                           <TableRow className="text-[10px] lg:text-sm text-center">
                             <TableHead className="text-xs font-bold w-1/6 text-left">
-                              Driver name
-                            </TableHead>
-                            <TableHead className="text-xs font-bold w-1/6 text-left">
                               Departure date
                             </TableHead>
                             <TableHead className="text-xs font-bold w-1/6 text-left">
                               Arrival date
                             </TableHead>
                             <TableHead className="text-xs font-bold w-1/6 text-center">
-                              Earnings: <br /> ( Driver / Total )
+                              Booking closing Date & Time
                             </TableHead>
                             <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Duration
+                            </TableHead>
+                            <TableHead className="text-xs w-1/6 font-bold text-center">
                               Status
                             </TableHead>
                             <TableHead className="text-xs w-1/6 font-bold text-center">
-                              Actions
+                              Action
                             </TableHead>
                           </TableRow>
                         </TableHeader>
@@ -507,28 +503,12 @@ const Trips = () => {
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                {data.status === "completed" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Completed
-                                    </span>
-                                  </div>
-                                ) : data.status === "pending" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                    <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Pending
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                    <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Cancelled
-                                    </span>
-                                  </div>
-                                )}
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                  <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                                  <span className="font-semibold capitalize text-xs">
+                                    {data?.status}
+                                  </span>
+                                </div>
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>
@@ -594,7 +574,7 @@ const Trips = () => {
         <TabsContent value="completed">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
-              {completedLoading ? (
+              {completedFetching || completedLoading ? (
                 <>
                   <Table className=" min-w-[700px] py-2">
                     <TableHeader>
@@ -644,21 +624,24 @@ const Trips = () => {
                     <ScrollArea>
                       <Table className=" min-w-[700px] py-2">
                         <TableHeader>
-                          <TableRow className="text-xs lg:text-sm text-center">
-                            <TableHead className="font-bold w-1/4 text-left">
-                              Date
+                          <TableRow className="text-[10px] lg:text-sm text-center">
+                            <TableHead className="text-xs font-bold w-1/6 text-left">
+                              Departure date
                             </TableHead>
-                            <TableHead className="font-bold w-1/4 text-left">
-                              Username
+                            <TableHead className="text-xs font-bold w-1/6 text-left">
+                              Arrival date
                             </TableHead>
-                            <TableHead className="font-bold w-1/4 text-center">
-                              Earnings
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Booking closing Date & Time
                             </TableHead>
-                            <TableHead className="font-bold w-1/4 text-center">
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Duration
+                            </TableHead>
+                            <TableHead className="text-xs w-1/6 font-bold text-center">
                               Status
                             </TableHead>
-                            <TableHead className="w-1/4 font-bold text-center">
-                              Actions
+                            <TableHead className="text-xs w-1/6 font-bold text-center">
+                              Action
                             </TableHead>
                           </TableRow>
                         </TableHeader>
@@ -724,28 +707,12 @@ const Trips = () => {
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                {data.status === "completed" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
-                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Completed
-                                    </span>
-                                  </div>
-                                ) : data.status === "pending" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                    <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Pending
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                    <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Cancelled
-                                    </span>
-                                  </div>
-                                )}
+                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
+                                  <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                                  <span className="font-semibold capitalize text-xs">
+                                    {data?.status}
+                                  </span>
+                                </div>
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>
