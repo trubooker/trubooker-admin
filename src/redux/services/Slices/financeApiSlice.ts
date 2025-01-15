@@ -6,9 +6,10 @@ const passengersApiConfig = api.enhanceEndpoints({
 const passengersApi = passengersApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getFinancialReport: builder.query({
-      query: () => ({
+      query: ({ filter_by }) => ({
         url: `/admin/transactions/report`,
         method: "GET",
+        params: { filter_by }, // Pass filter_by as a query parameter
       }),
       providesTags: ["Finance"],
     }),

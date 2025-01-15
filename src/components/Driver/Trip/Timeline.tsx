@@ -28,7 +28,7 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
       <div className="mb-6">
         <div className="flex flex-col justify-between items-center">
           <div>
-            <h4 className="text-gray-900 text-sm font-bold">
+            <h4 className="text-gray-900 text-sm font-bold text-center">
               {station?.pick_station || station?.departure_location}
             </h4>
             {/* <p className="text-xs text-gray-500">10:00AM</p> */}
@@ -40,7 +40,7 @@ const Timeline: React.FC<BusStopsProps> = ({ stops, station }) => {
             <div className="w-px h-3 flex flex-col bg-dashed border-l-2 border-dashed border-orange-400 mb-2"></div>
           </div>
           <div>
-            <h4 className="text-gray-900 text-sm flex-wrap font-bold text-right">
+            <h4 className="text-gray-900 text-sm flex-wrap font-bold text-center">
               {station?.drop_off_station || station?.arrival_location}
             </h4>
             {/* <p className="text-xs text-gray-500 text-end">12:50PM</p> */}

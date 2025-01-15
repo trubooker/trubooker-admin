@@ -22,13 +22,6 @@ import Notifications from "@/components/Notification";
 import { BarCharts } from "@/components/charts/BarChart";
 import debounce from "lodash/debounce";
 import Search from "@/components/SearchBar";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/DualModal";
@@ -40,8 +33,11 @@ import {
 } from "@/redux/services/Slices/financeApiSlice";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
+import Spinner from "@/components/Spinner";
+import { FaSpinner } from "react-icons/fa";
 
 const Finance = () => {
+  const [filterBy, setFilterBy] = useState("monthly"); // Default filter
   const router = useRouter();
   const [driverPage, setDriverPage] = useState(1);
   const [driverSearchQuery, setDriverSearchQuery] = useState("");
@@ -53,7 +49,7 @@ const Finance = () => {
     data: report,
     isLoading: reportLoading,
     isFetching: reportFetching,
-  } = useGetFinancialReportQuery(null);
+  } = useGetFinancialReportQuery({ filter_by: filterBy });
 
   const {
     data: driverEarnings,
@@ -137,9 +133,9 @@ const Finance = () => {
           <TabsTrigger className="me-auto lg:w-full" value="report">
             Financial Report
           </TabsTrigger>
-          <TabsTrigger className="me-auto lg:w-full" value="refund">
+          {/* <TabsTrigger className="me-auto lg:w-full" value="refund">
             Refund Requests
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger className="me-auto lg:w-full" value="driver">
             Drivers Earnings
           </TabsTrigger>
@@ -226,7 +222,22 @@ const Finance = () => {
                     </Card>
                   </div>
                 </div>
-                <div className="my-5 gap-3">
+                <div className="mb-5 mt-10 gap-3">
+                  <div className="flex justify-end gap-3 mb-4">
+                    {["daily", "monthly", "yearly"].map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setFilterBy(filter)}
+                        className={`px-5 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
+                          filterBy === filter
+                            ? "bg-[#F6A74E] text-white shadow-md scale-105"
+                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                        }`}
+                      >
+                        {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                      </button>
+                    ))}
+                  </div>
                   <ScrollArea className="w-full">
                     <div className="">
                       <BarCharts
@@ -249,7 +260,7 @@ const Finance = () => {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="refund">
+        {/* <TabsContent value="refund">
           <div className="bg-white rounded-xl p-5">
             <div className="flex gap-x-3 items-center ps-3 mb-5">
               <Search
@@ -455,7 +466,7 @@ const Finance = () => {
               </div>
             )}
           </div>
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="driver">
           <div className="bg-white rounded-xl p-5">
             <div className="flex gap-x-3 items-center ps-3 mb-5">

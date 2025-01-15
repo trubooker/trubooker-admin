@@ -54,17 +54,17 @@ export const BarCharts: FC<Props> = ({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="label"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="revenue" fill="#FD8C00" radius={8}>
+            <Bar dataKey="value" fill="#FD8C00" radius={8}>
               <LabelList
                 position="top"
                 offset={12}
