@@ -30,11 +30,13 @@ import {
   useGetAgentsEarningsQuery,
   useGetDriversEarningsQuery,
   useGetFinancialReportQuery,
+  useGetRefundRequestQuery,
 } from "@/redux/services/Slices/financeApiSlice";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import Spinner from "@/components/Spinner";
 import { FaSpinner } from "react-icons/fa";
+import { AgentTransactionDetails } from "@/components/finance/agentTransactionDetails";
 
 const Finance = () => {
   const [filterBy, setFilterBy] = useState("monthly"); // Default filter
@@ -66,10 +68,16 @@ const Finance = () => {
     isFetching: agentsEarningsFetching,
   } = useGetAgentsEarningsQuery({ page: agentPage, search: agentSearchQuery });
 
+  const {
+    data: refundRequests,
+    isLoading: refundRequestsLoading,
+    isFetching: refundRequestsFetching,
+  } = useGetRefundRequestQuery(null);
+
   console.log("report: ", report);
   console.log("driverEarnings: ", driverEarnings);
   console.log("agentsEarnings: ", agentsEarnings);
-
+  console.log("refund request: ", refundRequests);
   const revenue = report?.data;
 
   // Drivers Earnings ----------------------------------------------------------
@@ -393,7 +401,7 @@ const Finance = () => {
 
                               <TableCell className="w-1/6 py-5">
                                 {data.status === "paid" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                                     <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                                     <span className="font-semibold text-xs">
                                       Paid
@@ -602,7 +610,7 @@ const Finance = () => {
 
                               <TableCell className="w-1/6 py-5">
                                 {data.status === "paid" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                                     <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                                     <span className="font-semibold text-xs">
                                       Paid
@@ -734,19 +742,25 @@ const Finance = () => {
                       <Table className=" min-w-[700px] py-2">
                         <TableHeader>
                           <TableRow className="text-xs lg:text-sm text-center">
-                            <TableHead className="font-bold w-1/4 text-left">
-                              Date
-                            </TableHead>
-                            <TableHead className="font-bold w-1/4 text-left">
+                            <TableHead className="font-bold w-1/6 text-left">
                               Username
                             </TableHead>
-                            <TableHead className="font-bold w-1/4 text-center">
-                              Earnings
+                            <TableHead className="font-bold w-1/7 text-center">
+                              Referral count
                             </TableHead>
-                            <TableHead className="font-bold w-1/4 text-center">
+                            <TableHead className="w-1/7 font-bold text-center">
+                              Requested amount
+                            </TableHead>
+                            <TableHead className="font-bold w-1/7 text-center">
+                              Total Earnings
+                            </TableHead>
+                            <TableHead className="w-1/7 font-bold text-center">
+                              Earning paid
+                            </TableHead>
+                            <TableHead className="w-1/7 font-bold text-center">
                               Status
                             </TableHead>
-                            <TableHead className="w-1/4 font-bold text-center">
+                            <TableHead className="w-1/7 font-bold text-center">
                               Actions
                             </TableHead>
                           </TableRow>
@@ -754,39 +768,48 @@ const Finance = () => {
                         <TableBody>
                           {agentfiltered?.map((data: any) => (
                             <TableRow
-                              key={data.id}
+                              key={data?.id}
                               className="text-xs text-center lg:text-sm"
                             >
-                              <TableCell className=" py-5 w-1/5 text-left">
-                                {data.created_at}
-                              </TableCell>
                               <TableCell className=" py-5 font-medium text-left me-4">
                                 <div className="w-full flex gap-x-3 items-center">
                                   <Avatar className="w-8 h-8">
-                                    <AvatarImage src={data?.profile_picture} />
+                                    <AvatarImage
+                                      src={data?.agent?.profile_image}
+                                    />
                                     <AvatarFallback>
                                       <IoPersonOutline />
                                     </AvatarFallback>
                                   </Avatar>
                                   <span className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                                     <span className="font-semibold">
-                                      {data.name}
+                                      {data?.agent?.first_name}{" "}
+                                      {data?.agent?.last_name}
                                     </span>
-                                    <span className="font-medium text-xs capitalize">
-                                      {data.role}
+                                    <span className="font-medium text-xs">
+                                      {data?.agent?.email}
                                     </span>
                                   </span>
                                 </div>
                               </TableCell>
                               <TableCell className=" py-5 w-1/5">
-                                {data.earnings}
+                                {data.referral_count}
+                              </TableCell>
+                              <TableCell className=" py-5 w-1/5 text-[--primary]">
+                                {formatCurrency(Number(data.requested_amount))}
+                              </TableCell>
+                              <TableCell className=" py-5 w-1/5">
+                                {formatCurrency(Number(data.total_earning))}
+                              </TableCell>
+                              <TableCell className=" py-5 w-1/5">
+                                {formatCurrency(Number(data.earned_amount))}
                               </TableCell>
                               <TableCell className="py-5">
-                                {data.status === "paid" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                                {data.status === "approved" ? (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                                     <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                                     <span className="font-semibold text-xs">
-                                      Paid
+                                      Approved
                                     </span>
                                   </div>
                                 ) : data.status === "pending" ? (
@@ -796,13 +819,15 @@ const Finance = () => {
                                       Pending
                                     </span>
                                   </div>
-                                ) : (
+                                ) : data.status === "declined" ? (
                                   <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
                                     <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                                     <span className="font-semibold text-xs">
-                                      Failed
+                                      Declined
                                     </span>
                                   </div>
+                                ) : (
+                                  ""
                                 )}
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
@@ -818,7 +843,9 @@ const Finance = () => {
                                   }
                                   title={"Transaction details"}
                                   description={""}
-                                  content={<TransactionDetails />}
+                                  content={
+                                    <AgentTransactionDetails data={data} />
+                                  }
                                   classname="hidden"
                                 />
                               </TableCell>

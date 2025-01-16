@@ -32,7 +32,7 @@ export const LineChartDisplay: FC<Props> = ({
   graph_data,
 }) => {
   return (
-    <Card>
+    <Card className="min-w-[400px]">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div className="flex flex-col gap-y-3">
@@ -49,7 +49,7 @@ export const LineChartDisplay: FC<Props> = ({
       <CardContent className="">
         <ChartContainer className="p-0 m-0" config={chartConfig}>
           <AreaChart
-            className="m-0 p-0 min-w-[400px] h-[400px]"
+            className="m-0 p-0 h-[400px]"
             accessibilityLayer
             data={graph_data}
             margin={{
