@@ -112,7 +112,7 @@ const SwipeableNotification: React.FC<{
             <Image src={Logo} width="40" alt="Logo" className=" flex " />
             <div className=" flex flex-col h-auto min-h-[130px]">
               <div>
-                <p className="text-gray-800 font-semibold text-sm lg:text-base">
+                <p className="text-gray-800 font-semibold text-sm">
                   {content?.title}
                 </p>
                 <small className="my-5 text-[11px] text-gray-500">

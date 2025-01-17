@@ -29,6 +29,30 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       }),
       providesTags: ["Finance"],
     }),
+
+    getRefundRequest: builder.query({
+      query: ({page}) => ({
+        url: `/admin/transactions/refund-requests?page=${page}`,
+        method: "GET",
+      }),
+      providesTags: ["Finance"],
+    }),
+
+    approveWithdrawalRequest: builder.mutation({
+      query: (payout) => ({
+        url: `/admin/transactions/approve-withdrawal/${payout}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Finance"],
+    }),
+
+    DeclineWithdrawalRequest: builder.mutation({
+      query: (payout) => ({
+        url: `/admin/transactions/decline-withdrawal/${payout}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Finance"],
+    }),
   }),
 });
 
@@ -36,4 +60,7 @@ export const {
   useGetFinancialReportQuery,
   useGetDriversEarningsQuery,
   useGetAgentsEarningsQuery,
+  useApproveWithdrawalRequestMutation,
+  useDeclineWithdrawalRequestMutation,
+  useGetRefundRequestQuery
 } = passengersApi;
