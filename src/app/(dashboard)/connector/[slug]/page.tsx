@@ -165,7 +165,7 @@ const ViewAgent = () => {
             agent_ref={agent_ref}
             referral={referral}
             earning_overview={earning_overview}
-            withdrawal={withdrawal_req}
+            withdrawal_req={withdrawal_req}
             profile={profile}
             loading={loading}
             isFetching={isFetching}

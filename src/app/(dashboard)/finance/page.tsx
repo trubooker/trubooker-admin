@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import * as data from "@/constants";
+import { chartConfigLine } from "@/constants";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,12 +35,19 @@ import {
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import Spinner from "@/components/Spinner";
-import { FaSpinner } from "react-icons/fa";
+import { FaCaretDown, FaSpinner } from "react-icons/fa";
 import { AgentTransactionDetails } from "@/components/finance/agentTransactionDetails";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Finance = () => {
   const [filterBy, setFilterBy] = useState("monthly"); // Default filter
   const router = useRouter();
+  const [refundRequestPage, setRefundRequestPage] = useState(1);
+
   const [driverPage, setDriverPage] = useState(1);
   const [driverSearchQuery, setDriverSearchQuery] = useState("");
 
@@ -69,16 +76,26 @@ const Finance = () => {
   } = useGetAgentsEarningsQuery({ page: agentPage, search: agentSearchQuery });
 
   const {
-    data: refundRequests,
+    data,
     isLoading: refundRequestsLoading,
     isFetching: refundRequestsFetching,
-  } = useGetRefundRequestQuery(null);
+  } = useGetRefundRequestQuery(refundRequestPage);
 
   console.log("report: ", report);
   console.log("driverEarnings: ", driverEarnings);
   console.log("agentsEarnings: ", agentsEarnings);
-  console.log("refund request: ", refundRequests);
+  console.log("refund request: ", data);
   const revenue = report?.data;
+
+  // Refund request ----------------------------------------------------------
+
+  const refundRequests = data?.data;
+  const totalRefundRequestsPages = data?.meta?.last_page;
+  const onRefundRequestPageChange = (pageNumber: number) => {
+    if (!refundRequestsFetching && pageNumber !== refundRequestPage) {
+      setRefundRequestPage(pageNumber);
+    }
+  };
 
   // Drivers Earnings ----------------------------------------------------------
   const totalDriverPages = driverEarnings?.meta?.last_page;
@@ -111,7 +128,7 @@ const Finance = () => {
   const totalAgentPages = agentsEarnings?.meta?.last_page;
   const agentData = agentsEarnings?.data;
   const onAgentPageChange = (pageNumber: number) => {
-    if (!agentsEarningsFetching && pageNumber !== driverPage) {
+    if (!agentsEarningsFetching && pageNumber !== agentPage) {
       setAgentPage(pageNumber);
     }
   };
@@ -228,6 +245,29 @@ const Finance = () => {
                         </span>
                       </CardContent>
                     </Card>
+
+                    <Card
+                      className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
+                    >
+                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                        <div className="flex gap-x-3 text-white items-center">
+                          <span className="flex gap-x-2 items-center">
+                            {reportLoading ? (
+                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                            ) : (
+                              <CountUp
+                                end={Number(
+                                  revenue?.total_passegener_pending_withdrawals
+                                )}
+                              />
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm text-white font-normal">
+                          Pending Passenger Payout
+                        </span>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
                 <div className="mb-5 grid grid-cols-1 mt-10 w-full gap-3">
@@ -249,7 +289,7 @@ const Finance = () => {
                   <ScrollArea className="w-full">
                     <div>
                       <BarCharts
-                        chartConfig={data?.chartConfigLine}
+                        chartConfig={chartConfigLine}
                         total_revenue={revenue?.revenue?.total_revenue}
                         graph_data={
                           Array.isArray(revenue?.revenue?.revenue_graph)
@@ -278,25 +318,25 @@ const Finance = () => {
               />
             </div>
             <ScrollArea className="w-full">
-              {driverEarningsLoading ? (
+              {refundRequestsLoading ? (
                 <>
                   <Table className=" min-w-[700px] py-2">
                     <TableHeader>
                       <TableRow className="text-xs lg:text-sm text-center">
                         <TableHead className="font-bold w-1/4 text-left">
-                          Date
+                          Narration
                         </TableHead>
                         <TableHead className="font-bold w-1/4 text-center">
-                          Username
+                          Reference
                         </TableHead>
                         <TableHead className="font-bold w-1/4 text-center">
-                          Earnings
+                          Amount
                         </TableHead>
                         <TableHead className="font-bold w-1/4 text-center">
                           Status
                         </TableHead>
                         <TableHead className="w-1/4 text-center">
-                          Actions
+                          Bank Details
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -321,90 +361,49 @@ const Finance = () => {
                 </>
               ) : (
                 <>
-                  {driverfiltered?.length < 0 ? (
+                  {refundRequests?.length > 0 ? (
                     <ScrollArea>
                       <Table className=" min-w-[900px] py-2">
                         <TableHeader>
                           <TableRow className="text-[10px] lg:text-sm text-center">
-                            <TableHead className="text-xs font-bold w-1/6 text-left">
-                              Driver name
+                            <TableHead className="font-bold w-1/5 text-left">
+                              Narration
                             </TableHead>
-                            <TableHead className="text-xs font-bold w-1/6 text-left">
-                              Departure date
+                            <TableHead className="font-bold w-1/5 text-center">
+                              Reference
                             </TableHead>
-                            <TableHead className="text-xs font-bold w-1/6 text-left">
-                              Arrival date
+                            <TableHead className="font-bold w-1/5 text-center">
+                              Amount
                             </TableHead>
-                            <TableHead className="text-xs font-bold w-1/6 text-center">
-                              Earnings: <br /> ( Driver / Total )
-                            </TableHead>
-                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                            <TableHead className="font-bold w-1/5 text-center">
                               Status
                             </TableHead>
-                            <TableHead className="text-xs w-1/6 font-bold text-center">
-                              Actions
+                            <TableHead className="w-1/5 text-center">
+                              Bank Details
                             </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {driverfiltered?.map((data: any) => (
+                          {refundRequests?.map((data: any) => (
                             <TableRow
                               key={data.id}
                               className="text-xs text-center lg:text-sm"
                             >
-                              <TableCell className="w-1/6  py-5 font-medium text-left me-4">
-                                <div className="w-full flex gap-x-3 items-center">
-                                  <Avatar className="w-8 h-8">
-                                    <AvatarImage src={data?.profile_picture} />
-                                    <AvatarFallback>
-                                      <IoPersonOutline />
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
-                                    <span className="font-semibold">
-                                      {data?.driver?.first_name}{" "}
-                                      {data?.driver?.last_name}
-                                    </span>
-                                    <span className="font-medium text-xs capitalize">
-                                      {data?.driver?.email}
-                                    </span>
-                                  </span>
-                                </div>
+                              <TableCell className="w-1/5  py-5 font-medium text-left me-4">
+                                {data?.narration}
                               </TableCell>
-                              <TableCell className="w-1/6 ">
-                                <div className="flex flex-col">
-                                  <span className="text-left">
-                                    {data?.trip_date?.departure_date}
-                                  </span>
-                                  <small className="mt-1 font-light flex gap-x-2">
-                                    <span className="font-normal">Time:</span>{" "}
-                                    {data?.trip_date?.departure_time}
-                                  </small>
-                                </div>
+                              <TableCell className="w-1/5 ">
+                                {data?.reference}
                               </TableCell>
-                              <TableCell className="w-1/6 ">
-                                <div className="flex flex-col">
-                                  <span className="text-left">
-                                    {data?.trip_date?.arrival_date}
-                                  </span>
-                                  <small className="mt-1 font-light flex gap-x-2">
-                                    <span className="font-normal">Time:</span>{" "}
-                                    {data?.trip_date?.arrival_time}
-                                  </small>
-                                </div>
+                              <TableCell className="w-1/5 ">
+                                {data?.amount}
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
-                                {`${formatCurrency(
-                                  data.driver_earning
-                                )} / ${formatCurrency(data?.total_earning)}`}
-                              </TableCell>
-
-                              <TableCell className="w-1/6 py-5">
-                                {data.status === "paid" ? (
+                              <TableCell className="w-1/5 py-5">
+                                {data.status === "approved" ? (
                                   <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                                     <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                                     <span className="font-semibold text-xs">
-                                      Paid
+                                      Approved
                                     </span>
                                   </div>
                                 ) : data.status === "pending" ? (
@@ -418,27 +417,60 @@ const Finance = () => {
                                   <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
                                     <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                                     <span className="font-semibold text-xs">
-                                      Failed
+                                      Declined
                                     </span>
                                   </div>
                                 )}
                               </TableCell>
-                              <TableCell className="w-1/6  py-5 text-center">
-                                <Modal
-                                  trigger={
-                                    <Button
-                                      variant={"outline"}
-                                      size={"sm"}
-                                      className="text-xs text-blue-500 hover:text-blue-500 cursor-pointer font-medium"
-                                    >
-                                      View Details
-                                    </Button>
-                                  }
-                                  title={"Transaction details"}
-                                  description={""}
-                                  content={<TransactionDetails />}
-                                  classname="hidden"
-                                />
+                              <TableCell className="w-1/5  py-5 text-center">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <div className="gap-x-3 text-center flex cursor-pointer mx-auto justify-center items-center">
+                                      Bank Details
+                                      <FaCaretDown />
+                                    </div>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="start"
+                                    className="w-56 p-3"
+                                  >
+                                    <div className="flex flex-col gap-y-5">
+                                      <div className="flex flex-col gap-y-2">
+                                        <span className="font-normal text-xs  text-start text-gray-500">
+                                          Account Number
+                                        </span>
+                                        <span className="font-medium text-sm capitalize">
+                                          {
+                                            data?.paid_to?.payment_details
+                                              ?.account_number
+                                          }
+                                        </span>
+                                      </div>
+                                      <div className="flex flex-col gap-y-2">
+                                        <span className="font-normal text-xs  text-start text-gray-500">
+                                          Bank Holder Name
+                                        </span>
+                                        <span className="font-medium text-sm capitalize">
+                                          {
+                                            data?.paid_to?.payment_details
+                                              ?.bank_holder_name
+                                          }
+                                        </span>
+                                      </div>
+                                      <div className="flex flex-col gap-y-2">
+                                        <span className="font-normal text-xs  text-start text-gray-500">
+                                          Bank Name
+                                        </span>
+                                        <span className="font-medium text-sm capitalize">
+                                          {
+                                            data?.paid_to?.payment_details
+                                              ?.bank_name
+                                          }
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -464,12 +496,12 @@ const Finance = () => {
               )}
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            {totalDriverPages > 1 && (
+            {totalRefundRequestsPages > 1 && (
               <div className="pt-10">
                 <Pagination
-                  currentPage={driverPage}
-                  totalPages={totalDriverPages}
-                  onPageChange={onDriverPageChange}
+                  currentPage={refundRequestPage}
+                  totalPages={totalRefundRequestsPages}
+                  onPageChange={onRefundRequestPageChange}
                 />
               </div>
             )}

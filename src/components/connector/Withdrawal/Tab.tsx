@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/utils";
 import Image from "next/image";
 
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
   const handleSuspend = (id: string) => {
     alert(`Account id ${id} suspended!!`);
   };
-
+  console.log("withdrawalreq: ", PassengerTableData);
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
@@ -25,20 +26,14 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
         <Table className=" min-w-[700px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
-              <TableHead className="text-left font-bold w-1/7">
-                Trip Id
+              <TableHead className="text-center font-bold w-1/3">
+                Amount
               </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Departure
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Destination
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
-                Date
-              </TableHead>
-              <TableHead className="font-bold w-1/7 text-center">
+              <TableHead className="font-bold w-1/3 text-center">
                 Status
+              </TableHead>
+              <TableHead className="font-bold w-1/3 text-center">
+                Date
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -47,45 +42,42 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
               <>
                 {PassengerTableData?.map((data: any) => (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full">
-                    <TableCell className="py-5 font-medium w-1/7 text-left">
-                      {data.id}
+                    <TableCell className="w-1/3 py-5 text-center">
+                      {formatCurrency(Number(data.amount))}
                     </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.departure}
+                    <TableCell className="w-1/3 py-5 text-center">
+                      {new Date(data?.date).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                      })}
                     </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.destination}
-                    </TableCell>
-                    <TableCell className="w-1/7 py-5 text-center">
-                      {data.date}
-                    </TableCell>
-                    <TableCell>
-                      {data.status === "active" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                    <TableCell className="w-1/3 py-5 text-center">
+                      {data.status === "approved" ? (
+                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                           <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                          <span className="font-semibold text-xs">Active</span>
-                        </div>
-                      ) : data.status === "completed" ? (
-                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
-                          <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
                           <span className="font-semibold text-xs">
-                            Completed
+                            Approved
                           </span>
                         </div>
-                      ) : data.status === "upcoming" ? (
+                      ) : data.status === "pending" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
                           <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                          <span className="font-semibold text-xs">
-                            Upcoming
-                          </span>
+                          <span className="font-semibold text-xs">Pending</span>
                         </div>
-                      ) : (
+                      ) : data.status === "declined" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
                           <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                           <span className="font-semibold text-xs">
-                            Cancelled
+                            Declined
                           </span>
                         </div>
+                      ) : (
+                        ""
                       )}
                     </TableCell>
                   </TableRow>
@@ -101,17 +93,10 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
               <Table className="">
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
-                    <TableHead className="text-left font-bold w-1/7">
-                      Trip Id
+                    <TableHead className="text-left font-bold w-1/3">
+                      Amount
                     </TableHead>
-                    <TableHead className="font-bold w-1/7">Departure</TableHead>
-                    <TableHead className="font-bold w-1/7 text-center">
-                      Destination
-                    </TableHead>
-                    <TableHead className="font-bold w-1/7 text-center">
-                      Date
-                    </TableHead>
-                    <TableHead className="font-bold w-1/7 text-center">
+                    <TableHead className="font-bold w-1/3 text-center">
                       Status
                     </TableHead>
                   </TableRow>
