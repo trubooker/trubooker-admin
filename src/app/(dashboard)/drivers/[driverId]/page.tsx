@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Modal } from "@/components/Modal";
 import ToggleStatus from "@/components/ToggleStatus";
+import { formatCurrency } from "@/lib/utils";
 
 const ViewDriver = () => {
   const params = useParams();
@@ -96,10 +97,10 @@ const ViewDriver = () => {
             </div>
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
-                <FaMoneyBillWave /> NGN{" "}
+                <FaMoneyBillWave />
                 {profile?.current_balance === null
-                  ? "0.00"
-                  : profile?.current_balance}
+                  ? "NGN 0.00"
+                  : formatCurrency(Number(profile?.current_balance), "NGN")}
               </div>
               {profile?.status == "active" ? (
                 <Modal
@@ -154,10 +155,10 @@ const ViewDriver = () => {
               </span>
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
-              <FaMoneyBillWave /> NGN{" "}
+              <FaMoneyBillWave />
               {profile?.current_balance === null
-                ? "0.00"
-                : profile?.current_balance}
+                ? "NGN 0.00"
+                : formatCurrency(Number(profile?.current_balance), "NGN")}
             </div>
           </div>
           <ProfileVehicleDocs_Info

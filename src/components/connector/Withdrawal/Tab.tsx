@@ -46,17 +46,6 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
                       {formatCurrency(Number(data.amount))}
                     </TableCell>
                     <TableCell className="w-1/3 py-5 text-center">
-                      {new Date(data?.date).toLocaleString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        hour12: false,
-                      })}
-                    </TableCell>
-                    <TableCell className="w-1/3 py-5 text-center">
                       {data.status === "approved" ? (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
                           <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
@@ -79,6 +68,17 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
                       ) : (
                         ""
                       )}
+                    </TableCell>
+                    <TableCell className="w-1/3 py-5 text-center">
+                      {new Date(data?.date).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                      })}
                     </TableCell>
                   </TableRow>
                 ))}
