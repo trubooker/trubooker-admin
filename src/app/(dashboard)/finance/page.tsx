@@ -441,7 +441,7 @@ const Finance = () => {
                                         </span>
                                         <span className="font-medium text-sm capitalize">
                                           {
-                                            data?.paid_to?.payment_details
+                                            data?.payment_details
                                               ?.account_number
                                           }
                                         </span>
@@ -452,7 +452,7 @@ const Finance = () => {
                                         </span>
                                         <span className="font-medium text-sm capitalize">
                                           {
-                                            data?.paid_to?.payment_details
+                                            data?.payment_details
                                               ?.bank_holder_name
                                           }
                                         </span>
@@ -463,7 +463,7 @@ const Finance = () => {
                                         </span>
                                         <span className="font-medium text-sm capitalize">
                                           {
-                                            data?.paid_to?.payment_details
+                                            data?.payment_details
                                               ?.bank_name
                                           }
                                         </span>

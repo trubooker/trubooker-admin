@@ -44,24 +44,14 @@ const Withdrawal = ({
               <Table className="">
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
-                    <TableHead className="text-left font-bold w-1/6">
-                      Trip Id
+                    <TableHead className="text-center font-bold w-1/3">
+                      Amount
                     </TableHead>
-                    <TableHead className="font-bold w-1/6">Departure</TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
-                      Destination
-                    </TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
-                      Date
-                    </TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
+                    <TableHead className="font-bold w-1/3 text-center">
                       Status
                     </TableHead>
-                    <TableHead className="font-bold w-1/6 text-center">
-                      Amount paid
-                    </TableHead>
-                    <TableHead className="text-center font-bold w-1/6">
-                      Actions
+                    <TableHead className="font-bold w-1/3 text-center">
+                      Date
                     </TableHead>
                   </TableRow>
                 </TableHeader>

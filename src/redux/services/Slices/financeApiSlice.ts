@@ -31,7 +31,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
     }),
 
     getRefundRequest: builder.query({
-      query: ({page}) => ({
+      query: ({page}: any) => ({
         url: `/admin/transactions/refund-requests?page=${page}`,
         method: "GET",
       }),
