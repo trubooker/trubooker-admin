@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,25 +30,46 @@ const FormSchema = z.object({
   coupon_value: z.string().min(1, { message: "Required" }),
   validity_period: z.string().min(1, { message: "Required" }),
   no_of_referrals: z.string().min(1, { message: "Required" }),
-  usage_limit: z.enum(["once", "multiple"], {
-    required_error: "You need to select one.",
-  }),
+  usage_limit: z.enum(["once", "multiple"]).optional(),
 });
 
-const ReferralProgram = () => {
+const ReferralProgram = ({ refProgram }: any) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
   });
 
   const [setPrice, { isLoading }] = useSetReferralProgramMutation();
+
+  useEffect(() => {
+    if (refProgram) {
+      form.reset({
+        coupon_value: String(refProgram?.value?.coupon_value),
+        validity_period: String(refProgram?.value?.validity_period),
+        no_of_referrals: String(refProgram?.value?.no_of_referrals),
+      });
+    }
+  }, [refProgram, form]);
+
+  const usageLimitString =
+    refProgram?.value?.usage_limit === "once"
+      ? "once"
+      : refProgram?.value?.usage_limit === "multiple"
+      ? "multiple"
+      : undefined;
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const formdata = {
-      coupon_value: Number(data.coupon_value),
-      validity_period: Number(data.validity_period),
-      no_of_referrals: Number(data.no_of_referrals),
-      usage_limit: data.usage_limit,
+      coupon_value: Number(data.coupon_value || refProgram?.value?.coupon_value),
+      validity_period: Number(
+        data.validity_period || refProgram?.value?.validity_period
+      ),
+      no_of_referrals: Number(
+        data.no_of_referrals || refProgram?.value?.no_of_referrals
+      ),
+      usage_limit: data.usage_limit || usageLimitString,
     };
+
     await setPrice(formdata)
       .unwrap()
       .then((res) => {
@@ -124,34 +145,130 @@ const ReferralProgram = () => {
                       <FormItem className="">
                         <FormLabel>Usage Limit</FormLabel>
                         <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="grid grid-cols-2 mt-0 "
-                          >
-                            <FormItem className="flex items-center border rounded-lg space-x-3 space-y-0 p-4">
-                              <FormControl>
-                                <RadioGroupItem
-                                  className="border-muted-foreground h-5 w-5"
-                                  value="once"
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-base text-muted-foreground">
-                                One-time
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 border rounded-lg p-4 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem
-                                  className="border-muted-foreground h-5 w-5"
-                                  value="multiple"
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-base text-muted-foreground">
-                                Multiple
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
+                          <>
+                            {refProgram ? (
+                              <>
+                                {refProgram?.value?.usage_limit === "once" ? (
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue="once"
+                                    className="grid grid-cols-2 mt-0 "
+                                  >
+                                    <FormItem className="flex items-center border rounded-lg space-x-3 space-y-0 p-4">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="once"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        One-time
+                                      </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 border rounded-lg p-4 space-y-0">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="multiple"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        Multiple
+                                      </FormLabel>
+                                    </FormItem>
+                                  </RadioGroup>
+                                ) : refProgram?.value?.usage_limit ===
+                                  "multiple" ? (
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue="multiple"
+                                    className="grid grid-cols-2 mt-0 "
+                                  >
+                                    <FormItem className="flex items-center border rounded-lg space-x-3 space-y-0 p-4">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="once"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        One-time
+                                      </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 border rounded-lg p-4 space-y-0">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="multiple"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        Multiple
+                                      </FormLabel>
+                                    </FormItem>
+                                  </RadioGroup>
+                                ) : (
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="grid grid-cols-2 mt-0 "
+                                  >
+                                    <FormItem className="flex items-center border rounded-lg space-x-3 space-y-0 p-4">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="once"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        One-time
+                                      </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 border rounded-lg p-4 space-y-0">
+                                      <FormControl>
+                                        <RadioGroupItem
+                                          className="border-muted-foreground h-5 w-5"
+                                          value="multiple"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal text-base text-muted-foreground">
+                                        Multiple
+                                      </FormLabel>
+                                    </FormItem>
+                                  </RadioGroup>
+                                )}
+                              </>
+                            ) : (
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="grid grid-cols-2 mt-0 "
+                              >
+                                <FormItem className="flex items-center border rounded-lg space-x-3 space-y-0 p-4">
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      className="border-muted-foreground h-5 w-5"
+                                      value="once"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal text-base text-muted-foreground">
+                                    One-time
+                                  </FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 border rounded-lg p-4 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      className="border-muted-foreground h-5 w-5"
+                                      value="multiple"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal text-base text-muted-foreground">
+                                    Multiple
+                                  </FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            )}
+                          </>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -367,12 +367,7 @@ const Settings = () => {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="tel"
-                                  className="py-6"
-                                  disabled
-                                  {...field}
-                                />
+                                <Input type="tel" className="py-6" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
