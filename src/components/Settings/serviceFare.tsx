@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,13 +34,13 @@ import toast from "react-hot-toast";
 
 const FormSchema = z.object({
   base_trip_fare: z.string().min(1, { message: "Required" }),
-  driver_Earning_percentage: z.string().min(1, { message: "Required" }),
+  driver_earning_percentage: z.string().min(1, { message: "Required" }),
   // agent_earning: z.string().min(1, { message: "Required" }),
   agent_earning_amount: z.string().min(1, { message: "Required" }),
   agent_earning_percentage: z.string().min(1, { message: "Required" }),
 });
 
-const PriceControl = () => {
+const PriceControl = ({ price_control }: any) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -53,15 +53,44 @@ const PriceControl = () => {
   //   "percentage" | "amount"
   // >("amount");
 
+  useEffect(() => {
+    if (price_control) {
+      form.reset({
+        base_trip_fare: String(price_control?.value?.base_trip_fare),
+        driver_earning_percentage: String(
+          price_control?.value?.driver_earning_percentage
+        ),
+        agent_earning_amount: String(
+          price_control?.value?.agent_earning_amount
+        ),
+        agent_earning_percentage: String(
+          price_control?.value?.agent_earning_percentage
+        ),
+      });
+    }
+  }, [price_control, form]);
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const formdata = {
-      base_trip_fare: Number(data.base_trip_fare),
-      driver_earning_percentage: Number(data.driver_Earning_percentage),
+      base_trip_fare: Number(
+        data.base_trip_fare || price_control?.value?.base_trip_fare
+      ),
+      driver_earning_percentage: Number(
+        data.driver_earning_percentage ||
+          price_control?.value?.driver_earning_percentage
+      ),
       // ...(agentEarningType === "percentage"
-      //   ? { agent_earning_percentage: Number(data.agent_earning) }
-      //   : { agent_earning_amount: Number(data.agent_earning) }),
-      agent_earning_amount: Number(data.agent_earning_amount),
-      agent_earning_percentage: Number(data.agent_earning_percentage),
+      //   ? { agent_earning_percentage: Number(data.agent_earning  ||
+      // price_control?.value?.agent_earning_percentage) }
+      //   : { agent_earning_amount: Number(data.agent_earning || price_control?.value?.agent_earning_amount) }),
+
+      agent_earning_amount: Number(
+        data.agent_earning_amount || price_control?.value?.agent_earning_amount
+      ),
+      agent_earning_percentage: Number(
+        data.agent_earning_percentage ||
+          price_control?.value?.agent_earning_percentage
+      ),
     };
 
     await setPrice(formdata)
@@ -103,7 +132,7 @@ const PriceControl = () => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="driver_Earning_percentage"
+                    name="driver_earning_percentage"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Driver Earning Percentage</FormLabel>

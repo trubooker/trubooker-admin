@@ -21,7 +21,10 @@ import Pagination from "@/components/Pagination";
 import { useRouter } from "next/navigation";
 import ReferralProgram from "@/components/Settings/ReferralProgram";
 import PriceControl from "@/components/Settings/serviceFare";
-import { useGetReferralProgramsQuery } from "@/redux/services/Slices/settings/referralProgramApiSlice";
+import {
+  useGetReferralProgramsQuery,
+  useGetSystemSettingsQuery,
+} from "@/redux/services/Slices/settings/referralProgramApiSlice";
 import Image from "next/image";
 
 const Referral_program = () => {
@@ -33,6 +36,15 @@ const Referral_program = () => {
     isLoading: loading,
     isFetching,
   } = useGetReferralProgramsQuery(null);
+  const { data: systemSettingsData } = useGetSystemSettingsQuery(null);
+
+  const price_control = systemSettingsData?.data?.filter(
+    (setting: { key: string }) => setting.key === "price_control"
+  );
+
+  const refProgram = systemSettingsData?.data?.filter(
+    (setting: { key: string }) => setting.key === "referral_program"
+  );
 
   const totalPages = info?.data?.referral_performance?.meta?.last_page;
   const revenue = info?.data;
@@ -292,8 +304,8 @@ const Referral_program = () => {
           </div>
 
           <div className="w-full flex flex-col gap-y-5">
-            <ReferralProgram />
-            <PriceControl />
+            <ReferralProgram refProgram={refProgram} />
+            <PriceControl price_control={price_control} />
           </div>
         </div>
       </div>
