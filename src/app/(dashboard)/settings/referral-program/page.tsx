@@ -40,11 +40,11 @@ const Referral_program = () => {
 
   const price_control = systemSettingsData?.data?.filter(
     (setting: { key: string }) => setting.key === "price_control"
-  );
+  )[0];
 
   const refProgram = systemSettingsData?.data?.filter(
     (setting: { key: string }) => setting.key === "referral_program"
-  );
+  )[0];
 
   const totalPages = info?.data?.referral_performance?.meta?.last_page;
   const revenue = info?.data;
