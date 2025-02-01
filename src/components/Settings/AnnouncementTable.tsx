@@ -53,7 +53,9 @@ const AnnouncementTable = ({
                         {notification.title}
                       </TableCell>
                       <TableCell className=" py-5 text-center capitalize">
-                        {notification.target}
+                        {notification.target === "agent"
+                          ? "connector"
+                          : notification.target}
                       </TableCell>
                       <TableCell className=" py-5 text-[--primary] text-center">
                         {new Date(notification?.created_at).toLocaleString(
@@ -84,7 +86,9 @@ const AnnouncementTable = ({
                                 <p className="mb-4">{notification?.body}</p>
                                 <p className="mb-2 capitalize">
                                   <strong>Target audience:</strong>{" "}
-                                  {notification.target}
+                                  {notification.target === "agent"
+                                    ? "connector"
+                                    : notification.target}
                                 </p>
                                 <p className="mb-4">
                                   <strong>Date Sent/Scheduled Date:</strong>{" "}
