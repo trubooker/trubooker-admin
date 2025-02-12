@@ -185,9 +185,12 @@ const Finance = () => {
                             ) : (
                               revenue?.total_balance?.map((info: any) => (
                                 <>
-                                  <span>{info?.currency}</span>{" "}
+                                  {/* <span>{info?.currency}</span>{" "} */}
                                   <span>
-                                    <CountUp end={Number(info?.balance)} />
+                                    <CountUp
+                                      prefix="₦ "
+                                      end={Number(info?.balance)}
+                                    />
                                   </span>
                                 </>
                               ))
@@ -195,7 +198,7 @@ const Finance = () => {
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Total Balance
+                          Paystack Balance
                         </span>
                       </CardContent>
                     </Card>
@@ -210,15 +213,14 @@ const Finance = () => {
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
-                                end={Number(
-                                  revenue?.total_agent_pending_withdrawals
-                                )}
+                                prefix="₦ "
+                                end={Number(revenue?.platform_earnings)}
                               />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Connector Payout
+                          Platform Earnings
                         </span>
                       </CardContent>
                     </Card>
@@ -233,15 +235,16 @@ const Finance = () => {
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
+                                prefix="₦ "
                                 end={Number(
-                                  revenue?.total_driver_pending_withdrawals
+                                  revenue?.total_agent_pending_withdrawals
                                 )}
                               />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Drivers Payout
+                          Pending Connector Payout
                         </span>
                       </CardContent>
                     </Card>
@@ -256,6 +259,31 @@ const Finance = () => {
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
+                                prefix="₦ "
+                                end={Number(
+                                  revenue?.total_driver_pending_withdrawals
+                                )}
+                              />
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm text-white font-normal">
+                          Pending Drivers Payout
+                        </span>
+                      </CardContent>
+                    </Card>
+
+                    <Card
+                      className={`w-full h-32 border-none my-auto  bg-[--primary]`}
+                    >
+                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                        <div className="flex gap-x-3 text-white items-center">
+                          <span className="flex gap-x-2 items-center">
+                            {reportLoading ? (
+                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                            ) : (
+                              <CountUp
+                                prefix="₦ "
                                 end={Number(
                                   revenue?.total_passegener_pending_withdrawals
                                 )}
@@ -462,10 +490,7 @@ const Finance = () => {
                                           Bank Name
                                         </span>
                                         <span className="font-medium text-sm capitalize">
-                                          {
-                                            data?.payment_details
-                                              ?.bank_name
-                                          }
+                                          {data?.payment_details?.bank_name}
                                         </span>
                                       </div>
                                     </div>
