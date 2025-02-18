@@ -5,6 +5,37 @@ const driversApiConfig = api.enhanceEndpoints({
 });
 const driversApi = driversApiConfig.injectEndpoints({
   endpoints: (builder) => ({
+    getDriversDocuments: builder.query({
+      query: (driverId: string) => ({
+        url: `/admin/drivers/fetch-drivers-document/${driverId}`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
+
+    approveDriversDocuments: builder.mutation({
+      query: (documentVerificationId: string) => ({
+        url: `/admin/drivers/approve-document/${documentVerificationId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Drivers"],
+    }),
+
+    rejectDriversDocuments: builder.mutation({
+      query: ({
+        documentVerificationId,
+        reason,
+      }: {
+        documentVerificationId: string;
+        reason: string;
+      }) => ({
+        url: `/admin/drivers/reject-document/${documentVerificationId}`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: ["Drivers"],
+    }),
+
     getDrivers: builder.query({
       query: ({ page, search }) => ({
         url: `/admin/drivers?page=${page}&search=${search}`,
@@ -44,4 +75,7 @@ export const {
   useGetOneDriverQuery,
   useToggleDriverStatusMutation,
   useGetTripDetailsQuery,
+  useGetDriversDocumentsQuery,
+  useApproveDriversDocumentsMutation,
+  useRejectDriversDocumentsMutation,
 } = driversApi;

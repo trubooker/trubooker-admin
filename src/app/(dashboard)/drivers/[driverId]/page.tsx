@@ -168,6 +168,7 @@ const ViewDriver = () => {
             profile={profile}
             loading={loading}
             isFetching={isFetching}
+            driverId={id}
           />
         </div>
       ) : (

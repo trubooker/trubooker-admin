@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DriversTable from "@/components/Driver/Driver";
@@ -15,8 +17,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaRegFileLines } from "react-icons/fa6";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableHead, TableHeader, TableRow } from "../ui/table";
+import {
+  useRejectDriversDocumentsMutation,
+  useApproveDriversDocumentsMutation,
+  useGetDriversDocumentsQuery,
+} from "@/redux/services/Slices/driverApiSlice";
+import { Button } from "../ui/button";
+import { Modal } from "../DualModal";
+import toast from "react-hot-toast";
+import { Textarea } from "../ui/textarea";
 
 const ProfileVehicleDocs_Info = ({
   th,
@@ -25,7 +38,54 @@ const ProfileVehicleDocs_Info = ({
   profile,
   loading,
   isFetching,
+  driverId,
 }: any) => {
+  const [reason, setReason] = useState("");
+  const [reasonError, setReasonError] = useState("");
+  const { data: driverDocs } = useGetDriversDocumentsQuery(driverId);
+  const [approveDocs, { isLoading: approveLoading }] =
+    useApproveDriversDocumentsMutation();
+  const [rejectDocs, { isLoading: rejectLoading }] =
+    useRejectDriversDocumentsMutation(driverId);
+
+  const handleApproveDocument = async (id: string) => {
+    await approveDocs(id)
+      .unwrap()
+      .then((res) => {
+        toast.success("Document Approved");
+      });
+  };
+
+  const validateReason = (value: string) => {
+    if (value.length < 6) {
+      setReasonError("Reason must be at least 6 characters long");
+      return false;
+    }
+    setReasonError("");
+    return true;
+  };
+
+  const handleDisapproveDocument = async ({
+    reason,
+    id,
+  }: {
+    reason: string;
+    id: string;
+  }) => {
+    if (!validateReason(reason)) {
+      return;
+    }
+
+    await rejectDocs({ reason: reason, documentVerificationId: id })
+      .unwrap()
+      .then((res) => {
+        toast.error("Document Rejected");
+        setReason("");
+        setReasonError("");
+      });
+  };
+
+  const docs: any[] = driverDocs?.data;
   return (
     <div className="w-full">
       <div className="gap-4 grid xl:grid-cols-3 grid-rows-1 w-full">
@@ -348,150 +408,6 @@ const ProfileVehicleDocs_Info = ({
                 </Accordion>
               ))}
             </div>
-
-            {/* <div>
-              {vehicle?.map((deets: any) => (
-                <div key={deets.id} className="my-5 space-y-6">
-                  <div className="flex justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Vehicle Type
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.vehicle_type?.name === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.vehicle_type?.name
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex text-end flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Vehicle Model
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.model === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.model
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        License plate number
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.license_plate_number === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.license_plate_number
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex text-end flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Vehicle capacity
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.capacity === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.capacity
-                        )}{" "}
-                        Seats
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Vehicle colour
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.color === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.color
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex text-end flex-col">
-                      <span className="font-normal text-xs text-gray-500">
-                        Insurance
-                      </span>
-                      <span className="font-medium text-sm">
-                        {deets?.insurance === null ? (
-                          <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                        ) : (
-                          deets?.insurance
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Tabs defaultValue="vehiclePhotos" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="vehiclePhotos">Photos</TabsTrigger>
-                      <TabsTrigger value="features">Features</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="vehiclePhotos">
-                      <div className="w-full grid grid-cols-1 pt-5 gap-4">
-                        {deets?.photos?.map((i: any, index: number) => (
-                          <div key={index}>
-                            <Link href={i} target="_blank">
-                              <span className="font-medium text-sm">
-                                <span className="flex gap-x-2 items-center">
-                                  <Image
-                                    src={"/photoGrid.svg"}
-                                    alt="Vehicle Photo"
-                                    width={35}
-                                    height={35}
-                                  />
-
-                                  <div className="text-sm font-medium text-[#333F53]">
-                                    Vehicle photo {index + 1}.png
-                                  </div>
-                                </span>
-                              </span>
-                            </Link>
-                          </div>
-                        ))}
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="features">
-                      <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
-                        {deets?.features?.length > 1 ? (
-                          <div>
-                            <span className="font-medium text-sm">
-                              <span className="flex gap-x-2 items-center">
-                                <div className="text-sm font-medium text-[#333F53]">
-                                  {deets.features.join(", ")}
-                                </div>
-                              </span>
-                            </span>
-                          </div>
-                        ) : (
-                          deets?.features?.map((i: any, index: number) => (
-                            <div key={index}>
-                              <span className="font-medium text-sm">
-                                <span className="flex gap-x-2 items-center">
-                                  <div className="text-sm font-medium text-[#333F53]">
-                                    {i}
-                                  </div>
-                                </span>
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              ))}
-            </div> */}
           </CardContent>
         </Card>
 
@@ -504,37 +420,165 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
-              {vehicle?.reg_docs?.length > 0 ? (
-                <div className="my-5">
-                  <div className="grid grid-rows-1 xl:grid-cols-2 gap-8">
-                    {vehicle?.reg_docs.map((docs: any, index: number) => (
-                      <div key={index} className="flex flex-col gap-y-2">
-                        <span className="font-normal text-xs text-gray-500">
-                          Vehicle photo
-                        </span>
+              {docs?.length > 0 ? (
+                <div className="mb-3">
+                  <div className="max-h-[500px] h-auto overflow-y-auto">
+                    <div className="grid grid-cols-1 gap-8">
+                      {docs?.map((doc: any, index: number) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <Link href={doc.link} target="_blank">
+                            <span className="font-medium text-sm">
+                              <span className="flex gap-x-2 items-start">
+                                <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-gray-700" />
+                                <div className="flex flex-col">
+                                  <div className="text-sm font-bold items-center flex gap-x-2 text-[#333F53] capitalize">
+                                    <>{doc.verification_type}</>
+                                    <FaExternalLinkAlt className="w-3 h-3" />
+                                  </div>
+                                  <div className="text-xs mt-2 text-gray-500">
+                                    <span
+                                      className={`${
+                                        doc.status === "approved"
+                                          ? "text-green-600 font-medium"
+                                          : doc.status === "pending"
+                                          ? "text-yellow-600 font-medium"
+                                          : "text-red-600 font-medium"
+                                      } capitalize`}
+                                    >
+                                      {doc.status}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] mt-1 text-gray-500">
+                                    Added:{" "}
+                                    {new Date(
+                                      doc.created_at
+                                    ).toLocaleDateString("en-US", {
+                                      day: "numeric",
+                                      month: "short",
+                                      year: "numeric",
+                                    })}
+                                  </div>
+                                </div>
+                              </span>
+                            </span>
+                          </Link>
 
-                        <span className="font-medium text-sm">
-                          <span className="flex gap-x-2">
-                            <Link href={""}>
-                              <Image
-                                src={"/photoGrid.svg"}
-                                alt="Vehicle Photo"
-                                width={30}
-                                height={30}
-                              />
-                            </Link>
-                            <div className="w-full flex flex-col gap-x-2 gap-y-1">
-                              <div className="text-[12px] font-medium text-[#333F53]">
-                                Vehicle.png
-                              </div>
-                              <div className=" text-[#344054] text-xs">
-                                10kb
-                              </div>
-                            </div>
-                          </span>
-                        </span>
-                      </div>
-                    ))}
+                          {/* Buttons for approve/disapprove */}
+                          <div className="mt-4 flex gap-x-2">
+                            <Modal
+                              trigger={
+                                <Button
+                                  disabled={doc.status === "approved"}
+                                  className={`px-3 py-1.5 w-full text-xs font-bold rounded-md ${
+                                    doc.status === "approved"
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                      : "bg-green-500 text-white hover:bg-green-600"
+                                  }`}
+                                >
+                                  {doc.status === "approved"
+                                    ? "Approved"
+                                    : "Approve"}
+                                </Button>
+                              }
+                              title={"Approve Document"}
+                              description={""}
+                              content={
+                                <div className="flex flex-col space-y-4">
+                                  <p className="text-sm text-gray-600">
+                                    Are you sure you want to approve this
+                                    document? This action cannot be undone.
+                                  </p>
+                                  <div className="flex justify-end space-x-3 pt-4">
+                                    <Button
+                                      disabled={approveLoading}
+                                      className="px-4 py-2 text-sm font-medium text-white w-full bg-green-600 hover:bg-green-500 rounded-md"
+                                      onClick={() => {
+                                        handleApproveDocument(doc.id);
+                                      }}
+                                    >
+                                      {approveLoading
+                                        ? "Approving"
+                                        : "Yes, Approve"}
+                                    </Button>
+                                  </div>
+                                </div>
+                              }
+                            />
+
+                            <Modal
+                              trigger={
+                                <Button
+                                  disabled={doc.status === "rejected"}
+                                  className={`px-3 py-1.5 text-xs rounded-md w-full font-bold ${
+                                    doc.status === "rejected"
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                      : "bg-red-500 text-white hover:bg-red-600"
+                                  }`}
+                                >
+                                  {doc.status === "rejected"
+                                    ? "Rejected"
+                                    : "Reject"}
+                                </Button>
+                              }
+                              title={"Reject Document"}
+                              description={"Enter reason for rejection"}
+                              content={
+                                <div className="flex flex-col space-y-4">
+                                  <p className="text-sm text-gray-600 mb-2">
+                                    Please provide a reason for rejecting this
+                                    document. This will be shared with the
+                                    driver.
+                                  </p>
+                                  <div className="space-y-4 mx-1">
+                                    <div className="space-y-2">
+                                      <Textarea
+                                        value={reason}
+                                        onChange={(e) => {
+                                          setReason(e.target.value);
+                                          validateReason(e.target.value);
+                                        }}
+                                        placeholder="Enter reason for rejection..."
+                                        className={`w-full text-sm border rounded-md h-24 ${
+                                          reasonError
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                        }`}
+                                      />
+                                      {reasonError && (
+                                        <p className="text-red-500 text-xs">
+                                          {reasonError}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="flex justify-end space-x-3 pt-5">
+                                      <Button
+                                        className="px-4 py-2 text-sm font-medium text-white bg-red-400 w-full hover:bg-red-500 rounded-md disabled:bg-red-200"
+                                        onClick={() => {
+                                          handleDisapproveDocument({
+                                            reason: reason,
+                                            id: doc.id,
+                                          });
+                                        }}
+                                        disabled={
+                                          rejectLoading || reason.length < 6
+                                        }
+                                      >
+                                        {rejectLoading
+                                          ? "Submitting..."
+                                          : "Submit Rejection"}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              }
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (
