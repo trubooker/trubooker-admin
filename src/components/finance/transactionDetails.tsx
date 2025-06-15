@@ -194,13 +194,28 @@ export function TransactionDetails({ data }: any) {
                                       QR Code
                                     </h2>
                                     <div className="flex justify-center my-4">
-                                      <Image
-                                        src={ticket?.qr_code}
-                                        alt="QR Code"
-                                        width={300}
-                                        height={300}
-                                        // className="w-32 h-32 object-cover"
-                                      />
+                                      {ticket?.qr_code === null ? (
+                                        <div className="flex items-center w-full h-[200px] flex-col justify-center">
+                                          <Image
+                                            src={"/nodata.svg"}
+                                            alt=""
+                                            width={100}
+                                            height={100}
+                                            className="object-cover me-5"
+                                          />
+                                          <h1 className="mt-8 text-lg text-center font-semibold">
+                                            No QR Code
+                                          </h1>
+                                        </div>
+                                      ) : (
+                                        <Image
+                                          src={ticket?.qr_code}
+                                          alt="QR Code"
+                                          width={300}
+                                          height={300}
+                                          // className="w-32 h-32 object-cover"
+                                        />
+                                      )}
                                     </div>
                                   </div>
                                 </div>
