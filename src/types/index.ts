@@ -5,3 +5,8 @@ export interface LinkItem {
   icon: any;
   sublinks?: any[];
 }
+
+export interface ModalProps {
+  data: any;
+  onModalClose?: () => void;
+}

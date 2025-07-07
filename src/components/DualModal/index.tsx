@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useState, cloneElement, isValidElement, ReactElement } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Dialog,
@@ -25,12 +25,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
+interface ModalCloseProps {
+  onModalClose?: () => void;
+}
+
 interface Props {
   trigger: ReactNode;
   title: string;
   description: string;
   content: ReactNode;
   classname?: string;
+  onClose?: () => void;
 }
 
 export const Modal: FC<Props> = ({
@@ -39,9 +44,19 @@ export const Modal: FC<Props> = ({
   description,
   content,
   classname,
+  onClose,
 }) => {
   const [open, setOpen] = useState(false);
   const isDesktop = useIsMobile();
+
+  const handleClose = () => {
+    setOpen(false);
+    onClose?.();
+  };
+
+  const enhancedContent = isValidElement(content)
+    ? cloneElement(content as ReactElement<ModalCloseProps>, { onModalClose: handleClose })
+    : content;
 
   if (!isDesktop) {
     return (
@@ -54,7 +69,7 @@ export const Modal: FC<Props> = ({
           </DialogHeader>
           <div className="">
             <ScrollArea className="max-h-[500px] pt-2 overflow-y-auto">
-              {content}
+              {enhancedContent}
               <ScrollBar orientation="vertical" />
             </ScrollArea>
             <DialogClose className={`w-full mt-3 ${classname}`}>
@@ -77,7 +92,7 @@ export const Modal: FC<Props> = ({
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <ScrollArea className="px-5 pt-2 max-h-[500px] overflow-y-auto">
-          {content}
+          {enhancedContent}
           <ScrollBar orientation="vertical" />
         </ScrollArea>
         <DrawerFooter>
