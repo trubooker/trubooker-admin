@@ -1,6 +1,13 @@
 "use client";
 
-import { FC, ReactNode, useState, cloneElement, isValidElement, ReactElement } from "react";
+import {
+  FC,
+  ReactNode,
+  useState,
+  cloneElement,
+  isValidElement,
+  ReactElement,
+} from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Dialog,
@@ -55,7 +62,9 @@ export const Modal: FC<Props> = ({
   };
 
   const enhancedContent = isValidElement(content)
-    ? cloneElement(content as ReactElement<ModalCloseProps>, { onModalClose: handleClose })
+    ? cloneElement(content as ReactElement<ModalCloseProps>, {
+        onModalClose: handleClose,
+      })
     : content;
 
   if (!isDesktop) {
@@ -72,8 +81,12 @@ export const Modal: FC<Props> = ({
               {enhancedContent}
               <ScrollBar orientation="vertical" />
             </ScrollArea>
-            <DialogClose className={`w-full mt-3 ${classname}`}>
-              <Button className="w-full" type="button" variant="secondary">
+            <DialogClose className={`w-full ${classname}`}>
+              <Button
+                className="w-full bg-[--danger] hover:bg-[--danger-btn] text-white"
+                type="button"
+                variant="secondary"
+              >
                 Cancel
               </Button>
             </DialogClose>
@@ -96,7 +109,10 @@ export const Modal: FC<Props> = ({
           <ScrollBar orientation="vertical" />
         </ScrollArea>
         <DrawerFooter>
-          <DrawerClose asChild>
+          <DrawerClose
+            asChild
+            className="bg-[--danger] hover:bg-[--danger-btn] text-white"
+          >
             <Button variant="outline">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>

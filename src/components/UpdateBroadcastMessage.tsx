@@ -54,7 +54,11 @@ const formatDurationForAPI = (duration: string): string => {
     .replace(/\b(\d+)\s*day\b/g, "$1day");
 };
 
-const UpdateBroadcastMessage = ({ notification, refetch }: any) => {
+const UpdateBroadcastMessage = ({
+  notification,
+  refetch,
+  onModalClose,
+}: any) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

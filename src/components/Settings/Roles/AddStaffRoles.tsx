@@ -32,7 +32,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
 
-export function AddStaffRoles({ role }: { role: [] }) {
+export function AddStaffRoles({
+  role,
+  onModalClose,
+}: {
+  role: [];
+  onModalClose?: () => void;
+}) {
   const FormSchema = z.object({
     name: z.string().min(1, { message: "Required Field" }),
     role: z.string().min(1, { message: "Role is required" }),
@@ -117,6 +123,7 @@ export function AddStaffRoles({ role }: { role: [] }) {
       .unwrap()
       .then((res) => {
         toast.success("Successful");
+        onModalClose?.();
       })
       .catch((res) => {
         toast.error("Error occured");
@@ -124,7 +131,7 @@ export function AddStaffRoles({ role }: { role: [] }) {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full lg:mb-3">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
