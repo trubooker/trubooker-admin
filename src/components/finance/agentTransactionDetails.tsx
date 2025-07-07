@@ -20,8 +20,9 @@ import {
 } from "@/redux/services/Slices/financeApiSlice";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
+import { ModalProps } from "@/types";
 
-export function AgentTransactionDetails({ data }: any) {
+export function AgentTransactionDetails({ data, onModalClose }: ModalProps) {
   const [approve, { isLoading: approveLoading }] =
     useApproveWithdrawalRequestMutation();
   const [decline, { isLoading: declineLoading }] =
@@ -31,6 +32,7 @@ export function AgentTransactionDetails({ data }: any) {
     try {
       await approve(id).unwrap();
       toast.success("Withdrawal Request Approved");
+      onModalClose?.(); // Close modal after successful approval
     } catch (error) {
       console.error(error);
     }
@@ -40,6 +42,7 @@ export function AgentTransactionDetails({ data }: any) {
     try {
       await decline(id).unwrap();
       toast.error("Withdrawal Request Denied");
+      onModalClose?.(); // Close modal after successful decline
     } catch (error) {
       console.error(error);
     }

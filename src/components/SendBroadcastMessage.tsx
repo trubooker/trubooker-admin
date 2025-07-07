@@ -54,8 +54,11 @@ const formatDurationForAPI = (duration: string): string => {
     .replace(/\b(\d+)\s*day\b/g, "$1day");
 };
 
-
-const SendBroadcastMessage = () => {
+const SendBroadcastMessage = ({
+  onModalClose,
+}: {
+  onModalClose?: () => void;
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {},
@@ -74,30 +77,30 @@ const SendBroadcastMessage = () => {
       setCalculatedDuration("");
       return;
     }
-  
+
     try {
       // Extract hours and minutes from the time string (assuming HH:mm format)
       const [hours, minutes] = selectedEndTime.split(":").map(Number);
-  
+
       // Create the end DateTime from the selected date and time
       const endDateTime = new Date(selectedEndDate);
       endDateTime.setHours(hours, minutes || 0);
-  
+
       // Get the current date and time
       const currentDateTime = new Date();
-  
+
       // Calculate the difference in milliseconds
       const diffInMs = endDateTime.getTime() - currentDateTime.getTime();
-  
+
       if (diffInMs <= 0) {
         setCalculatedDuration("End date/time must be in the future.");
         return;
       }
-  
+
       // Convert the difference to total minutes
       const diffInMinutes = Math.ceil(diffInMs / (1000 * 60)); // Round up to the next minute
       const totalDays = Math.ceil(diffInMinutes / (24 * 60)); // Total days rounded up
-  
+
       // Format the output based on the largest rounded unit
       if (totalDays > 1) {
         setCalculatedDuration(`${totalDays} days`);
@@ -112,7 +115,7 @@ const SendBroadcastMessage = () => {
       setCalculatedDuration("Invalid date or time.");
     }
   };
-  
+
   // Recalculate whenever end date or time changes
   useEffect(() => {
     calculateDuration();
@@ -149,7 +152,7 @@ const SendBroadcastMessage = () => {
       ("");
     }
 
-    console.log(formattedDuration)
+    console.log(formattedDuration);
 
     const token = await fetchToken();
     const headers = {
@@ -169,10 +172,12 @@ const SendBroadcastMessage = () => {
     if (resdata?.status == "success") {
       setIsLoading(false);
       toast.success("Success");
+      onModalClose?.();
     }
     if (resdata?.status == "error") {
       setIsLoading(false);
       toast.error("Error Occured");
+      onModalClose?.();
     }
   };
 

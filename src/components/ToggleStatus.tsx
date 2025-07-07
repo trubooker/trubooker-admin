@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import { Button } from "./ui/button";
-import { DialogClose } from "@radix-ui/react-dialog";
 import Image from "next/image";
 
 interface Props {
@@ -8,9 +7,20 @@ interface Props {
   loading: boolean;
   status: string;
 }
-const ToggleStatus: FC<Props> = ({ toggle, status, loading }) => {
+const ToggleStatus: FC<Props> = ({
+  toggle,
+  status,
+  loading,
+  onModalClose,
+}: {
+  toggle: () => void;
+  status: string;
+  loading: boolean;
+  onModalClose?: () => void;
+}) => {
   const handleToggle = () => {
     toggle();
+    onModalClose?.();
   };
   return (
     <div>
@@ -29,25 +39,17 @@ const ToggleStatus: FC<Props> = ({ toggle, status, loading }) => {
           to your profile and all associated data.
         </p>
       </div>
-      <div className="flex items-center justify-between gap-x-5 p-6 ">
-        <DialogClose className="w-full">
-          <Button
-            variant="outline"
-            className="font-semibold lg:py-6 lg:px-6 w-full"
-          >
-            No
-          </Button>
-        </DialogClose>
-        <DialogClose className="w-full">
+      <div className="flex items-center justify-between gap-x-5 pt-6 lg:py-6">
+        <div className="w-full">
           <Button
             variant="outline"
             disabled={loading}
-            className="font-semibold bg-[--primary] w-full hover:bg-[--primary-btn] hover:text-white text-white lg:py-6 lg:px-6"
+            className="font-semibold bg-[--primary] w-full hover:bg-[--primary-btn] hover:text-white text-white lg:py-6"
             onClick={handleToggle}
           >
             Yes
           </Button>
-        </DialogClose>
+        </div>
       </div>
     </div>
   );

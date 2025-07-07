@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Modal } from "@/components/Modal";
+import { Modal } from "@/components/DualModal";
 import ToggleStatus from "@/components/ToggleStatus";
 import { DialogClose } from "@/components/ui/dialog";
 

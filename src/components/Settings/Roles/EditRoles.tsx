@@ -33,9 +33,11 @@ const FormSchema = z.object({
 export function EditRoles({
   role,
   allRoles,
+  onModalClose,
 }: {
   role: string;
   allRoles: any[];
+  onModalClose?: () => void;
 }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,6 +83,7 @@ export function EditRoles({
       .unwrap()
       .then((res) => {
         toast.success("Successful");
+        onModalClose?.();
       })
       .catch((res) => {
         toast.error("Error occured");
@@ -88,7 +91,7 @@ export function EditRoles({
   };
 
   return (
-    <div>
+    <div className="lg:mb-3">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

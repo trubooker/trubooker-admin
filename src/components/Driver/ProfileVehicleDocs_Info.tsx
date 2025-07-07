@@ -48,11 +48,15 @@ const ProfileVehicleDocs_Info = ({
   const [rejectDocs, { isLoading: rejectLoading }] =
     useRejectDriversDocumentsMutation(driverId);
 
-  const handleApproveDocument = async (id: string) => {
+  const handleApproveDocument = async (
+    id: string,
+    onModalClose?: () => void
+  ) => {
     await approveDocs(id)
       .unwrap()
       .then((res) => {
         toast.success("Document Approved");
+        onModalClose?.();
       });
   };
 
@@ -68,9 +72,11 @@ const ProfileVehicleDocs_Info = ({
   const handleDisapproveDocument = async ({
     reason,
     id,
+    onModalClose,
   }: {
     reason: string;
     id: string;
+    onModalClose?: () => void;
   }) => {
     if (!validateReason(reason)) {
       return;
@@ -82,6 +88,7 @@ const ProfileVehicleDocs_Info = ({
         toast.error("Document Rejected");
         setReason("");
         setReasonError("");
+        onModalClose?.();
       });
   };
 

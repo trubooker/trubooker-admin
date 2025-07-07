@@ -176,9 +176,49 @@ export function TransactionDetails({ data }: any) {
                                       </span>
                                     </p>
                                     <p className="text-sm">
-                                      Extra Luggage:{" "}
+                                      {ticket.extra_luggage.length == 0 && (
+                                        <div> Extra Luggage: None</div>
+                                      )}
                                       <span className="font-medium">
-                                        {ticket.extra_luggage || "None"}
+                                        {Array.isArray(ticket.extra_luggage) &&
+                                          ticket.extra_luggage.length > 0 && (
+                                            <>
+                                              {ticket.extra_luggage.map(
+                                                (
+                                                  luggage: any,
+                                                  index: number
+                                                ) => {
+                                                  return (
+                                                    <Accordion
+                                                      key={luggage?.id}
+                                                      type="single"
+                                                      collapsible
+                                                      className="w-full mt-2"
+                                                    >
+                                                      <AccordionItem
+                                                        value={`item-1`}
+                                                        className=""
+                                                      >
+                                                        <Separator />
+                                                        <AccordionTrigger className="border-black rounded-full py-5">
+                                                          Extra Luggage: Luggage
+                                                          - {index + 1}
+                                                        </AccordionTrigger>
+                                                        <AccordionContent>
+                                                          <>
+                                                            <p className="text-sm px-5">
+                                                              wt:{" "}
+                                                              {luggage?.weight}
+                                                            </p>
+                                                          </>
+                                                        </AccordionContent>
+                                                      </AccordionItem>
+                                                    </Accordion>
+                                                  );
+                                                }
+                                              )}
+                                            </>
+                                          )}
                                       </span>
                                     </p>
                                     <p className="text-sm">

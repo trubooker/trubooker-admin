@@ -29,7 +29,13 @@ import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-const CreateStaff = ({ role }: { role: [] }) => {
+const CreateStaff = ({
+  role,
+  onModalClose,
+}: {
+  role: [];
+  onModalClose?: () => void;
+}) => {
   const [emailError, setEmailError] = useState("");
   const FormSchema = z.object({
     first_name: z.string().min(1, { message: "First name is required" }),
@@ -65,6 +71,7 @@ const CreateStaff = ({ role }: { role: [] }) => {
       .unwrap()
       .then((res: any) => {
         toast.success("Successful");
+        onModalClose?.();
       })
       .catch((error: any) => {
         toast.error("Error occured");
@@ -82,7 +89,7 @@ const CreateStaff = ({ role }: { role: [] }) => {
       });
   };
   return (
-    <div>
+    <div className="lg:mb-3">
       {" "}
       <div className="h-full">
         <Form {...form}>

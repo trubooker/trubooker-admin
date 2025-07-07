@@ -54,7 +54,7 @@ const NotificationOpenModal: FC<NotificationOpenModalProps> = ({
     }
   };
   return (
-    <>
+    <div className="mb-6">
       <p className="mt-2 text-sm text-gray-500">{body}</p>
       <p className="mt-4 text-xs text-gray-400">
         {new Date(created_at).toLocaleString("en-GB", {
@@ -84,7 +84,7 @@ const NotificationOpenModal: FC<NotificationOpenModalProps> = ({
           <span>Delete</span>
         </Badge>
       </div>
-    </>
+    </div>
   );
 };
 
