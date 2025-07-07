@@ -14,6 +14,7 @@ import NotificationOpenModal from "@/components/notificationOpenModal";
 import Broadcast from "@/components/notifications/Broadcast";
 import SendBroadcastMessage from "@/components/SendBroadcastMessage";
 import Announcement from "@/components/notifications/Announcement";
+import { FaPaperPlane } from "react-icons/fa";
 
 const Notification = () => {
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
@@ -30,7 +31,8 @@ const Notification = () => {
         <Modal
           trigger={
             <Button className="text-xs bg-[--primary] text-white hover:bg-[--primary-btn]">
-              Send New Message
+              <FaPaperPlane />{" "}
+              <span className="hidden lg:block"> Send New Message</span>
             </Button>
           }
           title={"Send New Message"}

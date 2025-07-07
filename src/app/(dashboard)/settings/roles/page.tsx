@@ -45,7 +45,8 @@ const Roles = () => {
                 size={"sm"}
                 className="bg-[--primary] text-white hover:text-white hover:bg-[--primary-btn]"
               >
-                <FaPlus /> Add Member to Role
+                <FaPlus />{" "}
+                <span className="hidden lg:block">Add Member to Role</span>
               </Button>
             }
             title={"Add Staff to Role"}
