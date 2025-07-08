@@ -15,15 +15,22 @@ import Broadcast from "@/components/notifications/Broadcast";
 import SendBroadcastMessage from "@/components/SendBroadcastMessage";
 import Announcement from "@/components/notifications/Announcement";
 import { FaPaperPlane } from "react-icons/fa";
+import Pagination from "@/components/Pagination";
 
 const Notification = () => {
+  const [page, setPage] = useState(1);
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
   const { data, isLoading, isFetching, refetch } = useFetchNotificationsQuery({
     type: viewType,
   });
 
   const notifications = data?.data || [];
-
+  const totalPages: number = notifications?.meta?.last_page || 0;
+  const onPageChange = (pageNumber: number) => {
+    if (!isFetching && pageNumber !== page) {
+      setPage(pageNumber);
+    }
+  };
   return (
     <div className="flex flex-col w-full px-5">
       <div className="flex items-start justify-between gap-x-3 ">
@@ -60,59 +67,61 @@ const Notification = () => {
                 <Spinner />
               ) : notifications.length > 0 ? (
                 notifications.map((notification: any) => (
-                  <div key={notification?.id}>
-                    <div className="flex items-center">
-                      <div className="flex w-full  items-start space-x-4">
-                        <Image
-                          src={Logo}
-                          width="40"
-                          alt="Logo"
-                          className=" flex "
-                        />
-                        <div className=" flex flex-col h-auto min-h-[130px]">
-                          <div>
-                            <p className="text-gray-800 font-semibold text-sm lg:text-base">
-                              {notification?.title}
-                            </p>
-                            <small className="my-5 text-[11px] text-gray-500">
-                              {new Date(
-                                notification?.created_at
-                              ).toLocaleString("en-GB", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false,
-                              })}
-                            </small>
-                          </div>
-                          <p className="text-xs sm:text-base lg:text-xs mt-4 w-full">
-                            {truncateText(notification?.body, 80)}
-                          </p>
-                        </div>
-                      </div>
-                      <Modal
-                        trigger={
-                          <Button className="rounded-xl  text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs">
-                            View
-                          </Button>
-                        }
-                        title={notification?.title}
-                        description={""}
-                        content={
-                          <NotificationOpenModal
-                            id={notification?.id}
-                            body={notification?.body}
-                            created_at={notification?.created_at}
-                            refetch={refetch}
+                  <>
+                    <div key={notification?.id}>
+                      <div className="flex items-center">
+                        <div className="flex w-full  items-start space-x-4">
+                          <Image
+                            src={Logo}
+                            width="40"
+                            alt="Logo"
+                            className=" flex "
                           />
-                        }
-                      />
+                          <div className=" flex flex-col h-auto min-h-[130px]">
+                            <div>
+                              <p className="text-gray-800 font-semibold text-sm lg:text-base">
+                                {notification?.title}
+                              </p>
+                              <small className="my-5 text-[11px] text-gray-500">
+                                {new Date(
+                                  notification?.created_at
+                                ).toLocaleString("en-GB", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                  hour12: false,
+                                })}
+                              </small>
+                            </div>
+                            <p className="text-xs sm:text-base lg:text-xs mt-4 w-full">
+                              {truncateText(notification?.body, 80)}
+                            </p>
+                          </div>
+                        </div>
+                        <Modal
+                          trigger={
+                            <Button className="rounded-xl  text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs">
+                              View
+                            </Button>
+                          }
+                          title={notification?.title}
+                          description={""}
+                          content={
+                            <NotificationOpenModal
+                              id={notification?.id}
+                              body={notification?.body}
+                              created_at={notification?.created_at}
+                              refetch={refetch}
+                            />
+                          }
+                        />
+                      </div>
+                      <Separator />
                     </div>
-                    <Separator />
-                  </div>
+                  </>
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center h-[330px]">
@@ -125,6 +134,15 @@ const Notification = () => {
                   <h1 className="mt-8 text-lg font-semibold text-center">
                     You are all caught up
                   </h1>
+                </div>
+              )}
+              {!isLoading && totalPages > 0 && (
+                <div className="pt-10">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                  />
                 </div>
               )}
             </div>
