@@ -493,7 +493,7 @@ const ProfileVehicleDocs_Info = ({
                               title={"Approve Document"}
                               description={""}
                               content={
-                                <div className="flex flex-col space-y-4">
+                                <div className="flex flex-col space-y-4 lg:mb-4">
                                   <p className="text-sm text-gray-600">
                                     Are you sure you want to approve this
                                     document? This action cannot be undone.
@@ -533,7 +533,7 @@ const ProfileVehicleDocs_Info = ({
                               title={"Reject Document"}
                               description={"Enter reason for rejection"}
                               content={
-                                <div className="flex flex-col space-y-4">
+                                <div className="flex flex-col space-y-4 lg:mb-4">
                                   <p className="text-sm text-gray-600 mb-2">
                                     Please provide a reason for rejecting this
                                     document. This will be shared with the
