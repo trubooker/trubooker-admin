@@ -23,7 +23,6 @@ import { BarCharts } from "@/components/charts/BarChart";
 import debounce from "lodash/debounce";
 import Search from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { Modal } from "@/components/DualModal";
 import { TransactionDetails } from "@/components/finance/transactionDetails";
 import {
@@ -34,19 +33,24 @@ import {
 } from "@/redux/services/Slices/financeApiSlice";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import Spinner from "@/components/Spinner";
-import { FaCaretDown, FaSpinner } from "react-icons/fa";
+import { FaCaretDown } from "react-icons/fa";
 import { AgentTransactionDetails } from "@/components/finance/agentTransactionDetails";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
 const Finance = () => {
-  const [filterBy, setFilterBy] = useState("monthly"); // Default filter
-  const router = useRouter();
-  const [refundRequestPage, setRefundRequestPage] = useState(1);
+  const [filterBy, setFilterBy] = useState("monthly");
+  const [driverRefundRequestPage, setDriverRefundRequestPage] = useState(1);
+
+  const [driverRefundSearchQuery, setDriverRefundSearchQuery] = useState("");
+  const [passengerRefundRequestPage, setPassengerRefundRequestPage] =
+    useState(1);
+  const [passengerRefundSearchQuery, setPassengerRefundSearchQuery] =
+    useState("");
 
   const [driverPage, setDriverPage] = useState(1);
   const [driverSearchQuery, setDriverSearchQuery] = useState("");
@@ -76,25 +80,98 @@ const Finance = () => {
   } = useGetAgentsEarningsQuery({ page: agentPage, search: agentSearchQuery });
 
   const {
-    data,
-    isLoading: refundRequestsLoading,
-    isFetching: refundRequestsFetching,
-  } = useGetRefundRequestQuery(refundRequestPage);
+    data: driverRefundRequest,
+    isLoading: driverRefundRequestsLoading,
+    isFetching: driverRefundRequestsFetching,
+  } = useGetRefundRequestQuery({
+    page: driverRefundRequestPage,
+    search: driverRefundSearchQuery,
+    type: "driver",
+  });
+
+  const {
+    data: passengerRefundRequest,
+    isLoading: passengerRefundRequestsLoading,
+    isFetching: passengerRefundRequestsFetching,
+  } = useGetRefundRequestQuery({
+    page: passengerRefundRequestPage,
+    search: passengerRefundSearchQuery,
+    type: "passenger",
+  });
 
   console.log("report: ", report);
   console.log("driverEarnings: ", driverEarnings);
   console.log("agentsEarnings: ", agentsEarnings);
-  console.log("refund request: ", data);
+  console.log("driver refund request: ", driverRefundRequest);
+  console.log("passenger refund request: ", passengerRefundRequest);
   const revenue = report?.data;
 
-  // Refund request ----------------------------------------------------------
+  // DriverRefund request ----------------------------------------------------------
 
-  const refundRequests = data?.data;
-  const totalRefundRequestsPages = data?.meta?.last_page;
-  const onRefundRequestPageChange = (pageNumber: number) => {
-    if (!refundRequestsFetching && pageNumber !== refundRequestPage) {
-      setRefundRequestPage(pageNumber);
+  const driverRefundRequests = driverRefundRequest?.data;
+  const totalDriverRefundRequestsPages = driverRefundRequest?.meta?.last_page;
+  const onDriverRefundRequestPageChange = (pageNumber: number) => {
+    if (
+      !driverRefundRequestsFetching &&
+      pageNumber !== driverRefundRequestPage
+    ) {
+      setDriverRefundRequestPage(pageNumber);
     }
+  };
+
+  const [driverRefundfiltered, setDriverRefundFiltered] =
+    useState(driverRefundRequests);
+  useEffect(() => {
+    if (driverRefundRequest) {
+      setDriverRefundFiltered(driverRefundRequests);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [driverRefundRequests]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debounceDriverRefundSearch = useCallback(
+    debounce((query: string) => {
+      setDriverRefundSearchQuery(query);
+      setDriverRefundRequestPage(1);
+    }, 300),
+    []
+  );
+  const handleDriverRefundSearch = (query: string) => {
+    debounceDriverRefundSearch(query);
+  };
+
+  // PassengerRefund request ----------------------------------------------------------
+
+  const passengerRefundRequests = passengerRefundRequest?.data;
+  const totalPassengerRefundRequestsPages =
+    passengerRefundRequest?.meta?.last_page;
+  const onPassengerRefundRequestPageChange = (pageNumber: number) => {
+    if (
+      !passengerRefundRequestsFetching &&
+      pageNumber !== passengerRefundRequestPage
+    ) {
+      setPassengerRefundRequestPage(pageNumber);
+    }
+  };
+
+  const [passengerRefundfiltered, setPassengerRefundFiltered] = useState(
+    passengerRefundRequests
+  );
+  useEffect(() => {
+    if (passengerRefundRequests) {
+      setPassengerRefundFiltered(passengerRefundRequests);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passengerRefundRequests]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncePassengerRefundSearch = useCallback(
+    debounce((query: string) => {
+      setPassengerRefundSearchQuery(query);
+      setPassengerRefundRequestPage(1);
+    }, 300),
+    []
+  );
+  const handlePassengerRefundSearch = (query: string) => {
+    debouncePassengerRefundSearch(query);
   };
 
   // Drivers Earnings ----------------------------------------------------------
@@ -337,199 +414,430 @@ const Finance = () => {
           </div>
         </TabsContent>
         <TabsContent value="refund">
-          <div className="bg-white rounded-xl p-5">
-            <div className="flex gap-x-3 items-center ps-3 mb-5">
-              <Search
-                placeholder={"Search..."}
-                onSearch={handleDriverSearch}
-                classname="mb-5 max-w-[300px] lg:w-[500px]"
-              />
+          <Separator />
+          <div className="flex flex-col h-fit w-full mt-2">
+            <div className="mt-5">
+              <h1 className="text-xl font-semibold text-gray-500">
+                Refund Requests
+              </h1>
+              <p className="text-sm text-gray-500">
+                View and manage all refund requests from drivers and passengers.
+              </p>
             </div>
-            <ScrollArea className="w-full">
-              {refundRequestsLoading ? (
-                <>
-                  <Table className=" min-w-[700px] py-2">
-                    <TableHeader>
-                      <TableRow className="text-xs lg:text-sm text-center">
-                        <TableHead className="font-bold w-1/4 text-left">
-                          Narration
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-center">
-                          Reference
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-center">
-                          Amount
-                        </TableHead>
-                        <TableHead className="font-bold w-1/4 text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="w-1/4 text-center">
-                          Bank Details
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                        <TableRow key={i}>
-                          {[1, 2, 3, 4].map((i) => (
-                            <TableCell key={i}>
-                              <div>
-                                <div className="w-full rounded-md">
-                                  <div>
-                                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </>
-              ) : (
-                <>
-                  {refundRequests?.length > 0 ? (
-                    <ScrollArea>
-                      <Table className=" min-w-[900px] py-2">
-                        <TableHeader>
-                          <TableRow className="text-[10px] lg:text-sm text-center">
-                            <TableHead className="font-bold w-1/5 text-left">
-                              Narration
-                            </TableHead>
-                            <TableHead className="font-bold w-1/5 text-center">
-                              Reference
-                            </TableHead>
-                            <TableHead className="font-bold w-1/5 text-center">
-                              Amount
-                            </TableHead>
-                            <TableHead className="font-bold w-1/5 text-center">
-                              Status
-                            </TableHead>
-                            <TableHead className="w-1/5 text-center">
-                              Bank Details
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {refundRequests?.map((data: any) => (
-                            <TableRow
-                              key={data.id}
-                              className="text-xs text-center lg:text-sm"
-                            >
-                              <TableCell className="w-1/5  py-5 font-medium text-left me-4">
-                                {data?.narration}
-                              </TableCell>
-                              <TableCell className="w-1/5 ">
-                                {data?.reference}
-                              </TableCell>
-                              <TableCell className="w-1/5 ">
-                                {data?.amount}
-                              </TableCell>
-                              <TableCell className="w-1/5 py-5">
-                                {data.status === "approved" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
-                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Approved
-                                    </span>
-                                  </div>
-                                ) : data.status === "pending" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                    <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Pending
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                    <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Declined
-                                    </span>
-                                  </div>
-                                )}
-                              </TableCell>
-                              <TableCell className="w-1/5  py-5 text-center">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <div className="gap-x-3 text-center flex cursor-pointer mx-auto justify-center items-center">
-                                      Bank Details
-                                      <FaCaretDown />
-                                    </div>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent
-                                    align="start"
-                                    className="w-56 p-3"
-                                  >
-                                    <div className="flex flex-col gap-y-5">
-                                      <div className="flex flex-col gap-y-2">
-                                        <span className="font-normal text-xs  text-start text-gray-500">
-                                          Account Number
-                                        </span>
-                                        <span className="font-medium text-sm capitalize">
-                                          {
-                                            data?.payment_details
-                                              ?.account_number
-                                          }
-                                        </span>
-                                      </div>
-                                      <div className="flex flex-col gap-y-2">
-                                        <span className="font-normal text-xs  text-start text-gray-500">
-                                          Bank Holder Name
-                                        </span>
-                                        <span className="font-medium text-sm capitalize">
-                                          {
-                                            data?.payment_details
-                                              ?.bank_holder_name
-                                          }
-                                        </span>
-                                      </div>
-                                      <div className="flex flex-col gap-y-2">
-                                        <span className="font-normal text-xs  text-start text-gray-500">
-                                          Bank Name
-                                        </span>
-                                        <span className="font-medium text-sm capitalize">
-                                          {data?.payment_details?.bank_name}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </TableCell>
+            <Tabs defaultValue="driverRefundRequest" className="w-full">
+              <TabsList className="grid w-full justify-start text-center h-full xl:grid-rows-1 grid-cols-2 gap-3 mt-5">
+                <TabsTrigger
+                  className="w-full shadow-sm shadow-gray-200 transition-all duration-200"
+                  value="driverRefundRequest"
+                >
+                  Driver
+                </TabsTrigger>
+                <TabsTrigger
+                  className="w-full shadow-sm shadow-gray-200 transition-all duration-200"
+                  value="passengerRefundRequest"
+                >
+                  Passenger
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="driverRefundRequest" className="">
+                <div className="bg-white rounded-xl p-5">
+                  <div className="flex gap-x-3 items-center ps-3 mb-5">
+                    <Search
+                      placeholder={"Search..."}
+                      onSearch={handleDriverRefundSearch}
+                      classname="mb-5 max-w-[300px] lg:w-[500px]"
+                    />
+                  </div>
+                  <ScrollArea className="w-full">
+                    {driverRefundRequestsLoading ? (
+                      <>
+                        <Table className=" min-w-[700px] py-2">
+                          <TableHeader>
+                            <TableRow className="text-xs lg:text-sm text-center">
+                              <TableHead className="font-bold w-1/4 text-left">
+                                Narration
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Reference
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Amount
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Status
+                              </TableHead>
+                              <TableHead className="w-1/4 text-center">
+                                Bank Details
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                      <ScrollBar orientation="horizontal" />
-                    </ScrollArea>
-                  ) : (
-                    <div className="flex items-center w-full h-[357px] flex-col justify-center">
-                      <Image
-                        src={"/nodata.svg"}
-                        alt=""
-                        width={200}
-                        height={200}
-                        className="object-cover me-5"
+                          </TableHeader>
+                          <TableBody>
+                            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                              <TableRow key={i}>
+                                {[1, 2, 3, 4].map((i) => (
+                                  <TableCell key={i}>
+                                    <div>
+                                      <div className="w-full rounded-md">
+                                        <div>
+                                          <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </>
+                    ) : (
+                      <>
+                        {driverRefundRequests?.length > 0 ? (
+                          <ScrollArea>
+                            <Table className=" min-w-[900px] py-2">
+                              <TableHeader>
+                                <TableRow className="text-[10px] lg:text-sm text-center">
+                                  <TableHead className="font-bold w-1/5 text-left">
+                                    Narration
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Reference
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Amount
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Status
+                                  </TableHead>
+                                  <TableHead className="w-1/5 text-center">
+                                    Bank Details
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {driverRefundfiltered?.map((data: any) => (
+                                  <TableRow
+                                    key={data.id}
+                                    className="text-xs text-center lg:text-sm"
+                                  >
+                                    <TableCell className="w-1/5  py-5 font-medium text-left me-4">
+                                      {data?.narration}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 ">
+                                      {data?.reference}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 ">
+                                      {data?.amount}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 py-5">
+                                      {data.status === "approved" ? (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
+                                          <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Approved
+                                          </span>
+                                        </div>
+                                      ) : data.status === "pending" ? (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                          <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Pending
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                          <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Declined
+                                          </span>
+                                        </div>
+                                      )}
+                                    </TableCell>
+                                    <TableCell className="w-1/5  py-5 text-center">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <div className="gap-x-3 text-center flex cursor-pointer mx-auto justify-center items-center">
+                                            Bank Details
+                                            <FaCaretDown />
+                                          </div>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                          align="start"
+                                          className="w-56 p-3"
+                                        >
+                                          <div className="flex flex-col gap-y-5">
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Account Number
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.account_number
+                                                }
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Bank Holder Name
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.bank_holder_name
+                                                }
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Bank Name
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.bank_name
+                                                }
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                            <ScrollBar orientation="horizontal" />
+                          </ScrollArea>
+                        ) : (
+                          <div className="flex items-center w-full h-[357px] flex-col justify-center">
+                            <Image
+                              src={"/nodata.svg"}
+                              alt=""
+                              width={200}
+                              height={200}
+                              className="object-cover me-5"
+                            />
+                            <h1 className="mt-8 text-lg text-center font-semibold">
+                              No Data
+                            </h1>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                  {totalDriverRefundRequestsPages > 1 && (
+                    <div className="pt-10">
+                      <Pagination
+                        currentPage={driverRefundRequestPage}
+                        totalPages={totalDriverRefundRequestsPages}
+                        onPageChange={onDriverRefundRequestPageChange}
                       />
-                      <h1 className="mt-8 text-lg text-center font-semibold">
-                        No Data
-                      </h1>
                     </div>
                   )}
-                </>
-              )}
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-            {totalRefundRequestsPages > 1 && (
-              <div className="pt-10">
-                <Pagination
-                  currentPage={refundRequestPage}
-                  totalPages={totalRefundRequestsPages}
-                  onPageChange={onRefundRequestPageChange}
-                />
-              </div>
-            )}
+                </div>
+              </TabsContent>
+              <TabsContent value="passengerRefundRequest" className="">
+                <div className="bg-white rounded-xl p-5">
+                  <div className="flex gap-x-3 items-center ps-3 mb-5">
+                    <Search
+                      placeholder={"Search..."}
+                      onSearch={handlePassengerRefundSearch}
+                      classname="mb-5 max-w-[300px] lg:w-[500px]"
+                    />
+                  </div>
+                  <ScrollArea className="w-full">
+                    {passengerRefundRequestsLoading ? (
+                      <>
+                        <Table className=" min-w-[700px] py-2">
+                          <TableHeader>
+                            <TableRow className="text-xs lg:text-sm text-center">
+                              <TableHead className="font-bold w-1/4 text-left">
+                                Narration
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Reference
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Amount
+                              </TableHead>
+                              <TableHead className="font-bold w-1/4 text-center">
+                                Status
+                              </TableHead>
+                              <TableHead className="w-1/4 text-center">
+                                Bank Details
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                              <TableRow key={i}>
+                                {[1, 2, 3, 4].map((i) => (
+                                  <TableCell key={i}>
+                                    <div>
+                                      <div className="w-full rounded-md">
+                                        <div>
+                                          <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </>
+                    ) : (
+                      <>
+                        {passengerRefundRequests?.length > 0 ? (
+                          <ScrollArea>
+                            <Table className=" min-w-[900px] py-2">
+                              <TableHeader>
+                                <TableRow className="text-[10px] lg:text-sm text-center">
+                                  <TableHead className="font-bold w-1/5 text-left">
+                                    Narration
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Reference
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Amount
+                                  </TableHead>
+                                  <TableHead className="font-bold w-1/5 text-center">
+                                    Status
+                                  </TableHead>
+                                  <TableHead className="w-1/5 text-center">
+                                    Bank Details
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {passengerRefundfiltered?.map((data: any) => (
+                                  <TableRow
+                                    key={data.id}
+                                    className="text-xs text-center lg:text-sm"
+                                  >
+                                    <TableCell className="w-1/5  py-5 font-medium text-left me-4">
+                                      {data?.narration}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 ">
+                                      {data?.reference}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 ">
+                                      {data?.amount}
+                                    </TableCell>
+                                    <TableCell className="w-1/5 py-5">
+                                      {data.status === "approved" ? (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
+                                          <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Approved
+                                          </span>
+                                        </div>
+                                      ) : data.status === "pending" ? (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                          <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Pending
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                          <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
+                                          <span className="font-semibold text-xs">
+                                            Declined
+                                          </span>
+                                        </div>
+                                      )}
+                                    </TableCell>
+                                    <TableCell className="w-1/5  py-5 text-center">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <div className="gap-x-3 text-center flex cursor-pointer mx-auto justify-center items-center">
+                                            Bank Details
+                                            <FaCaretDown />
+                                          </div>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                          align="start"
+                                          className="w-56 p-3"
+                                        >
+                                          <div className="flex flex-col gap-y-5">
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Account Number
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.account_number
+                                                }
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Bank Holder Name
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.bank_holder_name
+                                                }
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                              <span className="font-normal text-xs  text-start text-gray-500">
+                                                Bank Name
+                                              </span>
+                                              <span className="font-medium text-sm capitalize">
+                                                {
+                                                  data?.payment_details
+                                                    ?.bank_name
+                                                }
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                            <ScrollBar orientation="horizontal" />
+                          </ScrollArea>
+                        ) : (
+                          <div className="flex items-center w-full h-[357px] flex-col justify-center">
+                            <Image
+                              src={"/nodata.svg"}
+                              alt=""
+                              width={200}
+                              height={200}
+                              className="object-cover me-5"
+                            />
+                            <h1 className="mt-8 text-lg text-center font-semibold">
+                              No Data
+                            </h1>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                  {totalPassengerRefundRequestsPages > 1 && (
+                    <div className="pt-10">
+                      <Pagination
+                        currentPage={passengerRefundRequestPage}
+                        totalPages={totalPassengerRefundRequestsPages}
+                        onPageChange={onPassengerRefundRequestPageChange}
+                      />
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </TabsContent>
         <TabsContent value="driver">
@@ -666,25 +974,35 @@ const Finance = () => {
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                {data.status === "paid" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
-                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                    <span className="font-semibold text-xs">
-                                      Paid
-                                    </span>
-                                  </div>
-                                ) : data.status === "pending" ? (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
+                                {data.status === "pending" && (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[110px] bg-[#FFF4E6] text-[#FFA500]">
                                     <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
                                     <span className="font-semibold text-xs">
                                       Pending
                                     </span>
                                   </div>
-                                ) : (
-                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
+                                )}
+                                {data.status === "active" && (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[110px] bg-[#E6F4FF] text-[#007AFF]">
+                                    <span className="w-2 h-2 bg-[#007AFF] rounded-full"></span>
+                                    <span className="font-semibold text-xs">
+                                      Active
+                                    </span>
+                                  </div>
+                                )}
+                                {data.status === "completed" && (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[110px] bg-[#CCFFCD] text-[#00B771]">
+                                    <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                                    <span className="font-semibold text-xs">
+                                      Completed
+                                    </span>
+                                  </div>
+                                )}
+                                {data.status === "cancelled" && (
+                                  <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[110px] bg-[#FFE6E6] text-[#FF4500]">
                                     <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                                     <span className="font-semibold text-xs">
-                                      Failed
+                                      Cancelled
                                     </span>
                                   </div>
                                 )}

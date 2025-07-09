@@ -18,24 +18,6 @@ import { Separator } from "../ui/separator";
 export function TransactionDetails({ data }: any) {
   return (
     <div className="flex flex-col gap-y-8 text-[#667085]">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          {/* <h1 className="text-lg font-semibold">Transaction details</h1> */}
-          <p className="text-sm">
-            Transaction ID:{" "}
-            <span className="font-medium">{data?.transactionID}</span>
-          </p>
-          <p className="text-sm">Date/Time: {data?.transaction_date}</p>
-        </div>
-        {/* <div>
-          <button className="flex items-center space-x-1 text-blue-600 text-sm font-medium">
-            <PiExport size={16} />
-            <span>Export PDF</span>
-          </button>
-        </div> */}
-      </div>
-
       {/* User Info */}
       <div className="flex items-start space-x-4">
         <Avatar className="w-12 h-12">
@@ -89,22 +71,6 @@ export function TransactionDetails({ data }: any) {
       <div>
         <h2 className="text-sm font-bold">Trip information</h2>
         <div className="mt-2 space-y-2">
-          {/* <div className="flex justify-between text-sm">
-            <span>Trip ID</span>
-            <span className="font-medium text-gray-900">#234XZA</span>
-          </div> */}
-          {/* <div className="flex justify-between text-sm">
-            <span>Booking date</span>
-            <span className="font-medium text-gray-900">01/01/2024</span>
-          </div> */}
-          {/* <div className="flex justify-between text-sm">
-            <span>Departure</span>
-            <span className="font-medium text-gray-900">Wuse Abuja</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Destination</span>
-            <span className="font-medium text-gray-900">Ogarinma Kogi</span>
-          </div> */}
           <div className="flex justify-between text-sm">
             <span>Departure date & time</span>
             <span className="font-medium text-gray-900">
@@ -129,10 +95,6 @@ export function TransactionDetails({ data }: any) {
               {data?.total_passengers}
             </span>
           </div>
-          {/* <div className="flex justify-between text-sm">
-            <span>Total payment</span>
-            <span className="font-medium text-gray-900">₦120,000</span>
-          </div> */}
         </div>
       </div>
 

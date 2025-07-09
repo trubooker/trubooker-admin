@@ -31,8 +31,16 @@ const passengersApi = passengersApiConfig.injectEndpoints({
     }),
 
     getRefundRequest: builder.query({
-      query: ({page}: any) => ({
-        url: `/admin/transactions/refund-requests?page=${page}`,
+      query: ({
+        page,
+        search,
+        type,
+      }: {
+        page: number;
+        search: string;
+        type: "passenger" | "driver";
+      }) => ({
+        url: `/admin/transactions/refund-requests?page=${page}&search=${search}&type=${type}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
@@ -62,5 +70,5 @@ export const {
   useGetAgentsEarningsQuery,
   useApproveWithdrawalRequestMutation,
   useDeclineWithdrawalRequestMutation,
-  useGetRefundRequestQuery
+  useGetRefundRequestQuery,
 } = passengersApi;
