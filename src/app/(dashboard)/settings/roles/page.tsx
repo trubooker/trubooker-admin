@@ -24,14 +24,12 @@ const Roles = () => {
     isFetching: roleFetching,
   } = useGetRolesQuery(null);
   const role = data?.data;
-  console.log("roles: ", role);
 
   const {
     data: groupUsers,
     isLoading: groupUsersLoading,
     isFetching: groupUsersFetching,
   } = useGroupUserByRolesQuery(null);
-  console.log("groupUsers: ", groupUsers);
 
   return (
     <div>
