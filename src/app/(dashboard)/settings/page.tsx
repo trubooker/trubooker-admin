@@ -75,31 +75,6 @@ const Settings = () => {
     setImages((prevImages) => prevImages.filter((image) => image.url !== url));
   };
 
-  // const handleFileChange = async (e: any) => {
-  //   const file = e.target.files?.[0];
-
-  //   if (file) {
-  //     const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
-
-  //     if (validImageTypes.includes(file.type)) {
-  //       const reader = new FileReader();
-
-  //       reader.onloadend = () => {
-  //         setPreviewSrc(reader.result as string);
-  //         setImageChange(true);
-  //       };
-
-  //       reader.readAsDataURL(file);
-  //       setSelectedFile(file);
-  //     } else {
-  //       toast.error("Please upload a valid image file (JPEG, JPG, or PNG)");
-  //       setPreviewSrc("");
-  //     }
-  //   } else {
-  //     setPreviewSrc("");
-  //   }
-  // };
-
   const handleUploadPicture = async () => {
     setLoading(true);
 
@@ -141,10 +116,6 @@ const Settings = () => {
     }
   };
 
-  // const handleDeleteAccount = () => {
-  //   alert("clicked");
-  // };
-
   useEffect(() => {
     if (userData) {
       form.reset({
@@ -185,7 +156,6 @@ const Settings = () => {
       dob: dateString,
       email: data.email || null,
     };
-    console.log("formdata: ", formdata);
     await update(formdata)
       .unwrap()
       .then((res: any) => {

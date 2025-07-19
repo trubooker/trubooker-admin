@@ -28,8 +28,8 @@ export async function POST(req: Request, res: NextRequest) {
 
   if (data?.status == "success") {
     if (
-      data?.data?.user?.role === "admin" ||
-      data?.data?.user?.role === "super_admin"
+      data?.data?.user?.role != "passenger" ||
+      data?.data?.user?.role != "driver" || data?.data?.user?.role != "agent"
     ) {
       const response = {
         data: data?.data?.user,
