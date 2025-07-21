@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-// import QuickActions from "@/components/(admin)/quick-action";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Search from "@/components/SearchBar";
-import { AgentListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -35,7 +32,6 @@ const Agent = () => {
     data: userData,
     isFetching,
   } = useGetAgentsQuery({ page, search: searchQuery });
-  console.log("Agent", userData);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const AgentListData = userData?.data;
