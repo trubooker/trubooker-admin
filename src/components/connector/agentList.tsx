@@ -23,10 +23,6 @@ import { useRouter } from "next/navigation";
 export function AgentList({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
 
-  const handleSuspend = (id: string) => {
-    alert(`Account id ${id} suspended!!`);
-  };
-
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
@@ -83,13 +79,13 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                           <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                           <span className="font-semibold text-xs">
-                            Suspended
+                            Inactive
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#fc9c95] text-[--danger]">
                           <span className="w-2 h-2 bg-[--danger] rounded-full"></span>
-                          <span className="font-semibold text-xs">Deleted</span>
+                          <span className="font-semibold text-xs">Pending</span>
                         </div>
                       )}
                     </TableCell>
