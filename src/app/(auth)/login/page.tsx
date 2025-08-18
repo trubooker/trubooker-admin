@@ -64,11 +64,8 @@ export default function LoginComponent() {
       if (response.status === 200) {
         form.setValue("email", "");
         form.setValue("password", "");
-        setLoading(false);
         toast.success("Successfully Logged In");
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1000);
+        router.push("/dashboard");
       }
     } catch (error: any) {
       setEmailError("");
