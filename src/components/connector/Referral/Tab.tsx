@@ -10,19 +10,11 @@ import {
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
-
-import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 
 export function Tab({ data: AgentTableData, isFetching, loading }: any) {
-  const router = useRouter();
-  console.log("AgentTableData: ", AgentTableData);
 
-  const handleSuspend = (id: string) => {
-    alert(`Account id ${id} suspended!!`);
-  };
-
-  const denom_amount: number = 2500;
+  const denom_amount: number = 3000;
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}

@@ -15,15 +15,7 @@ import { Tab } from "./Tab";
 
 const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
   const [page, setPage] = useState(1);
-  // const {
-  //   isLoading: loading,
-  //   data,
-  //   isFetching,
-  // } = useGetStudentReportQuery(page);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  const users: any = [];
+  
   const totalPages = SingleAgentListData?.data?.meta?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
