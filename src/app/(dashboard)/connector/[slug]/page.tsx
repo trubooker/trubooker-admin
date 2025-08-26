@@ -1,7 +1,7 @@
 "use client";
 
 import Goback from "@/components/Goback";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { IoPersonOutline } from "react-icons/io5";
@@ -17,8 +17,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Modal } from "@/components/Modal";
@@ -28,7 +26,6 @@ import { formatCurrency } from "@/lib/utils";
 const ViewAgent = () => {
   const params = useParams();
   const id = String(params.slug);
-  const router = useRouter();
   const {
     isLoading: loading,
     data: userData,
@@ -41,7 +38,6 @@ const ViewAgent = () => {
     await mutate(id).unwrap().then();
   };
 
-  console.log("SingleAgent", userData);
   const profile = userData?.data?.profile; // object
   const agent_ref = userData?.data?.agent_referrals; // array
   const referral = userData?.data?.refferals; // array
@@ -170,6 +166,7 @@ const ViewAgent = () => {
             profile={profile}
             loading={loading}
             isFetching={isFetching}
+            params={params}
           />
         </div>
       ) : (

@@ -39,7 +39,6 @@ const Dashboard = () => {
     isLoading: loading,
     isFetching,
   } = useGetDashboardQuery({ page });
-  console.log(info);
 
   const totalPages = info?.data?.active_trips?.last_page;
   const userData = info?.data?.active_trips?.data || [];
@@ -52,29 +51,6 @@ const Dashboard = () => {
     }
   };
   const router = useRouter();
-
-  // const [sortConfig, setSortConfig] = useState<{
-  //   column: string;
-  //   order: string;
-  // } | null>(null);
-
-  // const sortedData = [...userData].sort((a, b) => {
-  //   if (!sortConfig) return 0;
-  //   const { column, order } = sortConfig;
-  //   const valA = a[column as keyof typeof a];
-  //   const valB = b[column as keyof typeof b];
-  //   if (valA < valB) return order === "asc" ? -1 : 1;
-  //   if (valA > valB) return order === "asc" ? 1 : -1;
-  //   return 0;
-  // });
-  // const handleSort = (column: string) => {
-  //   setSortConfig((prev) => {
-  //     if (prev?.column === column) {
-  //       return { column, order: prev.order === "asc" ? "desc" : "asc" };
-  //     }
-  //     return { column, order: "asc" };
-  //   });
-  // };
 
   return (
     <div className="flex flex-col h-fit w-full  gap-4">

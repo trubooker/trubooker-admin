@@ -18,7 +18,7 @@ export function Tab({ data: AgentTableData, isFetching, loading }: any) {
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}
-      {AgentTableData?.length > 0 ? (
+      {AgentTableData?.data?.length > 0 ? (
         <Table className=" min-w-[700px] py-2">
           <TableHeader>
             <TableRow className="text-xs lg:text-sm">
@@ -37,7 +37,7 @@ export function Tab({ data: AgentTableData, isFetching, loading }: any) {
           <TableBody>
             <>
               <>
-                {AgentTableData?.map((data: any) => (
+                {AgentTableData?.data?.map((data: any) => (
                   <TableRow
                     key={data?.id}
                     className="text-xs lg:text-sm w-full"

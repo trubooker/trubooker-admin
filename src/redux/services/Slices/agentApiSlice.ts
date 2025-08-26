@@ -21,6 +21,14 @@ const agentsApi = agentsApiConfig.injectEndpoints({
       providesTags: ["Agents"],
     }),
 
+    getAgentReferrals: builder.query({
+      query: ({agent, page}) => ({
+        url: `/admin/agents/referrals/${agent}?page=${page}`,
+        method: "GET",
+      }),
+      providesTags: ["Agents"],
+    }),
+
     toggleAgentStatus: builder.mutation({
       query: (agent) => ({
         url: `/admin/agents/toggle-status/${agent}`,
@@ -33,6 +41,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 
 export const {
   useGetAgentsQuery,
+  useGetAgentReferralsQuery,
   useGetOneAgentQuery,
   useToggleAgentStatusMutation,
 } = agentsApi;
