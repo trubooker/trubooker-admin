@@ -12,11 +12,23 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
 import { Tab } from "./Tab";
+import { useGetAgentReferralsQuery } from "@/redux/services/Slices/agentApiSlice";
 
-const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
+const Referral = ({ params }: any) => {
   const [page, setPage] = useState(1);
-  
-  const totalPages = SingleAgentListData?.data?.meta?.last_page;
+
+  // Pass the page parameter to your query
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetAgentReferralsQuery({
+    agent: params?.slug,
+    page: page, // Add page parameter here
+  });
+
+  const totalPages = userData?.data?.last_page;
+
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -25,6 +37,12 @@ const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
 
   return (
     <div className="flex flex-col h-fit w-full">
+      <div className="py-4 flex gap-x-3 items-center">
+        <h2 className="text-base font-bold">Referral performance</h2>
+        <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
+          {userData?.data?.total || 0}
+        </div>
+      </div>
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">
           {isFetching || loading ? (
@@ -49,8 +67,8 @@ const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
                 <TableBody>
                   {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                     <TableRow key={i}>
-                      {[1, 2, 3, 4].map((i) => (
-                        <TableCell key={i}>
+                      {[1, 2, 3, 4].map((j) => (
+                        <TableCell key={j}>
                           <div>
                             <div className="w-full rounded-md">
                               <div>
@@ -67,7 +85,7 @@ const Referral = ({ data: SingleAgentListData, loading, isFetching }: any) => {
             </>
           ) : (
             <Tab
-              data={SingleAgentListData}
+              data={userData?.data}
               isFetching={isFetching}
               loading={loading}
             />

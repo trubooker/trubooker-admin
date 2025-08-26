@@ -14,6 +14,7 @@ const AgentInfo = ({
   profile,
   loading,
   isFetching,
+  params,
 }: any) => {
   return (
     <div className="w-full">
@@ -219,16 +220,11 @@ const AgentInfo = ({
         <div className="xl:w-[60%] w-full">
           <ScrollArea className="w-full mb-4 lg:col-span-2 col-span-1 text-lg text-gray-500">
             <div className="bg-white rounded-lg w-full p-5">
-              <div className="py-4 flex gap-x-3 items-center">
-                <h2 className="text-base font-bold">Referral performance</h2>
-                <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-                  {referral?.length}
-                </div>
-              </div>
               <Referral
                 data={referral}
                 loading={loading}
                 isFetching={isFetching}
+                params={params}
               />
             </div>
             <ScrollBar orientation="horizontal" />
