@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { Input } from "./ui/input";
 
@@ -10,6 +10,7 @@ interface Props<T> {
   onSearch: (query: string) => void;
   // filterKey: string[];
   // emptyListState: React.ReactNode;
+  defaultValue?: string; // Add this
 }
 
 const Search: React.FC<Props<any>> = ({
@@ -19,8 +20,14 @@ const Search: React.FC<Props<any>> = ({
   // data,
   // filterKey,
   // emptyListState,
+  defaultValue = "", // Add this with default value
 }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(defaultValue); // Initialize with defaultValue
+
+  // Update query when defaultValue changes (when coming back from another page)
+  useEffect(() => {
+    setQuery(defaultValue);
+  }, [defaultValue]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;

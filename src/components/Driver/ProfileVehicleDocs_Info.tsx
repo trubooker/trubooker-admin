@@ -32,32 +32,38 @@ import toast from "react-hot-toast";
 import { Textarea } from "../ui/textarea";
 
 const ProfileVehicleDocs_Info = ({
-  th,
-  feedback,
-  vehicle,
-  profile,
+  th = [], // Add default value
+  feedback = [], // Add default value
+  vehicle = [], // Add default value
+  profile = {}, // Add default value
   loading,
   isFetching,
   driverId,
 }: any) => {
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
-  const { data: driverDocs } = useGetDriversDocumentsQuery(driverId);
+  const { data: driverDocs, isLoading: docsLoading } = useGetDriversDocumentsQuery(driverId);
+  
   const [approveDocs, { isLoading: approveLoading }] =
     useApproveDriversDocumentsMutation();
   const [rejectDocs, { isLoading: rejectLoading }] =
-    useRejectDriversDocumentsMutation(driverId);
+    useRejectDriversDocumentsMutation();
 
   const handleApproveDocument = async (
     id: string,
     onModalClose?: () => void
   ) => {
-    await approveDocs(id)
-      .unwrap()
-      .then((res) => {
-        toast.success("Document Approved");
-        onModalClose?.();
-      });
+    try {
+      await approveDocs(id)
+        .unwrap()
+        .then((res) => {
+          toast.success("Document Approved");
+          onModalClose?.();
+        });
+    } catch (error) {
+      console.error("Failed to approve document:", error);
+      toast.error("Failed to approve document");
+    }
   };
 
   const validateReason = (value: string) => {
@@ -82,17 +88,35 @@ const ProfileVehicleDocs_Info = ({
       return;
     }
 
-    await rejectDocs({ reason: reason, documentVerificationId: id })
-      .unwrap()
-      .then((res) => {
-        toast.error("Document Rejected");
-        setReason("");
-        setReasonError("");
-        onModalClose?.();
-      });
+    try {
+      await rejectDocs({ reason: reason, documentVerificationId: id })
+        .unwrap()
+        .then((res) => {
+          toast.error("Document Rejected");
+          setReason("");
+          setReasonError("");
+          onModalClose?.();
+        });
+    } catch (error) {
+      console.error("Failed to reject document:", error);
+      toast.error("Failed to reject document");
+    }
   };
 
-  const docs: any[] = driverDocs?.data;
+  const docs: any[] = driverDocs?.data || [];
+
+  // Safe profile data
+  const safeProfile = profile || {};
+  
+  // Safe vehicle data - ensure it's an array
+  const safeVehicle = Array.isArray(vehicle) ? vehicle : [];
+  
+  // Safe feedback data - ensure it's an array
+  const safeFeedback = Array.isArray(feedback) ? feedback : [];
+  
+  // Safe trip history data
+  const safeTripHistory = Array.isArray(th) ? th : [];
+
   return (
     <div className="w-full">
       <div className="gap-4 grid xl:grid-cols-3 grid-rows-1 w-full">
@@ -112,13 +136,12 @@ const ProfileVehicleDocs_Info = ({
                       Full name
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.first_name === null ||
-                      profile?.last_name === null ? (
+                      {(!safeProfile?.first_name && !safeProfile?.last_name) ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
                         <div className="flex gap-x-2">
-                          <span> {profile?.first_name}</span>
-                          <span> {profile?.last_name}</span>
+                          <span> {safeProfile?.first_name || 'N/A'}</span>
+                          <span> {safeProfile?.last_name || ''}</span>
                         </div>
                       )}
                     </span>
@@ -128,10 +151,10 @@ const ProfileVehicleDocs_Info = ({
                       Email address
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.email === null ? (
+                      {!safeProfile?.email ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.email
+                        safeProfile?.email
                       )}
                     </span>
                   </div>
@@ -142,10 +165,10 @@ const ProfileVehicleDocs_Info = ({
                       Phone number
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.phone === null ? (
+                      {!safeProfile?.phone ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.phone
+                        safeProfile?.phone
                       )}
                     </span>
                   </div>
@@ -156,10 +179,10 @@ const ProfileVehicleDocs_Info = ({
                       Address
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.address === null ? (
+                      {!safeProfile?.address ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.address
+                        safeProfile?.address || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -168,10 +191,10 @@ const ProfileVehicleDocs_Info = ({
                       Date of birth
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.dob === null ? (
+                      {!safeProfile?.dob ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        new Date(profile?.dob).toLocaleDateString("en-US", {
+                        new Date(safeProfile?.dob).toLocaleDateString("en-US", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
@@ -186,10 +209,10 @@ const ProfileVehicleDocs_Info = ({
                       City
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.city === null ? (
+                      {!safeProfile?.city ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.city
+                        safeProfile?.city || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -198,10 +221,10 @@ const ProfileVehicleDocs_Info = ({
                       Country
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.country === null ? (
+                      {!safeProfile?.country ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.country
+                        safeProfile?.country || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -212,10 +235,10 @@ const ProfileVehicleDocs_Info = ({
                       Gender
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.gender === null ? (
+                      {!safeProfile?.gender ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.gender
+                        safeProfile?.gender || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -224,10 +247,10 @@ const ProfileVehicleDocs_Info = ({
                       Referral code
                     </span>
                     <span className="font-medium text-sm">
-                      {profile?.referral === null ? (
+                      {!safeProfile?.referral ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        profile?.referral
+                        safeProfile?.referral || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -246,174 +269,177 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
-              {vehicle?.map((deets: any, index: number) => (
-                <Accordion
-                  key={deets.id}
-                  type="single"
-                  collapsible
-                  // defaultValue="item-1"
-                  className="w-full"
-                >
-                  <AccordionItem value={`item-${index + 1}`} className="">
-                    <AccordionTrigger className="my-3">
-                      <Table className="w-full">
-                        <TableHeader>
-                          <TableRow className="text-xs lg:text-sm">
-                            <TableHead className="font-bold w-1/2 text-left">
-                              <div className="flex flex-col">
-                                <span className="font-normal text-xs text-gray-500">
-                                  Vehicle Type
-                                </span>
-                                <span className="font-medium text-sm">
-                                  {deets?.vehicle_type?.name === null ? (
-                                    <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                                  ) : (
-                                    deets?.vehicle_type?.name
-                                  )}
-                                </span>
-                              </div>
-                            </TableHead>
-
-                            <TableHead className="font-bold w-1/2 text-left">
-                              <div className="flex text-end flex-col">
-                                <span className="font-normal text-xs text-gray-500">
-                                  Vehicle Model
-                                </span>
-                                <span className="font-medium text-sm">
-                                  {deets?.model === null ? (
-                                    <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                                  ) : (
-                                    deets?.model
-                                  )}
-                                </span>
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                      </Table>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="my-5 space-y-6">
-                        <div className="flex justify-between">
-                          <div className="flex flex-col">
-                            <span className="font-normal text-xs text-gray-500">
-                              License plate number
-                            </span>
-                            <span className="font-medium text-sm">
-                              {deets?.license_plate_number === null ? (
-                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                              ) : (
-                                deets?.license_plate_number
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex text-end flex-col">
-                            <span className="font-normal text-xs text-gray-500">
-                              Vehicle capacity
-                            </span>
-                            <span className="font-medium text-sm">
-                              {deets?.capacity === null ? (
-                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                              ) : (
-                                deets?.capacity
-                              )}{" "}
-                              Seats
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between">
-                          <div className="flex flex-col">
-                            <span className="font-normal text-xs text-gray-500">
-                              Vehicle colour
-                            </span>
-                            <span className="font-medium text-sm">
-                              {deets?.color === null ? (
-                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                              ) : (
-                                deets?.color
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex text-end flex-col">
-                            <span className="font-normal text-xs text-gray-500">
-                              Insurance
-                            </span>
-                            <span className="font-medium text-sm">
-                              {deets?.insurance === null ? (
-                                <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                              ) : (
-                                deets?.insurance
-                              )}
-                            </span>
-                          </div>
-                        </div>
-
-                        <Tabs defaultValue="vehiclePhotos" className="w-full">
-                          <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="vehiclePhotos">
-                              Photos
-                            </TabsTrigger>
-                            <TabsTrigger value="features">Features</TabsTrigger>
-                          </TabsList>
-                          <TabsContent value="vehiclePhotos">
-                            <div className="w-full grid grid-cols-1 pt-5 gap-4">
-                              {deets?.photos?.map((i: any, index: number) => (
-                                <div key={index}>
-                                  <Link href={i} target="_blank">
-                                    <span className="font-medium text-sm">
-                                      <span className="flex gap-x-2 items-center">
-                                        <Image
-                                          src={"/photoGrid.svg"}
-                                          alt="Vehicle Photo"
-                                          width={35}
-                                          height={35}
-                                        />
-
-                                        <div className="text-sm font-medium text-[#333F53]">
-                                          Vehicle photo {index + 1}.png
-                                        </div>
-                                      </span>
-                                    </span>
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
-                          </TabsContent>
-                          <TabsContent value="features">
-                            <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
-                              {deets?.features?.length > 1 ? (
-                                <div>
+              {safeVehicle?.length > 0 ? (
+                safeVehicle.map((deets: any, index: number) => (
+                  <Accordion
+                    key={deets?.id || index}
+                    type="single"
+                    collapsible
+                    className="w-full"
+                  >
+                    <AccordionItem value={`item-${index + 1}`} className="">
+                      <AccordionTrigger className="my-3">
+                        <Table className="w-full">
+                          <TableHeader>
+                            <TableRow className="text-xs lg:text-sm">
+                              <TableHead className="font-bold w-1/2 text-left">
+                                <div className="flex flex-col">
+                                  <span className="font-normal text-xs text-gray-500">
+                                    Vehicle Type
+                                  </span>
                                   <span className="font-medium text-sm">
-                                    <span className="flex gap-x-2 items-center">
-                                      <div className="text-sm font-medium text-[#333F53]">
-                                        {deets.features.join(", ")}
-                                      </div>
-                                    </span>
+                                    {!deets?.vehicle_type?.name ? (
+                                      <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                    ) : (
+                                      deets?.vehicle_type?.name || 'Not specified'
+                                    )}
                                   </span>
                                 </div>
-                              ) : (
-                                deets?.features?.map(
-                                  (i: any, index: number) => (
-                                    <div key={index}>
+                              </TableHead>
+
+                              <TableHead className="font-bold w-1/2 text-left">
+                                <div className="flex text-end flex-col">
+                                  <span className="font-normal text-xs text-gray-500">
+                                    Vehicle Model
+                                  </span>
+                                  <span className="font-medium text-sm">
+                                    {!deets?.model ? (
+                                      <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                    ) : (
+                                      deets?.model || 'Not specified'
+                                    )}
+                                  </span>
+                                </div>
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                        </Table>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="my-5 space-y-6">
+                          <div className="flex justify-between">
+                            <div className="flex flex-col">
+                              <span className="font-normal text-xs text-gray-500">
+                                License plate number
+                              </span>
+                              <span className="font-medium text-sm">
+                                {!deets?.license_plate_number ? (
+                                  <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                ) : (
+                                  deets?.license_plate_number || 'Not specified'
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex text-end flex-col">
+                              <span className="font-normal text-xs text-gray-500">
+                                Vehicle capacity
+                              </span>
+                              <span className="font-medium text-sm">
+                                {!deets?.capacity ? (
+                                  <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                ) : (
+                                  `${deets?.capacity || '0'} Seats`
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between">
+                            <div className="flex flex-col">
+                              <span className="font-normal text-xs text-gray-500">
+                                Vehicle colour
+                              </span>
+                              <span className="font-medium text-sm">
+                                {!deets?.color ? (
+                                  <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                ) : (
+                                  deets?.color || 'Not specified'
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex text-end flex-col">
+                              <span className="font-normal text-xs text-gray-500">
+                                Insurance
+                              </span>
+                              <span className="font-medium text-sm">
+                                {!deets?.insurance ? (
+                                  <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                                ) : (
+                                  deets?.insurance || 'Not provided'
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          <Tabs defaultValue="vehiclePhotos" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                              <TabsTrigger value="vehiclePhotos">
+                                Photos
+                              </TabsTrigger>
+                              <TabsTrigger value="features">Features</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="vehiclePhotos">
+                              <div className="w-full grid grid-cols-1 pt-5 gap-4">
+                                {(deets?.photos || []).map((i: any, index: number) => (
+                                  <div key={index}>
+                                    <Link href={i || '#'} target="_blank">
                                       <span className="font-medium text-sm">
                                         <span className="flex gap-x-2 items-center">
+                                          <Image
+                                            src={"/photoGrid.svg"}
+                                            alt="Vehicle Photo"
+                                            width={35}
+                                            height={35}
+                                          />
+
                                           <div className="text-sm font-medium text-[#333F53]">
-                                            {i}
+                                            Vehicle photo {index + 1}.png
                                           </div>
                                         </span>
                                       </span>
-                                    </div>
-                                  )
-                                )
-                              )}
-                            </div>
-                          </TabsContent>
-                        </Tabs>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              ))}
+                                    </Link>
+                                  </div>
+                                ))}
+                              </div>
+                            </TabsContent>
+                            <TabsContent value="features">
+                              <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
+                                {Array.isArray(deets?.features) && deets.features.length > 0 ? (
+                                  <div>
+                                    <span className="font-medium text-sm">
+                                      <span className="flex gap-x-2 items-center">
+                                        <div className="text-sm font-medium text-[#333F53]">
+                                          {deets.features.join(", ")}
+                                        </div>
+                                      </span>
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="text-sm text-gray-500">
+                                    No features specified
+                                  </div>
+                                )}
+                              </div>
+                            </TabsContent>
+                          </Tabs>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-[200px] flex-col">
+                  <Image
+                    src={"/nodata.svg"}
+                    alt="No vehicle data"
+                    width={100}
+                    height={100}
+                    className="object-cover"
+                  />
+                  <h1 className="mt-4 text-sm text-center font-semibold">
+                    No Vehicle Information
+                  </h1>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -427,46 +453,48 @@ const ProfileVehicleDocs_Info = ({
           </CardHeader>
           <CardContent>
             <div>
-              {docs?.length > 0 ? (
+              {docsLoading ? (
+                <div className="flex items-center justify-center h-[200px]">
+                  <Skeleton className="h-4 w-full bg-gray-200" />
+                </div>
+              ) : docs?.length > 0 ? (
                 <div className="mb-3">
                   <div className="max-h-[500px] h-auto overflow-y-auto">
                     <div className="grid grid-cols-1 gap-8">
-                      {docs?.map((doc: any, index: number) => (
+                      {docs.map((doc: any, index: number) => (
                         <div
-                          key={index}
+                          key={doc?.id || index}
                           className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                         >
-                          <Link href={doc.link} target="_blank">
+                          <Link href={doc?.link || '#'} target="_blank">
                             <span className="font-medium text-sm">
                               <span className="flex gap-x-2 items-start">
                                 <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-gray-700" />
                                 <div className="flex flex-col">
                                   <div className="text-sm font-bold items-center flex gap-x-2 text-[#333F53] capitalize">
-                                    <>{doc.verification_type}</>
+                                    {doc?.verification_type || 'Document'}
                                     <FaExternalLinkAlt className="w-3 h-3" />
                                   </div>
                                   <div className="text-xs mt-2 text-gray-500">
                                     <span
                                       className={`${
-                                        doc.status === "approved"
+                                        doc?.status === "approved"
                                           ? "text-green-600 font-medium"
-                                          : doc.status === "pending"
+                                          : doc?.status === "pending"
                                           ? "text-yellow-600 font-medium"
                                           : "text-red-600 font-medium"
                                       } capitalize`}
                                     >
-                                      {doc.status}
+                                      {doc?.status || 'unknown'}
                                     </span>
                                   </div>
                                   <div className="text-[11px] mt-1 text-gray-500">
                                     Added:{" "}
-                                    {new Date(
-                                      doc.created_at
-                                    ).toLocaleDateString("en-US", {
+                                    {doc?.created_at ? new Date(doc.created_at).toLocaleDateString("en-US", {
                                       day: "numeric",
                                       month: "short",
                                       year: "numeric",
-                                    })}
+                                    }) : 'N/A'}
                                   </div>
                                 </div>
                               </span>
@@ -478,14 +506,14 @@ const ProfileVehicleDocs_Info = ({
                             <Modal
                               trigger={
                                 <Button
-                                  disabled={doc.status === "approved"}
+                                  disabled={doc?.status === "approved"}
                                   className={`px-3 py-1.5 w-full text-xs font-bold rounded-md ${
-                                    doc.status === "approved"
+                                    doc?.status === "approved"
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                       : "bg-green-500 text-white hover:bg-green-600"
                                   }`}
                                 >
-                                  {doc.status === "approved"
+                                  {doc?.status === "approved"
                                     ? "Approved"
                                     : "Approve"}
                                 </Button>
@@ -503,7 +531,7 @@ const ProfileVehicleDocs_Info = ({
                                       disabled={approveLoading}
                                       className="px-4 py-2 text-sm font-medium text-white w-full bg-green-600 hover:bg-green-500 rounded-md"
                                       onClick={() => {
-                                        handleApproveDocument(doc.id);
+                                        handleApproveDocument(doc?.id);
                                       }}
                                     >
                                       {approveLoading
@@ -518,14 +546,14 @@ const ProfileVehicleDocs_Info = ({
                             <Modal
                               trigger={
                                 <Button
-                                  disabled={doc.status === "rejected"}
+                                  disabled={doc?.status === "rejected"}
                                   className={`px-3 py-1.5 text-xs rounded-md w-full font-bold ${
-                                    doc.status === "rejected"
+                                    doc?.status === "rejected"
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                       : "bg-red-500 text-white hover:bg-red-600"
                                   }`}
                                 >
-                                  {doc.status === "rejected"
+                                  {doc?.status === "rejected"
                                     ? "Rejected"
                                     : "Reject"}
                                 </Button>
@@ -566,7 +594,7 @@ const ProfileVehicleDocs_Info = ({
                                         onClick={() => {
                                           handleDisapproveDocument({
                                             reason: reason,
-                                            id: doc.id,
+                                            id: doc?.id,
                                           });
                                         }}
                                         disabled={
@@ -612,7 +640,11 @@ const ProfileVehicleDocs_Info = ({
             <div className="py-4">
               <h2 className="text-base font-bold">Trip history</h2>
             </div>
-            <DriversTable data={th} loading={loading} isFetching={isFetching} />
+            <DriversTable 
+              data={safeTripHistory} 
+              loading={loading} 
+              isFetching={isFetching} 
+            />
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
@@ -625,10 +657,10 @@ const ProfileVehicleDocs_Info = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {feedback?.length > 0 ? (
+            {safeFeedback?.length > 0 ? (
               <>
-                {feedback?.map((actions: any) => (
-                  <div key={actions.id}>
+                {safeFeedback.map((actions: any, index: number) => (
+                  <div key={actions?.id || index}>
                     <Separator />
                     <div className="my-6">
                       <div className="flex w-full items-start space-x-4">
@@ -640,15 +672,12 @@ const ProfileVehicleDocs_Info = ({
                         </Avatar>
                         <div className="">
                           <p className="text-gray-800 font-bold text-sm">
-                            {actions?.passenger}
+                            {actions?.passenger || 'Anonymous'}
                           </p>
-                          {/* <p className="text-xs text-gray-500">
-                            {actions.email}
-                          </p> */}
                           <span className="flex items-center gap-x-3">
-                            {actions?.rating}.0{" "}
+                            {(actions?.rating || 0).toFixed(1)}{" "}
                             <StarRatings
-                              rating={actions?.rating}
+                              rating={actions?.rating || 0}
                               numberOfStars={5}
                               name="rating"
                               starRatedColor="#F5A623"
@@ -659,7 +688,9 @@ const ProfileVehicleDocs_Info = ({
                           </span>
                         </div>
                       </div>
-                      <div className="text-sm mt-3">{actions?.comment}</div>
+                      <div className="text-sm mt-3">
+                        {actions?.comment || 'No comment provided'}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -674,7 +705,7 @@ const ProfileVehicleDocs_Info = ({
                   className="object-cover me-5"
                 />
                 <h1 className="mt-8 text-lg text-center font-semibold">
-                  No Data
+                  No Feedback
                 </h1>
               </div>
             )}

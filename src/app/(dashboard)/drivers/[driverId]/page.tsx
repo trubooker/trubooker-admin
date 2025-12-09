@@ -29,32 +29,76 @@ const ViewDriver = () => {
   const params = useParams();
   const id = String(params.driverId);
   const router = useRouter();
-  const status = "active";
+  
   const {
     isLoading: loading,
     data: userData,
     isFetching,
+    error, // Add error state
   } = useGetOneDriverQuery(id);
 
   const [mutate, { isLoading: loadingToggle }] =
     useToggleDriverStatusMutation();
 
   const toggleDriverStatus = async () => {
-    await mutate(id).unwrap().then();
+    try {
+      await mutate(id).unwrap();
+    } catch (error) {
+      console.error("Failed to toggle status:", error);
+    }
   };
+
   console.log("SingleDriver", userData);
-  const profile = userData?.data?.profile; //object
-  const vehicle = userData?.data?.vehicles; //array
-  const feedback = userData?.data?.reviews; //array
-  const th = userData?.data?.trip_history; //array
+  
+  // Add safe access with optional chaining and fallbacks
+  const profile = userData?.data?.profile || {}; // object with fallback
+  const vehicle = userData?.data?.vehicles || []; // array with fallback
+  const feedback = userData?.data?.reviews || []; // array with fallback
+  const th = userData?.data?.trip_history || []; // array with fallback
+
+  // Safe name display
+  const driverName = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unknown Driver';
+  
+  // Safe date display
+  const joinDate = profile?.created_at 
+    ? new Date(profile.created_at).toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : 'N/A';
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="p-5">
+        <Goback formerPage={"Drivers"} presentPage={"Error"} />
+        <div className="bg-white p-5 rounded-lg my-5">
+          <div className="text-center py-10">
+            <h2 className="text-xl font-bold text-red-600">Error Loading Driver Data</h2>
+            <p className="text-gray-500 mt-2">
+              Unable to load driver information. The driver data might be incomplete or corrupted.
+            </p>
+            <Button 
+              onClick={() => router.back()} 
+              className="mt-4"
+              variant="outline"
+            >
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      {!isFetching || !loading ? (
+      {!isFetching && !loading ? (
         <div>
           <Goback
             formerPage={"Drivers"}
-            presentPage={`${profile?.first_name} ${profile?.last_name}`}
+            presentPage={driverName}
           />
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
@@ -66,43 +110,48 @@ const ViewDriver = () => {
               </Avatar>
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                 <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
-                  <span className="text-xl font-extrabold  text-start">
-                    {profile?.first_name} {profile?.last_name}
+                  <span className="text-xl font-extrabold text-start">
+                    {driverName}
                   </span>
-                  <>
-                    {profile?.status === "active" ? (
-                      <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                  {profile?.status ? (
+                    profile.status === "active" ? (
+                      <div className="flex text-start items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                         <span className="font-semibold text-xs capitalize">
-                          {profile?.status}
+                          {profile.status}
                         </span>
                       </div>
                     ) : (
-                      <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
+                      <div className="flex items-center text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                         <span className="font-semibold text-xs capitalize">
-                          {profile?.status}
+                          {profile.status}
                         </span>
                       </div>
-                    )}
-                  </>
+                    )
+                  ) : (
+                    <div className="flex items-center text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-gray-200 text-gray-600">
+                      <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+                      <span className="font-semibold text-xs">Unknown</span>
+                    </div>
+                  )}
                 </div>
                 <div className="lg:mt-3 mt-1 flex flex-col">
                   <span className="font-extrabold text-sm capitalize">
-                    {profile?.role || profile?.type}
+                    {profile?.role || profile?.type || 'driver'}
                   </span>
-                  <span className="text-gray-400 text-xs">#{profile?.id}</span>
+                  <span className="text-gray-400 text-xs">#{profile?.id || 'N/A'}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave />
-                {profile?.current_balance === null
+                {profile?.current_balance === null || profile?.current_balance === undefined
                   ? "NGN 0.00"
-                  : formatCurrency(Number(profile?.current_balance), "NGN")}
+                  : formatCurrency(Number(profile.current_balance), "NGN")}
               </div>
-              {profile?.status == "active" ? (
+              {profile?.status === "active" ? (
                 <Modal
                   trigger={
                     <Button
@@ -118,7 +167,7 @@ const ViewDriver = () => {
                   content={
                     <ToggleStatus
                       toggle={toggleDriverStatus}
-                      status={profile?.status}
+                      status={profile?.status || 'inactive'}
                       loading={loadingToggle}
                     />
                   }
@@ -139,26 +188,21 @@ const ViewDriver = () => {
                   content={
                     <ToggleStatus
                       toggle={toggleDriverStatus}
-                      status={profile?.status}
+                      status={profile?.status || 'inactive'}
                       loading={loadingToggle}
                     />
                   }
                 />
               )}
               <span className="text-left lg:text-right lg:me-5 text-sm">
-                Joined{" "}
-                {new Date(profile?.created_at).toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
+                Joined {joinDate}
               </span>
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave />
-              {profile?.current_balance === null
+              {profile?.current_balance === null || profile?.current_balance === undefined
                 ? "NGN 0.00"
-                : formatCurrency(Number(profile?.current_balance), "NGN")}
+                : formatCurrency(Number(profile.current_balance), "NGN")}
             </div>
           </div>
           <ProfileVehicleDocs_Info
@@ -174,9 +218,9 @@ const ViewDriver = () => {
       ) : (
         <div>
           <Skeleton className="h-8 bg-gray-200 w-[250px]" />
-          <Skeleton className=" bg-gray-200 p-5 rounded-lg my-5 h-32 flex items-center justify-between lg:flex-row flex-col gap-y-10" />
+          <Skeleton className="bg-gray-200 p-5 rounded-lg my-5 h-32 flex items-center justify-between lg:flex-row flex-col gap-y-10" />
 
-          <div className="w-full grid lg:grid-cols-3 grid-cols-1 pt-5  mt-5 gap-8">
+          <div className="w-full grid lg:grid-cols-3 grid-cols-1 pt-5 mt-5 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div className="w-full rounded-md" key={i}>
                 <div className="flex flex-col space-y-3">
