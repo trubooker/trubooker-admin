@@ -262,7 +262,6 @@ const Finance = () => {
                             ) : (
                               revenue?.total_balance?.map((info: any) => (
                                 <>
-                                  {/* <span>{info?.currency}</span>{" "} */}
                                   <span>
                                     <CountUp
                                       prefix="₦ "
@@ -302,6 +301,7 @@ const Finance = () => {
                       </CardContent>
                     </Card>
 
+                    {/* Pending Connector Payout Count */}
                     <Card
                       className={`w-full h-32 border-none my-auto  bg-[--primary]`}
                     >
@@ -312,20 +312,18 @@ const Finance = () => {
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
-                                prefix="₦ "
-                                end={Number(
-                                  revenue?.total_agent_pending_withdrawals
-                                )}
+                                end={Number(revenue?.total_agent_pending_withdrawals)}
                               />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Connector Payout
+                          Pending Connector Payouts (Count)
                         </span>
                       </CardContent>
                     </Card>
 
+                    {/* Pending Connector Payout Amount */}
                     <Card
                       className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
                     >
@@ -337,19 +335,18 @@ const Finance = () => {
                             ) : (
                               <CountUp
                                 prefix="₦ "
-                                end={Number(
-                                  revenue?.total_driver_pending_withdrawals
-                                )}
+                                end={Number(revenue?.total_agent_pending_withdrawals_amount)}
                               />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Drivers Payout
+                          Pending Connector Payout Amount
                         </span>
                       </CardContent>
                     </Card>
 
+                    {/* Pending Drivers Payout Count */}
                     <Card
                       className={`w-full h-32 border-none my-auto  bg-[--primary]`}
                     >
@@ -360,16 +357,81 @@ const Finance = () => {
                               <Skeleton className="h-8 w-[50px] bg-gray-200" />
                             ) : (
                               <CountUp
-                                prefix="₦ "
-                                end={Number(
-                                  revenue?.total_passegener_pending_withdrawals
-                                )}
+                                end={Number(revenue?.total_driver_pending_withdrawals)}
                               />
                             )}
                           </span>
                         </div>
                         <span className="text-sm text-white font-normal">
-                          Pending Passenger Payout
+                          Pending Driver Payouts (Count)
+                        </span>
+                      </CardContent>
+                    </Card>
+
+                    {/* Pending Drivers Payout Amount */}
+                    <Card
+                      className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
+                    >
+                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                        <div className="flex gap-x-3 text-white items-center">
+                          <span className="flex gap-x-2 items-center">
+                            {reportLoading ? (
+                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                            ) : (
+                              <CountUp
+                                prefix="₦ "
+                                end={Number(revenue?.total_driver_pending_withdrawals_amount)}
+                              />
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm text-white font-normal">
+                          Pending Driver Payout Amount
+                        </span>
+                      </CardContent>
+                    </Card>
+
+                    {/* Pending Passenger Payout Count */}
+                    <Card
+                      className={`w-full h-32 border-none my-auto  bg-[--primary]`}
+                    >
+                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                        <div className="flex gap-x-3 text-white items-center">
+                          <span className="flex gap-x-2 items-center">
+                            {reportLoading ? (
+                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                            ) : (
+                              <CountUp
+                                end={Number(revenue?.total_passegener_pending_withdrawals)}
+                              />
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm text-white font-normal">
+                          Pending Passenger Payouts (Count)
+                        </span>
+                      </CardContent>
+                    </Card>
+
+                    {/* Pending Passenger Payout Amount */}
+                    <Card
+                      className={`w-full h-32 border-none my-auto  bg-[--primary-orange]`}
+                    >
+                      <CardContent className="text-2xl font-semibold h-full flex flex-col my-auto justify-center gap-y-2">
+                        <div className="flex gap-x-3 text-white items-center">
+                          <span className="flex gap-x-2 items-center">
+                            {reportLoading ? (
+                              <Skeleton className="h-8 w-[50px] bg-gray-200" />
+                            ) : (
+                              <CountUp
+                                prefix="₦ "
+                                end={Number(revenue?.total_passenger_pending_withdrawals_amount)}
+                              />
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm text-white font-normal">
+                          Pending Passenger Payout Amount
                         </span>
                       </CardContent>
                     </Card>
