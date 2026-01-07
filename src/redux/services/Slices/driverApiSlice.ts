@@ -36,13 +36,13 @@ const driversApi = driversApiConfig.injectEndpoints({
       invalidatesTags: ["Drivers"],
     }),
 
-getDrivers: builder.query({
-  query: ({ page, search, per_page = 10 }) => ({
-    url: `/admin/drivers?page=${page}&search=${search}&per_page=${per_page}`,
-    method: "GET",
-  }),
-  providesTags: ["Drivers"],
-}),
+    getDrivers: builder.query({
+      query: ({ page, search, per_page = 10 }) => ({
+        url: `/admin/drivers?page=${page}&search=${search}&per_page=${per_page}`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
 
     getOneDriver: builder.query({
       query: (driver) => ({
