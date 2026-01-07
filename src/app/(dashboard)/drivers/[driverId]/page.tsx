@@ -30,34 +30,140 @@ const ViewDriver = () => {
   const id = String(params.driverId);
   const router = useRouter();
   
+  console.log("🆔 Driver ID from params:", id);
+  
   const {
     isLoading: loading,
     data: userData,
     isFetching,
-    error, // Add error state
+    error,
   } = useGetOneDriverQuery(id);
 
   const [mutate, { isLoading: loadingToggle }] =
     useToggleDriverStatusMutation();
 
   const toggleDriverStatus = async () => {
+    console.log("🔄 Toggling driver status for ID:", id);
     try {
       await mutate(id).unwrap();
+      console.log("✅ Driver status toggled successfully");
     } catch (error) {
-      console.error("Failed to toggle status:", error);
+      console.error("❌ Failed to toggle status:", error);
     }
   };
 
-  console.log("SingleDriver", userData);
+  // ===== COMPREHENSIVE CONSOLE LOGS =====
+  console.log("📥 COMPLETE API RESPONSE (userData):", userData);
   
-  // Add safe access with optional chaining and fallbacks
-  const profile = userData?.data?.profile || {}; // object with fallback
-  const vehicle = userData?.data?.vehicles || []; // array with fallback
-  const feedback = userData?.data?.reviews || []; // array with fallback
-  const th = userData?.data?.trip_history || []; // array with fallback
+  if (error) {
+    console.error("❌ API ERROR DETAILS:", error);
+    console.error("❌ Error status:", error?.status);
+    console.error("❌ Error data:", error?.data);
+    console.error("❌ Error message:", error?.error);
+  }
+  
+  if (userData) {
+    console.log("🔍 COMPLETE DATA STRUCTURE ANALYSIS:");
+    console.log("1. Root level keys:", Object.keys(userData));
+    
+    if (userData.data) {
+      console.log("2. Data property type:", typeof userData.data);
+      console.log("3. Data object keys:", Object.keys(userData.data));
+      
+      // Log ALL properties in data object
+      for (const [key, value] of Object.entries(userData.data)) {
+        console.log(`   - "${key}":`, {
+          type: typeof value,
+          isArray: Array.isArray(value),
+          value: value
+        });
+      }
+      
+      // Detailed profile logging
+      if (userData.data.profile) {
+        console.log("4. PROFILE DETAILS:");
+        console.log("   Profile object:", userData.data.profile);
+        console.log("   Profile keys:", Object.keys(userData.data.profile));
+        console.log("   Profile ID:", userData.data.profile.id);
+        console.log("   Profile status:", userData.data.profile.status);
+        console.log("   Profile balance:", userData.data.profile.current_balance);
+      } else {
+        console.log("4. PROFILE: Not found or undefined");
+      }
+      
+      // Detailed vehicles logging
+      if (userData.data.vehicles) {
+        console.log("5. VEHICLES:");
+        console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
+        console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
+        if (userData.data.vehicles?.length > 0) {
+          console.log("   First vehicle:", userData.data.vehicles[0]);
+        }
+      } else {
+        console.log("5. VEHICLES: Not found or undefined");
+      }
+      
+      // Detailed reviews logging
+      if (userData.data.reviews) {
+        console.log("6. REVIEWS/Feedback:");
+        console.log("   Reviews count:", userData.data.reviews?.length || 0);
+        console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
+      } else {
+        console.log("6. REVIEWS: Not found or undefined");
+      }
+      
+      // Detailed trip history logging
+      if (userData.data.trip_history) {
+        console.log("7. TRIP HISTORY:");
+        console.log("   Trip history count:", userData.data.trip_history?.length || 0);
+        console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
+      } else {
+        console.log("7. TRIP HISTORY: Not found or undefined");
+      }
+      
+      // Check for any other properties
+      console.log("8. OTHER PROPERTIES IN DATA:");
+      const knownProps = ['profile', 'vehicles', 'reviews', 'trip_history'];
+      const otherProps = Object.keys(userData.data).filter(key => !knownProps.includes(key));
+      if (otherProps.length > 0) {
+        otherProps.forEach(prop => {
+          console.log(`   - ${prop}:`, userData.data[prop]);
+        });
+      } else {
+        console.log("   No other properties found");
+      }
+    } else {
+      console.log("2. Data property: undefined or null");
+    }
+    
+    // Log meta and links if they exist
+    if (userData.meta) {
+      console.log("9. META DATA:", userData.meta);
+    }
+    if (userData.links) {
+      console.log("10. LINKS DATA:", userData.links);
+    }
+  } else {
+    console.log("📭 No userData received from API");
+  }
 
+  // Add safe access with optional chaining and fallbacks
+  const profile = userData?.data?.profile || {};
+  const vehicle = userData?.data?.vehicles || [];
+  const feedback = userData?.data?.reviews || [];
+  const th = userData?.data?.trip_history || [];
+
+  // Log extracted data
+  console.log("📋 EXTRACTED DATA:");
+  console.log("- Profile object:", profile);
+  console.log("- Profile keys:", Object.keys(profile));
+  console.log("- Vehicles array length:", vehicle.length);
+  console.log("- Feedback array length:", feedback.length);
+  console.log("- Trip history array length:", th.length);
+  
   // Safe name display
   const driverName = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unknown Driver';
+  console.log("👤 Driver name:", driverName);
   
   // Safe date display
   const joinDate = profile?.created_at 
@@ -67,6 +173,9 @@ const ViewDriver = () => {
         year: "numeric",
       })
     : 'N/A';
+  console.log("📅 Join date:", joinDate);
+  
+  console.log("🔄 Loading states - isLoading:", loading, "isFetching:", isFetching);
 
   // Handle error state
   if (error) {
