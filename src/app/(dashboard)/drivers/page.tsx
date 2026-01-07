@@ -25,6 +25,10 @@ import {
 } from "@/components/ui/select";
 import { Check, Clock, X, FileText, Car } from "lucide-react";
 
+interface DocStatusStats {
+  [key: string]: number;
+}
+
 const Drivers = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -178,11 +182,11 @@ const Drivers = () => {
   };
 
   // Statistics for document status
-  const docStatusStats = userData?.data?.reduce((acc: Record<string, number>, driver: any) => {
-    const status = driver.vehicle_document_status || 'no status';
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, {}) || {};
+const docStatusStats: DocStatusStats = userData?.data?.reduce((acc: DocStatusStats, driver: any) => {
+  const status = driver.vehicle_document_status || 'no status';
+  acc[status] = (acc[status] || 0) + 1;
+  return acc;
+}, {}) || {};
 
   return (
     <div className="flex flex-col h-fit w-full">
