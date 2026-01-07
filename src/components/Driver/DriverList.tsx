@@ -144,7 +144,6 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900">{data.name}</span>
-                          <span className="text-xs text-gray-500">ID: {data.id.substring(0, 8)}...</span>
                         </div>
                       </div>
                     </TableCell>
