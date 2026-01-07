@@ -54,13 +54,7 @@ const ViewDriver = () => {
 
   // ===== COMPREHENSIVE CONSOLE LOGS =====
   console.log("📥 COMPLETE API RESPONSE (userData):", userData);
-  
-  if (error) {
-    console.error("❌ API ERROR DETAILS:", error);
-    console.error("❌ Error status:", error?.status);
-    console.error("❌ Error data:", error?.data);
-    console.error("❌ Error message:", error?.error);
-  }
+
   
   if (userData) {
     console.log("🔍 COMPLETE DATA STRUCTURE ANALYSIS:");
