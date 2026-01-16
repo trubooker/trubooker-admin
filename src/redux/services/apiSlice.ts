@@ -37,7 +37,7 @@ const CustomBaseQuery: BaseQueryFn<
 export const api = createApi({
   reducerPath: "api",
   baseQuery: CustomBaseQuery,
-  tagTypes: ["User", "Teacher", "Withdraw"],
+  tagTypes: ["User", "Teacher", "Withdraw", "WelcomeCoupon", "Coupons", "CouponStats"],
   keepUnusedDataFor: 30,
   endpoints: () => ({}),
 });
