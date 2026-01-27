@@ -336,7 +336,7 @@ const WelcomeCoupon = () => {
                               "font-medium",
                               couponType === "percentage" ? "text-blue-600" : "text-blue-600"
                             )}>
-                              {couponType === "percentage" ? "%" : "$"}
+                              {couponType === "percentage" ? "%" : ""}
                             </span>
                           </div>
                         </div>
