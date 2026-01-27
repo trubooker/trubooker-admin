@@ -244,7 +244,7 @@ const CouponGenerator = () => {
                         <div className="absolute inset-y-0 right-3 flex items-center">
                           {form.watch("coupon_type") === "percentage"
                             ? "%"
-                            : "$"}
+                            : ""}
                         </div>
                       </div>
                     </FormControl>
