@@ -60,7 +60,7 @@ export function formatDateTime(DATE: string, TIME: string): string {
 
 
 export const truncateText = (text: string, maxLength: number = 20) => {
-  if (text.length > maxLength) {
+  if (text?.length > maxLength) {
     return text.slice(0, maxLength) + "...";
   }
   return text;

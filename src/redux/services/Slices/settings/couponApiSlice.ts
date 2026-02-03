@@ -1,4 +1,4 @@
-// redux/services/Slices/settings/couponApiSlice.ts
+// @/redux/services/Slices/settings/couponApiSlice.ts
 import { api } from "@/redux/services/apiSlice";
 
 export const couponApiSlice = api.injectEndpoints({
@@ -41,6 +41,27 @@ export const couponApiSlice = api.injectEndpoints({
       providesTags: ['Coupons'],
     }),
 
+    // Get single coupon details (We'll need to create this endpoint in backend)
+    // For now, we'll filter from the list
+    getCouponById: builder.query({
+      query: (id) => ({
+        url: `/admin/coupons/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: 'Coupons', id }],
+    }),
+
+    // Update coupon (We'll need to create this endpoint in backend)
+    // For now, we'll use status update
+    updateCoupon: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/admin/coupons/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ['Coupons'],
+    }),
+
     // Update coupon status
     updateCouponStatus: builder.mutation({
       query: ({ id, ...data }) => ({
@@ -76,6 +97,8 @@ export const {
   useSetWelcomeCouponSettingsMutation,
   useGenerateCouponMutation,
   useGetGeneratedCouponsQuery,
+  useGetCouponByIdQuery,
+  useUpdateCouponMutation,
   useUpdateCouponStatusMutation,
   useDeleteCouponMutation,
   useGetCouponStatsQuery,
