@@ -37,6 +37,15 @@ import { useGetCouponByIdQuery, useGetCouponStatsQuery } from "@/redux/services/
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
+interface UserUsed {
+  id: number;
+  name: string;
+  email: string;
+  used_at: string;
+  ride_fare: number;
+  discount_amount: number;
+}
+
 interface Coupon {
   id: number;
   coupon_code: string;
@@ -52,14 +61,7 @@ interface Coupon {
   min_order_amount?: number;
   created_at: string;
   updated_at: string;
-  users_used?: Array<{
-    id: number;
-    name: string;
-    email: string;
-    used_at: string;
-    ride_fare: number;
-    discount_amount: number;
-  }>;
+  users_used?: UserUsed[];
   total_revenue_generated?: number;
   total_discount_given?: number;
   usage_rate?: number;
@@ -80,7 +82,9 @@ const ViewCouponModal: React.FC<ViewCouponModalProps> = ({ couponId, onCopyCode,
     { skip: !open } // Only fetch when modal is open
   );
   
-  const { data: stats, isLoading: statsLoading } = useGetCouponStatsQuery();
+  const { data: stats, isLoading: statsLoading } = useGetCouponStatsQuery(undefined, {
+    skip: !open,
+  });
 
   const coupon = couponData?.data;
 
@@ -107,14 +111,14 @@ const ViewCouponModal: React.FC<ViewCouponModalProps> = ({ couponId, onCopyCode,
     );
   };
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-};
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -397,7 +401,7 @@ const formatCurrency = (amount: number) => {
                 {coupon?.users_used && coupon.users_used.length > 0 ? (
                   <ScrollArea className="h-96">
                     <div className="space-y-3">
-                      {coupon.users_used.map((user, index) => (
+                     {coupon.users_used.map((user: UserUsed, index: number) => (
                         <div key={`${user.id}-${index}`} className="p-3 border rounded-lg hover:bg-gray-50">
                           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
                             <div>
@@ -449,7 +453,7 @@ const formatCurrency = (amount: number) => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    
+                      <DollarSign className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                       <div className="text-2xl font-bold text-blue-600">
                         {formatCurrency(coupon?.total_revenue_generated || 0)}
                       </div>
