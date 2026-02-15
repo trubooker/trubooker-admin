@@ -63,6 +63,7 @@ export const NavLinks: LinkItem[] = [
         icon: CiFlag1,
         link: "/settings",
       },
+
       {
         id: 2,
         title: "Roles & permission",
@@ -74,6 +75,12 @@ export const NavLinks: LinkItem[] = [
         title: "Referral program",
         icon: CiFlag1,
         link: "/settings/referral-program",
+      },
+      {
+        id: 4,
+        title: "App update Settings",
+        icon: CiFlag1,
+        link: "/settings/app_settings",
       },
       // {
       //   id: 4,
