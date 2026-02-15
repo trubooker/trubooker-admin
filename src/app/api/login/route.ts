@@ -1,77 +1,57 @@
 import { NextResponse, NextRequest } from "next/server";
+import axios from "axios";
 import { serialize } from "cookie";
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    
-    const headers = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-    
-    const resData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
+export async function POST(req: Request, res: NextRequest) {
+  const body = await req.json();
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  const resData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
 
-    const data = await resData.json();
-    const token = data?.data?.token;
-    console.log(data);
+  const data = await resData.json();
+  const token = data?.data?.token;
+  console.log(data);
 
-    // Check if login was successful
-    if (data?.status === "success") {
-      // Check user role - fix the logic here
-      const userRole = data?.data?.user?.role;
-      
-      // Allow admin, agent, and driver? Your condition seems reversed
-      // Original: if role is NOT passenger OR NOT driver OR NOT agent (this is always true)
-      // Let's clarify what roles should be allowed
-      if (userRole === "admin" || userRole === "agent" || userRole === "driver") {
-        
-        const serialized = serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NEXT_PUBLIC_NODE_ENV !== "development",
-          maxAge: 60 * 60 * 24 * 1, // 1 day
-          sameSite: "strict",
-          path: "/",
-        });
+  const serialized = serialize(`token`, token, {
+    httpOnly: true,
+    secure: process.env.NEXT_PUBLIC_NODE_ENV !== `development`,
+    maxAge: 60 * 60 * 24 * 1, // 1 day
+    sameSite: `strict`,
+    path: `/`,
+  });
 
-        const response = {
-          data: data?.data?.user,
-        };
-        
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          headers: { "Set-Cookie": serialized }, // Fixed header name (capital C)
-        });
-      } else {
-        return new Response(
-          JSON.stringify({ message: "Unauthorized!! Admin only" }),
-          {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
+  if (data?.status == "success") {
+    if (
+      data?.data?.user?.role != "passenger" ||
+      data?.data?.user?.role != "driver" || data?.data?.user?.role != "agent"
+    ) {
+      const response = {
+        data: data?.data?.user,
+      };
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Set-cookie": serialized },
+      });
     } else {
       return new Response(
-        JSON.stringify({ message: data?.errors || "Login failed" }),
+        JSON.stringify({ message: "Unauthorized!! Admin only" }),
         {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
+          status: 401,
         }
       );
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    return new Response(
-      JSON.stringify({ message: "Internal server error" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+  } else {
+    const response = {
+      message: data?.errors,
+    };
+    return new Response(JSON.stringify(response), {
+      status: 400,
+    });
   }
 }
