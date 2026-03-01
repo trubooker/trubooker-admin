@@ -67,7 +67,56 @@ const driversApi = driversApiConfig.injectEndpoints({
       }),
       invalidatesTags: ["Drivers"],
     }),
+// Temporary debug version
+addDriversDocument: builder.mutation({
+  query: (formData) => {
+    // Log the raw FormData entries
+    console.log("🔍 MUTATION RECEIVED FORM DATA:");
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
+      } else {
+        console.log(`  ${key}: ${value}`);
+      }
+    }
+    
+    return {
+      url: `/admin/drivers/add-document`,
+      method: "POST",
+      body: formData,
+      // Don't set Content-Type
+    };
+  },
+  invalidatesTags: ["Drivers"],
+}),
+
+updateDriversDocument: builder.mutation({
+  query: ({ id, formData }) => ({
+    url: `/admin/drivers/update-document/${id}`,
+    method: "POST",
+    body: formData,
   }),
+  invalidatesTags: ["Drivers"],
+}),
+
+deleteDriversDocument: builder.mutation({
+  query: (id) => ({
+    url: `/admin/drivers/delete-document/${id}`,
+    method: "DELETE",
+  }),
+  invalidatesTags: ["Drivers"],
+}),
+
+getDocumentHistory: builder.query({
+  query: (driverId) => ({
+    url: `/admin/drivers/document-history/${driverId}`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+  }),
+
+  
 });
 
 export const {
@@ -78,4 +127,8 @@ export const {
   useGetDriversDocumentsQuery,
   useApproveDriversDocumentsMutation,
   useRejectDriversDocumentsMutation,
+    useAddDriversDocumentMutation,
+  useUpdateDriversDocumentMutation,
+  useDeleteDriversDocumentMutation,
+  useGetDocumentHistoryQuery,
 } = driversApi;

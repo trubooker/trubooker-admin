@@ -54,16 +54,19 @@ import {
   Calendar,
   ArrowLeftRight,
   RefreshCw,
+  User,
+  Car,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 const AppSettings = () => {
+  const [activeApp, setActiveApp] = useState<"passenger" | "driver">("passenger");
   const [activePlatform, setActivePlatform] = useState<"android" | "ios">("android");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingUpdate, setPendingUpdate] = useState<any>(null);
   
-  // Form state
-  const [androidSettings, setAndroidSettings] = useState({
+  // Form state for passenger app
+  const [passengerAndroidSettings, setPassengerAndroidSettings] = useState({
     minVersion: "",
     latestVersion: "",
     isForceUpdate: false,
@@ -71,7 +74,24 @@ const AppSettings = () => {
     isEnabled: true,
   });
   
-  const [iosSettings, setIosSettings] = useState({
+  const [passengerIosSettings, setPassengerIosSettings] = useState({
+    minVersion: "",
+    latestVersion: "",
+    isForceUpdate: false,
+    updateMessage: "",
+    isEnabled: true,
+  });
+
+  // Form state for driver app
+  const [driverAndroidSettings, setDriverAndroidSettings] = useState({
+    minVersion: "",
+    latestVersion: "",
+    isForceUpdate: false,
+    updateMessage: "",
+    isEnabled: true,
+  });
+  
+  const [driverIosSettings, setDriverIosSettings] = useState({
     minVersion: "",
     latestVersion: "",
     isForceUpdate: false,
@@ -83,100 +103,138 @@ const AppSettings = () => {
   const { data: settingsData, isLoading, refetch } = useGetAppSettingsQuery(null);
   const [updateSettings, { isLoading: isUpdating }] = useUpdateAppSettingsMutation();
   const { data: historyData, isLoading: historyLoading } = useGetVersionHistoryQuery({
+    app_type: activeApp, // Add this to filter history by app type
     platform: activePlatform,
     limit: 10,
   });
 
-useEffect(() => {
-  if (settingsData?.data) {
-    const android = settingsData.data.android || {};
-    const ios = settingsData.data.ios || {};
+  useEffect(() => {
+    if (settingsData?.data) {
+      // Passenger app settings
+      const passengerAndroid = settingsData.data.passenger?.android || {};
+      const passengerIos = settingsData.data.passenger?.ios || {};
+      
+      setPassengerAndroidSettings({
+        minVersion: passengerAndroid.min_version || "1.0.0",
+        latestVersion: passengerAndroid.latest_version || "1.0.0",
+        isForceUpdate: passengerAndroid.is_force_update || false,
+        updateMessage: passengerAndroid.update_message || "",
+        isEnabled: passengerAndroid.is_enabled !== false,
+      });
+      
+      setPassengerIosSettings({
+        minVersion: passengerIos.min_version || "1.0.0",
+        latestVersion: passengerIos.latest_version || "1.0.0",
+        isForceUpdate: passengerIos.is_force_update || false,
+        updateMessage: passengerIos.update_message || "",
+        isEnabled: passengerIos.is_enabled !== false,
+      });
+
+      // Driver app settings
+      const driverAndroid = settingsData.data.driver?.android || {};
+      const driverIos = settingsData.data.driver?.ios || {};
+      
+      setDriverAndroidSettings({
+        minVersion: driverAndroid.min_version || "1.0.0",
+        latestVersion: driverAndroid.latest_version || "1.0.0",
+        isForceUpdate: driverAndroid.is_force_update || false,
+        updateMessage: driverAndroid.update_message || "",
+        isEnabled: driverAndroid.is_enabled !== false,
+      });
+      
+      setDriverIosSettings({
+        minVersion: driverIos.min_version || "1.0.0",
+        latestVersion: driverIos.latest_version || "1.0.0",
+        isForceUpdate: driverIos.is_force_update || false,
+        updateMessage: driverIos.update_message || "",
+        isEnabled: driverIos.is_enabled !== false,
+      });
+    }
+  }, [settingsData]);
+
+  const handlePassengerChange = (platform: "android" | "ios", field: string, value: any) => {
+    if (platform === "android") {
+      setPassengerAndroidSettings((prev) => ({ ...prev, [field]: value }));
+    } else {
+      setPassengerIosSettings((prev) => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const handleDriverChange = (platform: "android" | "ios", field: string, value: any) => {
+    if (platform === "android") {
+      setDriverAndroidSettings((prev) => ({ ...prev, [field]: value }));
+    } else {
+      setDriverIosSettings((prev) => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const validateVersion = (version: string) => {
+    const trimmed = version?.trim() || "";
+    const pattern = /^\d+\.\d+\.\d+$/;
+    return pattern.test(trimmed);
+  };
+
+  const handleSubmit = async () => {
+    // Get current settings based on active app
+    const androidSettings = activeApp === "passenger" ? passengerAndroidSettings : driverAndroidSettings;
+    const iosSettings = activeApp === "passenger" ? passengerIosSettings : driverIosSettings;
+
+    // Ensure we have default values if empty
+    const androidMin = androidSettings.minVersion?.trim() || "1.0.0";
+    const androidLatest = androidSettings.latestVersion?.trim() || "1.0.0";
+    const iosMin = iosSettings.minVersion?.trim() || "1.0.0";
+    const iosLatest = iosSettings.latestVersion?.trim() || "1.0.0";
     
-    setAndroidSettings({
-      minVersion: android.min_version || "1.0.0",
-      latestVersion: android.latest_version || "1.0.0",
-      isForceUpdate: android.is_force_update || false,
-      updateMessage: android.update_message || "",
-      isEnabled: android.is_enabled !== false,
-    });
-    
-    setIosSettings({
-      // ✅ FIX: Add fallback values!
-      minVersion: ios.min_version || "1.0.0",  // If empty, use "1.0.0"
-      latestVersion: ios.latest_version || "1.0.0",  // If empty, use "1.0.0"
-      isForceUpdate: ios.is_force_update || false,
-      updateMessage: ios.update_message || "",
-      isEnabled: ios.is_enabled !== false,
-    });
-  }
-}, [settingsData]);
+    if (!validateVersion(androidMin) || 
+        !validateVersion(androidLatest) ||
+        !validateVersion(iosMin) ||
+        !validateVersion(iosLatest)) {
+      toast.error("Versions must be in format: 1.0.0", {
+        duration: 4000,
+        position: 'top-right',
+      });
+      return;
+    }
 
+    // Create payload with all fields for both apps
+    const payload = {
+      passenger: {
+        android: {
+          min_version: activeApp === "passenger" ? androidMin : passengerAndroidSettings.minVersion?.trim() || "1.0.0",
+          latest_version: activeApp === "passenger" ? androidLatest : passengerAndroidSettings.latestVersion?.trim() || "1.0.0",
+          is_force_update: activeApp === "passenger" ? androidSettings.isForceUpdate : passengerAndroidSettings.isForceUpdate,
+          update_message: activeApp === "passenger" ? androidSettings.updateMessage || null : passengerAndroidSettings.updateMessage || null,
+          is_enabled: activeApp === "passenger" ? androidSettings.isEnabled : passengerAndroidSettings.isEnabled,
+        },
+        ios: {
+          min_version: activeApp === "passenger" ? iosMin : passengerIosSettings.minVersion?.trim() || "1.0.0",
+          latest_version: activeApp === "passenger" ? iosLatest : passengerIosSettings.latestVersion?.trim() || "1.0.0",
+          is_force_update: activeApp === "passenger" ? iosSettings.isForceUpdate : passengerIosSettings.isForceUpdate,
+          update_message: activeApp === "passenger" ? iosSettings.updateMessage || null : passengerIosSettings.updateMessage || null,
+          is_enabled: activeApp === "passenger" ? iosSettings.isEnabled : passengerIosSettings.isEnabled,
+        },
+      },
+      driver: {
+        android: {
+          min_version: activeApp === "driver" ? androidMin : driverAndroidSettings.minVersion?.trim() || "1.0.0",
+          latest_version: activeApp === "driver" ? androidLatest : driverAndroidSettings.latestVersion?.trim() || "1.0.0",
+          is_force_update: activeApp === "driver" ? androidSettings.isForceUpdate : driverAndroidSettings.isForceUpdate,
+          update_message: activeApp === "driver" ? androidSettings.updateMessage || null : driverAndroidSettings.updateMessage || null,
+          is_enabled: activeApp === "driver" ? androidSettings.isEnabled : driverAndroidSettings.isEnabled,
+        },
+        ios: {
+          min_version: activeApp === "driver" ? iosMin : driverIosSettings.minVersion?.trim() || "1.0.0",
+          latest_version: activeApp === "driver" ? iosLatest : driverIosSettings.latestVersion?.trim() || "1.0.0",
+          is_force_update: activeApp === "driver" ? iosSettings.isForceUpdate : driverIosSettings.isForceUpdate,
+          update_message: activeApp === "driver" ? iosSettings.updateMessage || null : driverIosSettings.updateMessage || null,
+          is_enabled: activeApp === "driver" ? iosSettings.isEnabled : driverIosSettings.isEnabled,
+        },
+      },
+    };
 
-  const handleAndroidChange = (field: string, value: any) => {
-    setAndroidSettings((prev) => ({ ...prev, [field]: value }));
+    setPendingUpdate(payload);
+    setShowConfirmDialog(true);
   };
-
-  const handleIosChange = (field: string, value: any) => {
-    setIosSettings((prev) => ({ ...prev, [field]: value }));
-  };
-const validateVersion = (version: string) => {
-  // Trim whitespace first
-  const trimmed = version?.trim() || "";
-  
-  // Pattern for version like 1.0.0, 2.3.4, 10.20.30
-  const pattern = /^\d+\.\d+\.\d+$/;
-  
-  console.log("Validating:", trimmed, "Result:", pattern.test(trimmed));
-  
-  return pattern.test(trimmed);
-};
-
-const handleSubmit = async () => {
-  // Ensure we have default values if empty
-  const androidMin = androidSettings.minVersion?.trim() || "1.0.0";
-  const androidLatest = androidSettings.latestVersion?.trim() || "1.0.0";
-  const iosMin = iosSettings.minVersion?.trim() || "1.0.0";  // FIX
-  const iosLatest = iosSettings.latestVersion?.trim() || "1.0.0"; // FIX
-  
-  console.log("=== VALIDATION DEBUG ===");
-  console.log("Android minVersion:", androidMin);
-  console.log("Android latestVersion:", androidLatest);
-  console.log("iOS minVersion:", iosMin);
-  console.log("iOS latestVersion:", iosLatest);
-  
-  if (!validateVersion(androidMin) || 
-      !validateVersion(androidLatest) ||
-      !validateVersion(iosMin) ||  // Now won't be empty
-      !validateVersion(iosLatest)) {  // Now won't be empty
-    toast.error("Versions must be in format: 1.0.0", {
-      duration: 4000,
-      position: 'top-right',
-    });
-    return;
-  }
-
-  // Create payload with all fields
-  const payload = {
-    android: {
-      min_version: androidMin,
-      latest_version: androidLatest,
-      is_force_update: androidSettings.isForceUpdate,
-      update_message: androidSettings.updateMessage || null,
-      is_enabled: androidSettings.isEnabled,
-    },
-    ios: {
-      min_version: iosMin,
-      latest_version: iosLatest,
-      is_force_update: iosSettings.isForceUpdate,
-      update_message: iosSettings.updateMessage || null,
-      is_enabled: iosSettings.isEnabled,
-    },
-  };
-
-  console.log("Submitting payload:", payload);
-  setPendingUpdate(payload);
-  setShowConfirmDialog(true);
-};
 
   const confirmUpdate = async () => {
     try {
@@ -196,6 +254,208 @@ const handleSubmit = async () => {
       setShowConfirmDialog(false);
       setPendingUpdate(null);
     }
+  };
+
+  const renderPlatformSettings = (appType: "passenger" | "driver") => {
+    const androidSettings = appType === "passenger" ? passengerAndroidSettings : driverAndroidSettings;
+    const iosSettings = appType === "passenger" ? passengerIosSettings : driverIosSettings;
+    const handleChange = appType === "passenger" ? handlePassengerChange : handleDriverChange;
+
+    return (
+      <Tabs value={activePlatform} onValueChange={(v: any) => setActivePlatform(v)}>
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="android" className="flex items-center gap-2">
+            <Smartphone className="h-4 w-4" />
+            Android
+          </TabsTrigger>
+          <TabsTrigger value="ios" className="flex items-center gap-2">
+            <Smartphone className="h-4 w-4" />
+            iOS
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Android Tab */}
+        <TabsContent value="android" className="space-y-6">
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor={`${appType}-android-min-version`}>Minimum Required Version</Label>
+                  <Input
+                    id={`${appType}-android-min-version`}
+                    placeholder="e.g., 1.4.0"
+                    value={androidSettings.minVersion}
+                    onChange={(e) => handleChange("android", "minVersion", e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Users below this version will be prompted to update
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${appType}-android-latest-version`}>Latest Version</Label>
+                  <Input
+                    id={`${appType}-android-latest-version`}
+                    placeholder="e.g., 1.4.0"
+                    value={androidSettings.latestVersion}
+                    onChange={(e) => handleChange("android", "latestVersion", e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">
+                    The newest version available on Play Store
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`${appType}-android-update-message`}>Update Message (Optional)</Label>
+                <Input
+                  id={`${appType}-android-update-message`}
+                  placeholder="What's new in this update?"
+                  value={androidSettings.updateMessage}
+                  onChange={(e) => handleChange("android", "updateMessage", e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="space-y-1">
+                  <Label htmlFor={`${appType}-android-force-update`} className="text-base font-medium">
+                    Force Update
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Block app usage until user updates to minimum version
+                  </p>
+                </div>
+                <Switch
+                  id={`${appType}-android-force-update`}
+                  checked={androidSettings.isForceUpdate}
+                  onCheckedChange={(checked) => handleChange("android", "isForceUpdate", checked)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="space-y-1">
+                  <Label htmlFor={`${appType}-android-enabled`} className="text-base font-medium">
+                    Enable Updates
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Temporarily disable update checks
+                  </p>
+                </div>
+                <Switch
+                  id={`${appType}-android-enabled`}
+                  checked={androidSettings.isEnabled}
+                  onCheckedChange={(checked) => handleChange("android", "isEnabled", checked)}
+                />
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-800">Current Status</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                      {androidSettings.isEnabled ? (
+                        <>
+                          {appType === "passenger" ? "Passengers" : "Drivers"} on v{androidSettings.minVersion} and above can use the app.
+                          {androidSettings.isForceUpdate && (
+                            <span className="font-semibold block mt-1">
+                              ⚠️ Force update is enabled - users below v{androidSettings.minVersion} cannot use the app.
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        "Update checks are disabled"
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* iOS Tab */}
+        <TabsContent value="ios" className="space-y-6">
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor={`${appType}-ios-min-version`}>Minimum Required Version</Label>
+                  <Input
+                    id={`${appType}-ios-min-version`}
+                    placeholder="e.g., 1.4.0"
+                    value={iosSettings.minVersion}
+                    onChange={(e) => handleChange("ios", "minVersion", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${appType}-ios-latest-version`}>Latest Version</Label>
+                  <Input
+                    id={`${appType}-ios-latest-version`}
+                    placeholder="e.g., 1.4.0"
+                    value={iosSettings.latestVersion}
+                    onChange={(e) => handleChange("ios", "latestVersion", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`${appType}-ios-update-message`}>Update Message (Optional)</Label>
+                <Input
+                  id={`${appType}-ios-update-message`}
+                  placeholder="What's new in this update?"
+                  value={iosSettings.updateMessage}
+                  onChange={(e) => handleChange("ios", "updateMessage", e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="space-y-1">
+                  <Label htmlFor={`${appType}-ios-force-update`} className="text-base font-medium">
+                    Force Update
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Block app usage until user updates
+                  </p>
+                </div>
+                <Switch
+                  id={`${appType}-ios-force-update`}
+                  checked={iosSettings.isForceUpdate}
+                  onCheckedChange={(checked) => handleChange("ios", "isForceUpdate", checked)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="space-y-1">
+                  <Label htmlFor={`${appType}-ios-enabled`} className="text-base font-medium">
+                    Enable Updates
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Temporarily disable update checks
+                  </p>
+                </div>
+                <Switch
+                  id={`${appType}-ios-enabled`}
+                  checked={iosSettings.isEnabled}
+                  onCheckedChange={(checked) => handleChange("ios", "isEnabled", checked)}
+                />
+              </div>
+            </>
+          )}
+        </TabsContent>
+      </Tabs>
+    );
   };
 
   return (
@@ -242,183 +502,33 @@ const handleSubmit = async () => {
         </div>
       </div>
 
-
       {/* Main Settings Card */}
       <Card>
         <CardHeader>
           <CardTitle>App Version Settings</CardTitle>
           <CardDescription>
-            Configure minimum required versions and update behavior for each platform
+            Configure minimum required versions and update behavior for each app and platform
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activePlatform} onValueChange={(v: any) => setActivePlatform(v)}>
+          <Tabs value={activeApp} onValueChange={(v: any) => setActiveApp(v)}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="android" className="flex items-center gap-2">
-                <Smartphone className="h-4 w-4" />
-                Android
+              <TabsTrigger value="passenger" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Passenger App
               </TabsTrigger>
-              <TabsTrigger value="ios" className="flex items-center gap-2">
-                <Smartphone className="h-4 w-4" />
-                iOS
+              <TabsTrigger value="driver" className="flex items-center gap-2">
+                <Car className="h-4 w-4" />
+                Driver App
               </TabsTrigger>
             </TabsList>
 
-            {/* Android Tab */}
-            <TabsContent value="android" className="space-y-6">
-              {isLoading ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-24 w-full" />
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="android-min-version">Minimum Required Version</Label>
-                      <Input
-                        id="android-min-version"
-                        placeholder="e.g., 1.4.0"
-                        value={androidSettings.minVersion}
-                        onChange={(e) => handleAndroidChange("minVersion", e.target.value)}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Users below this version will be prompted to update
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="android-latest-version">Latest Version</Label>
-                      <Input
-                        id="android-latest-version"
-                        placeholder="e.g., 1.4.0"
-                        value={androidSettings.latestVersion}
-                        onChange={(e) => handleAndroidChange("latestVersion", e.target.value)}
-                      />
-                      <p className="text-xs text-gray-500">
-                        The newest version available on Play Store
-                      </p>
-                    </div>
-                  </div>
-
-                  
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="space-y-1">
-                      <Label htmlFor="android-force-update" className="text-base font-medium">
-                        Force Update
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Block app usage until user updates to minimum version
-                      </p>
-                    </div>
-                    <Switch
-                      id="android-force-update"
-                      checked={androidSettings.isForceUpdate}
-                      onCheckedChange={(checked) => handleAndroidChange("isForceUpdate", checked)}
-                    />
-                  </div>
-
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium text-blue-800">Current Status</h4>
-                        <p className="text-sm text-blue-700 mt-1">
-                          {androidSettings.isEnabled ? (
-                            <>
-                              Users on v{androidSettings.minVersion} and above can use the app.
-                              {androidSettings.isForceUpdate && (
-                                <span className="font-semibold block mt-1">
-                                  ⚠️ Force update is enabled - users below v{androidSettings.minVersion} cannot use the app.
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            "Update checks are disabled for Android"
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+            <TabsContent value="passenger">
+              {renderPlatformSettings("passenger")}
             </TabsContent>
 
-            {/* iOS Tab */}
-            <TabsContent value="ios" className="space-y-6">
-              {isLoading ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-24 w-full" />
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="ios-min-version">Minimum Required Version</Label>
-                      <Input
-                        id="ios-min-version"
-                        placeholder="e.g., 1.4.0"
-                        value={iosSettings.minVersion}
-                        onChange={(e) => handleIosChange("minVersion", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ios-latest-version">Latest Version</Label>
-                      <Input
-                        id="ios-latest-version"
-                        placeholder="e.g., 1.4.0"
-                        value={iosSettings.latestVersion}
-                        onChange={(e) => handleIosChange("latestVersion", e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="ios-update-message">Update Message (Optional)</Label>
-                    <Input
-                      id="ios-update-message"
-                      placeholder="What's new in this update?"
-                      value={iosSettings.updateMessage}
-                      onChange={(e) => handleIosChange("updateMessage", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="space-y-1">
-                      <Label htmlFor="ios-force-update" className="text-base font-medium">
-                        Force Update
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Block app usage until user updates
-                      </p>
-                    </div>
-                    <Switch
-                      id="ios-force-update"
-                      checked={iosSettings.isForceUpdate}
-                      onCheckedChange={(checked) => handleIosChange("isForceUpdate", checked)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="space-y-1">
-                      <Label htmlFor="ios-enabled" className="text-base font-medium">
-                        Enable Updates
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Temporarily disable update checks for iOS
-                      </p>
-                    </div>
-                    <Switch
-                      id="ios-enabled"
-                      checked={iosSettings.isEnabled}
-                      onCheckedChange={(checked) => handleIosChange("isEnabled", checked)}
-                    />
-                  </div>
-                </>
-              )}
+            <TabsContent value="driver">
+              {renderPlatformSettings("driver")}
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -444,11 +554,12 @@ const handleSubmit = async () => {
             </div>
           ) : (
             <ScrollArea className="w-full">
-              <div className="min-w-[600px]">
+              <div className="min-w-[700px]">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Date</TableHead>
+                      <TableHead>App</TableHead>
                       <TableHead>Platform</TableHead>
                       <TableHead>Min Version</TableHead>
                       <TableHead>Latest</TableHead>
@@ -462,6 +573,11 @@ const handleSubmit = async () => {
                         <TableRow key={item.id}>
                           <TableCell className="font-mono text-sm">
                             {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={item.app_type === "passenger" ? "default" : "secondary"}>
+                              {item.app_type === "passenger" ? "Passenger" : "Driver"}
+                            </Badge>
                           </TableCell>
                           <TableCell>
                             <Badge variant={item.platform === "android" ? "default" : "secondary"}>
@@ -482,7 +598,7 @@ const handleSubmit = async () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                        <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                           No version history available
                         </TableCell>
                       </TableRow>
@@ -503,23 +619,23 @@ const handleSubmit = async () => {
             <AlertDialogTitle>Update App Version Settings?</AlertDialogTitle>
             <AlertDialogDescription>
               This will immediately affect all users. 
-              {pendingUpdate?.android?.isForceUpdate && (
+              {pendingUpdate?.[activeApp]?.android?.isForceUpdate && (
                 <span className="block mt-2 text-red-600 font-medium">
-                  ⚠️ Android users below v{pendingUpdate.android.minVersion} will be blocked from using the app.
+                  ⚠️ {activeApp === "passenger" ? "Passenger" : "Driver"} Android users below v{pendingUpdate[activeApp].android.min_version} will be blocked from using the app.
                 </span>
               )}
-              {pendingUpdate?.ios?.isForceUpdate && (
+              {pendingUpdate?.[activeApp]?.ios?.isForceUpdate && (
                 <span className="block mt-2 text-red-600 font-medium">
-                  ⚠️ iOS users below v{pendingUpdate.ios.minVersion} will be blocked from using the app.
+                  ⚠️ {activeApp === "passenger" ? "Passenger" : "Driver"} iOS users below v{pendingUpdate[activeApp].ios.min_version} will be blocked from using the app.
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogCancel onClick={confirmUpdate}>
+            <AlertDialogAction onClick={confirmUpdate}>
               Confirm Update
-            </AlertDialogCancel>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
