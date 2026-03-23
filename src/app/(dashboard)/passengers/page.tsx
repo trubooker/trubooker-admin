@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import Search from "@/components/SearchBar";
-import { PassengerListData } from "@/constants";
 import {
   Table,
   TableBody,
@@ -34,15 +33,15 @@ const Passengers = () => {
     isFetching,
   } = useGetPassengersQuery({ page, search: searchQuery });
 
-  console.log("Passenger", userData);
-
   const PassengerListData = userData?.data;
   const totalPages = userData?.meta?.last_page;
+  
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
+  
   const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
 
   useEffect(() => {
@@ -51,7 +50,6 @@ const Passengers = () => {
     }
   }, [PassengerListData]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
     debounce((query: string) => {
       setSearchQuery(query);
@@ -64,10 +62,8 @@ const Passengers = () => {
     debounceSearch(query);
   };
 
-  // Step 1: Add a state for the selected status filter
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // Step 2: Filter data based on the selected status filter
   const statusFilteredData =
     statusFilter === "all"
       ? filteredStudents
@@ -75,24 +71,45 @@ const Passengers = () => {
           (passenger: any) => passenger.status === statusFilter
         );
 
+  // Helper to count verified users
+  const verifiedCount = {
+    emailVerified: filteredStudents?.filter((p: any) => p.email_verified).length || 0,
+    phoneVerified: filteredStudents?.filter((p: any) => p.phone_verified).length || 0,
+  };
+
   return (
     <div className="flex flex-col h-fit w-full">
-      {/* <div className="py-4">
-      </div> */}
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Passengers</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
           {PassengerListData?.length}
         </div>
       </div>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="text-sm text-gray-500">Total Passengers</h3>
+          <p className="text-2xl font-bold">{PassengerListData?.length || 0}</p>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="text-sm text-gray-500">Email Verified</h3>
+          <p className="text-2xl font-bold text-green-600">{verifiedCount.emailVerified}</p>
+        </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="text-sm text-gray-500">Phone Verified</h3>
+          <p className="text-2xl font-bold text-blue-600">{verifiedCount.phoneVerified}</p>
+        </div>
+      </div>
+      
       <div className="flex flex-col xl:flex-row w-full">
         <div className="w-full">
           <div className="bg-white rounded-lg w-full p-5 mt-5">
             <div className="flex flex-col lg:flex-row gap-x-3 lg:justify-between text-left lg:text-center lg:items-center">
               <Search
-                placeholder={"Search..."}
+                placeholder={"Search by name, email or phone..."}
                 onSearch={handleSearch}
-                classname="mb-5 max-w-[300px] "
+                classname="mb-5 max-w-[300px]"
               />
               <div className="mb-4">
                 <DropdownMenu>
@@ -117,62 +134,44 @@ const Passengers = () => {
                     <DropdownMenuItem onClick={() => setStatusFilter("active")}>
                       Active
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setStatusFilter("inactive")}
-                    >
+                    <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>
                       Inactive
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setStatusFilter("deleted")}
-                    >
+                    <DropdownMenuItem onClick={() => setStatusFilter("deleted")}>
                       Deleted
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </div>
+            
             {isFetching || loading ? (
-              <>
-                <Table className="">
-                  <TableHeader>
-                    <TableRow className="text-xs lg:text-sm">
-                      {/* <TableHead className="text-left font-bold w-1/6">
-                        Id
-                      </TableHead> */}
-                      <TableHead className="font-bold w-1/6">Name</TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Email
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Phone Number
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-center font-bold w-1/6">
-                        Actions
-                      </TableHead>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="text-center">Email</TableHead>
+                    <TableHead className="text-center">Phone Number</TableHead>
+                    <TableHead className="text-center">Email Verified</TableHead>
+                    <TableHead className="text-center">Phone Verified</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                    <TableRow key={i}>
+                      {[1, 2, 3, 4, 5, 6, 7].map((j) => (
+                        <TableCell key={j}>
+                          <div className="w-full rounded-md">
+                            <Skeleton className="h-4 w-full bg-gray-200" />
+                          </div>
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                      <TableRow key={i}>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <TableCell key={i}>
-                            <div>
-                              <div className="w-full rounded-md">
-                                <div>
-                                  <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </>
+                  ))}
+                </TableBody>
+              </Table>
             ) : (
               <PassengerList
                 data={statusFilteredData}
@@ -180,6 +179,7 @@ const Passengers = () => {
                 loading={loading}
               />
             )}
+            
             {totalPages > 1 && (
               <div className="pt-10">
                 <Pagination
