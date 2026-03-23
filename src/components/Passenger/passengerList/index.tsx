@@ -38,6 +38,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
           ? "Passenger deactivated successfully" 
           : "Passenger activated successfully"
       );
+      setSelectedPassenger(null);
     } catch (error) {
       console.error("Failed to toggle status:", error);
       toast.error("Failed to update passenger status");
@@ -235,8 +236,9 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
       {/* Confirmation Modal for Status Change */}
       {selectedPassenger && (
         <Modal
-          isOpen={!!selectedPassenger}
-          onClose={() => setSelectedPassenger(null)}
+          trigger={
+            <div /> // This is required but hidden since we're controlling via state
+          }
           title={actionType === "activate" ? "Activate Passenger" : "Deactivate Passenger"}
           description={`Are you sure you want to ${actionType === "activate" ? "activate" : "deactivate"} ${selectedPassenger.name}?`}
           content={
@@ -257,7 +259,6 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                 <Button
                   onClick={() => {
                     handleToggleStatus(selectedPassenger.id, selectedPassenger.status);
-                    setSelectedPassenger(null);
                   }}
                   className={actionType === "activate" 
                     ? "bg-green-600 hover:bg-green-700" 
