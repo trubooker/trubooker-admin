@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { MoreHorizontal, Check, X, Clock, Car, FileText, UserCheck } from "lucide-react";
+import { MoreHorizontal, Check, X, Clock, Car, FileText, Mail, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
@@ -103,25 +103,38 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
     }
   };
 
+  // Helper to render verification icon
+  const renderVerificationIcon = (isVerified: boolean) => {
+    if (isVerified) {
+      return <Check className="w-4 h-4 text-green-500" />;
+    }
+    return <X className="w-4 h-4 text-red-500" />;
+  };
+
   return (
     <div>
       <ScrollArea className="w-full">
         {Data?.length > 0 ? (
-          <Table className="min-w-[1200px] py-2">
+          <Table className="min-w-[1400px] py-2">
             <TableHeader>
               <TableRow className="text-xs lg:text-sm">
-                <TableHead className="font-bold w-1/8">Driver</TableHead>
-                <TableHead className="font-bold w-1/8 text-center">
+                <TableHead className="font-bold w-1/9">Driver</TableHead>
+                <TableHead className="font-bold w-1/9 text-center">
                   Contact
                 </TableHead>
-                <TableHead className="font-bold w-1/8 text-center">
+                <TableHead className="font-bold w-1/9 text-center">
+                  Email Verified
+                </TableHead>
+                <TableHead className="font-bold w-1/9 text-center">
+                  Phone Verified
+                </TableHead>
+                <TableHead className="font-bold w-1/9 text-center">
                   Account Status
                 </TableHead>
-                <TableHead className="font-bold w-1/8 text-center">
+                <TableHead className="font-bold w-1/9 text-center">
                   Vehicle Status
                 </TableHead>
-
-                <TableHead className="text-center font-bold w-1/8">
+                <TableHead className="text-center font-bold w-1/9">
                   Actions
                 </TableHead>
               </TableRow>
@@ -155,6 +168,18 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                       </div>
                     </TableCell>
                     
+                    <TableCell className="py-4 text-center">
+                      <div className="flex justify-center">
+                        {renderVerificationIcon(data.email_verified)}
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell className="py-4 text-center">
+                      <div className="flex justify-center">
+                        {renderVerificationIcon(data.phone_verified)}
+                      </div>
+                    </TableCell>
+                    
                     <TableCell className="py-4">
                       <div className="flex justify-center">
                         <div className={`flex items-center gap-x-2 px-3 py-1.5 rounded-full ${statusDisplay.bg} ${statusDisplay.text}`}>
@@ -174,8 +199,6 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                         </div>
                       </div>
                     </TableCell>
-                    
-                    
                     
                     <TableCell className="py-4 text-center">
                       <div className="flex justify-center">
@@ -216,21 +239,26 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
         ) : (
           <>
             {isFetching || loading ? (
-              <Table className="min-w-[1200px]">
+              <Table className="min-w-[1400px]">
                 <TableHeader>
                   <TableRow className="text-xs lg:text-sm">
-                    <TableHead className="font-bold w-1/8">Driver</TableHead>
-                    <TableHead className="font-bold w-1/8 text-center">
+                    <TableHead className="font-bold w-1/9">Driver</TableHead>
+                    <TableHead className="font-bold w-1/9 text-center">
                       Contact
                     </TableHead>
-                    <TableHead className="font-bold w-1/8 text-center">
+                    <TableHead className="font-bold w-1/9 text-center">
+                      Email Verified
+                    </TableHead>
+                    <TableHead className="font-bold w-1/9 text-center">
+                      Phone Verified
+                    </TableHead>
+                    <TableHead className="font-bold w-1/9 text-center">
                       Account Status
                     </TableHead>
-                    <TableHead className="font-bold w-1/8 text-center">
+                    <TableHead className="font-bold w-1/9 text-center">
                       Vehicle Status
                     </TableHead>
-                
-                    <TableHead className="text-center font-bold w-1/8">
+                    <TableHead className="text-center font-bold w-1/9">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -238,7 +266,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                 <TableBody>
                   {[1, 2, 3, 4, 5].map((i) => (
                     <TableRow key={i}>
-                      {[1, 2, 3, 4, 5, 6].map((j) => (
+                      {[1, 2, 3, 4, 5, 6, 7].map((j) => (
                         <TableCell key={`${i}-${j}`}>
                           <Skeleton className="h-6 w-full bg-gray-300" />
                         </TableCell>
