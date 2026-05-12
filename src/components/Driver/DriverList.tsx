@@ -150,7 +150,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-x-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={data?.profile_picture} />
+                          <AvatarImage src={data?.profile_image} />
                           <AvatarFallback className="bg-gray-200">
                             <IoPersonOutline className="w-5 h-5 text-gray-500" />
                           </AvatarFallback>

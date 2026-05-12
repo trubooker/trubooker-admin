@@ -95,7 +95,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                 <TableCell className="py-5 text-left">
                   <div className="w-full flex gap-x-3 items-center">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={data?.profile_picture} />
+                      <AvatarImage src={data?.profile_image} />
                       <AvatarFallback>
                         <IoPersonOutline />
                       </AvatarFallback>
