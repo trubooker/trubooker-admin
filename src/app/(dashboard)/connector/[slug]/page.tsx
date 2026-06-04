@@ -1,0 +1,212 @@
+"use client";
+
+import Goback from "@/components/Goback";
+import { useParams } from "next/navigation";
+import React from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { IoPersonOutline } from "react-icons/io5";
+import { Button } from "@/components/ui/button";
+import { FaMoneyBillWave } from "react-icons/fa";
+import AgentInfo from "@/components/connector/agentInfo";
+import {
+  useGetOneAgentQuery,
+  useToggleAgentStatusMutation,
+} from "@/redux/services/Slices/agentApiSlice";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
+import { Modal } from "@/components/DualModal";
+import ToggleStatus from "@/components/ToggleStatus";
+import { formatCurrency } from "@/lib/utils";
+
+const ViewAgent = () => {
+  const params = useParams();
+  const id = String(params.slug);
+  const {
+    isLoading: loading,
+    data: userData,
+    isFetching,
+  } = useGetOneAgentQuery(id);
+
+  const [mutate, { isLoading: loadingToggle }] = useToggleAgentStatusMutation();
+
+  const toggleAgentStatus = async () => {
+    await mutate(id).unwrap().then();
+  };
+
+  const profile = userData?.data?.profile; // object
+  const agent_ref = userData?.data?.agent_referrals; // array
+  const referral = userData?.data?.refferals; // array
+  const earning_overview = userData?.data?.earning_overview; // object
+  const withdrawal_req = userData?.data?.withdrawal_request; // array
+  return (
+    <>
+      {!isFetching || !loading ? (
+        <div>
+          <Goback
+            formerPage={"Connectors"}
+            presentPage={`${profile?.first_name} ${profile?.last_name}`}
+          />
+          <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
+            <div className="w-full flex gap-x-3 items-center">
+              <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
+                <AvatarImage src={profile?.profile_image} />
+                <AvatarFallback>
+                  <IoPersonOutline className="w-14 h-14" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
+                  <span className="text-xl font-extrabold  text-start">
+                    {profile?.first_name} {profile?.last_name}
+                  </span>
+                  <>
+                    {profile?.status === "active" ? (
+                      <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
+                        <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
+                        <span className="font-semibold text-xs capitalize">
+                          {profile?.status}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
+                        <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
+                        <span className="font-semibold text-xs capitalize">
+                          {profile?.status}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                </div>
+                <div className="lg:mt-3 mt-1 ms-1 flex flex-col">
+                  <span className="font-extrabold text-sm capitalize">
+                    {profile?.role === "agent" || profile?.type === "agent"
+                      ? "Connector"
+                      : profile?.role || profile?.type}
+                  </span>
+                  <span className="text-gray-400 text-xs">#{profile?.id}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
+              <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
+                <FaMoneyBillWave />
+                {profile?.current_balance === null
+                  ? "NGN 0.00"
+                  : formatCurrency(Number(profile?.current_balance), "NGN")}
+              </div>
+              {profile?.status == "active" ? (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-[--danger] hover:bg-[--danger-btn] hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Deactivate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={toggleAgentStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              ) : (
+                <Modal
+                  trigger={
+                    <Button
+                      disabled={loadingToggle || isFetching}
+                      variant={"outline"}
+                      className="bg-green-800 hover:bg-green-700 hover:text-white lg:w-[300px] h-10 lg:h-14 text-white"
+                    >
+                      Activate account
+                    </Button>
+                  }
+                  title={""}
+                  description={""}
+                  content={
+                    <ToggleStatus
+                      toggle={toggleAgentStatus}
+                      status={profile?.status}
+                      loading={loadingToggle}
+                    />
+                  }
+                />
+              )}
+              <span className="text-left lg:text-right lg:me-5 text-sm">
+                Joined{" "}
+                {new Date(profile?.created_at).toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
+              <FaMoneyBillWave />
+              {profile?.current_balance === null
+                ? "NGN 0.00"
+                : formatCurrency(Number(profile?.current_balance), "NGN")}
+            </div>
+          </div>
+          <AgentInfo
+            agent_ref={agent_ref}
+            referral={referral}
+            earning_overview={earning_overview}
+            withdrawal_req={withdrawal_req}
+            profile={profile}
+            loading={loading}
+            isFetching={isFetching}
+            params={params}
+          />
+        </div>
+      ) : (
+        <div>
+          <Skeleton className="h-8 bg-gray-200 w-[250px]" />
+          <Skeleton className=" bg-gray-200 p-5 rounded-lg my-5 h-32 flex items-center justify-between lg:flex-row flex-col gap-y-10" />
+
+          <div className="w-full grid lg:grid-cols-3 grid-cols-1 pt-5  mt-5 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div className="w-full rounded-md" key={i}>
+                <div className="flex flex-col space-y-3">
+                  <Skeleton className="bg-gray-200 h-[125px] w-full rounded-xl" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Table className="mt-5">
+            <TableBody>
+              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <TableRow key={i}>
+                  {[1, 2, 3].map((i) => (
+                    <TableCell key={i}>
+                      <div>
+                        <div className="w-full rounded-md">
+                          <div>
+                            <Skeleton className="h-4 w-1/7 bg-gray-200" />
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default ViewAgent;
