@@ -166,17 +166,17 @@ const MobileNavbar = () => {
               <p className="text-sm font-semibold text-black lg:flex flex-col hidden ">
                 {/* Hello, {data?.data?.first_name} */}
                 <span className="text-lg">
-                  {data?.first_name} {data?.last_name}
+                  {data?.firstName} {data?.lastName}
                 </span>
                 <small className="text-[13px] mt-1 font-normal capitalize">
                   {formatSnakeCase(data?.role)}
                 </small>
               </p>
               <Avatar className="w-10 h-10">
-                <AvatarImage src={data?.profile_image} />
+                <AvatarImage src={data?.profilePhoto} />
                 <AvatarFallback>
-                  {data?.first_name?.charAt(0)}
-                  {data?.last_name?.charAt(0)}
+                  {data?.firstName?.charAt(0)}
+                  {data?.lastName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </>

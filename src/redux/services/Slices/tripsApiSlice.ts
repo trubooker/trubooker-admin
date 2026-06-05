@@ -1,4 +1,3 @@
-import { Search } from "lucide-react";
 import { api } from "../apiSlice";
 
 const tripsApiConfig = api.enhanceEndpoints({
@@ -8,7 +7,7 @@ const tripsApi = tripsApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getAllTrips: builder.query({
       query: ({ type, page }: any) => ({
-        url: `/admin/drivers-trips`,
+        url: `/v1/admin/trips`,
         method: "GET",
         params: { type, page },
       }),
@@ -17,7 +16,7 @@ const tripsApi = tripsApiConfig.injectEndpoints({
 
     getSingleTrip: builder.query({
       query: ({ trip }: any) => ({
-        url: `/admin/drivers-trips/${trip}`,
+        url: `/v1/admin/trips/${trip}`,
         method: "GET",
       }),
       providesTags: ["Trips"],

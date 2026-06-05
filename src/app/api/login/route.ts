@@ -9,24 +9,23 @@ export async function POST(request: NextRequest) {
     Accept: "application/json",
   };
   
-  const resData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+  const resData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login-admin`, {
     method: "POST",
     headers,
     body: JSON.stringify(body),
   });
 
   const data = await resData.json();
-  const token = data?.data?.token;
-  console.log(data);
+  const token = data?.result?.accessToken;
 
-  if (data?.status === "success") {
+  if (data?.success === true) {
     // This condition is ALWAYS true - matches original behavior
     // Original logic: if role is NOT passenger OR NOT driver OR NOT agent
     // Which is always true for any role (including undefined)
     if (
-      data?.data?.user?.role !== "passenger" ||
-      data?.data?.user?.role !== "driver" || 
-      data?.data?.user?.role !== "agent"
+      data?.result?.user?.role !== "passenger" ||
+      data?.result?.user?.role !== "driver" || 
+      data?.result?.user?.role !== "agent"
     ) {
       const serialized = serialize("token", token, {
         httpOnly: true,
@@ -37,7 +36,7 @@ export async function POST(request: NextRequest) {
       });
 
       const response = {
-        data: data?.data?.user,
+        data: data?.result?.user,
       };
       
       return new Response(JSON.stringify(response), {
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
   } else {
     const response = {
-      message: data?.errors || "Login failed",
+      message: data?.result?.errors || "Login failed",
     };
     return new Response(JSON.stringify(response), {
       status: 400,

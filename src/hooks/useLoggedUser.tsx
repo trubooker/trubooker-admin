@@ -9,7 +9,7 @@ export const useLoggedInUser = () => {
     status,
   } = useGetCurrentUserQuery(null);
 
-  const userData = data?.data || null;
+  const userData = data?.result || null;
 
   return { userData, userError, userLoading, userRefetching, status };
 };

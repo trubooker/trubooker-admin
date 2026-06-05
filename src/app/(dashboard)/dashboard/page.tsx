@@ -34,17 +34,15 @@ import { useRouter } from "next/navigation";
 const Dashboard = () => {
   const [page, setPage] = useState(1);
 
-  const {
-    data: info,
-    isLoading: loading,
-    isFetching,
-  } = useGetDashboardQuery({ page });
+const { data: info, isLoading: loading, isFetching } = useGetDashboardQuery({ page });
 
-  const totalPages = info?.data?.active_trips?.last_page;
-  const userData = info?.data?.active_trips?.data || [];
-  const overview = info?.data?.overviews;
-  const revenue = info?.data?.revenue;
-  const users = info?.data;
+const result = info?.result;
+const userData = result?.activeTrips?.data || [];          
+const totalPages = result?.activeTrips?.meta?.pageCount ?? 0; 
+const stats = result?.users;
+const graphData = result?.graphData ?? [];
+const totalRevenue = result?.finance?.totalRevenue;
+
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -72,7 +70,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(users?.total_passengers)} />
+                          <CountUp end={Number(stats?.passengers ?? 0)} />
                         )}
                       </span>
                     </div>
@@ -97,7 +95,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(users?.total_drivers)} />
+                          <CountUp end={Number(stats?.drivers ?? 0)} />
                         )}
                       </span>
                     </div>
@@ -122,7 +120,7 @@ const Dashboard = () => {
                         {loading ? (
                           <Skeleton className="h-8 w-[50px] bg-gray-200" />
                         ) : (
-                          <CountUp end={Number(users?.total_agents)} />
+                          <CountUp end={Number(stats?.agents ?? 0)} />
                         )}
                       </span>
                     </div>
@@ -139,17 +137,13 @@ const Dashboard = () => {
               <div>
                 <LineChartDisplay
                   chartConfig={data?.chartConfigLine}
-                  total_revenue={revenue?.total_revenue}
-                  graph_data={
-                    Array.isArray(revenue?.graph_data)
-                      ? revenue?.graph_data
-                      : [revenue?.graph_data]
-                  }
+                  total_revenue={totalRevenue}
+                  graph_data={graphData}
                 />
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            <Overview data={overview} loading={loading} />
+            <Overview data={result} loading={loading} />
           </div>
         </div>
         <div className="xl:w-[40%]">

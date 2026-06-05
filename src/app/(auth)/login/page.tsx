@@ -60,21 +60,21 @@ export default function LoginComponent() {
     try {
       setEmailError("");
       setPasswordError("");
-      const response = await axios.post(`http://localhost:8083/v1/auth/login-admin`, values);
-      console.log(response.data)
-      if (response.data.statusCode === 201) {
+      const response = await axios.post(`/api/login`, values);
+      console.log('response',response)
+      if (response.status === 200) {
         form.setValue("email", "");
         form.setValue("password", "");
         toast.success("Successfully Logged In");
-        
+        router.push("/dashboard");
       }
     } catch (error: any) {
       setEmailError("");
       setPasswordError("");
       setLoading(false);
       if (error?.status === 400) {
-        setEmailError(error.response?.data?.message?.email[0]);
-        setPasswordError(error.response?.data?.message?.password[0]);
+        setEmailError(error.response?.data?.message);
+        setPasswordError(error.response?.data?.message);
       }
       if (error.status === 401) {
         toast.error(error?.response?.data?.message);

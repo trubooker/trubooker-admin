@@ -83,7 +83,7 @@ const Settings = () => {
         const formdata = new FormData();
         images &&
           images.forEach((image) => {
-            formdata.append("profile_image", image.file);
+            formdata.append("file", image.file);
           });
 
         const token = await fetchToken();
@@ -92,16 +92,17 @@ const Settings = () => {
           Accept: "application/json",
         };
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/upload-profile-picture`,
+          `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/update-profile`,
           {
-            method: "POST",
+            method: "PATCH",
             headers,
             body: formdata,
           }
         );
 
         const resdata = await res.json();
-        if (resdata?.status == "success") {
+        
+        if (resdata?.success) {
           toast.success(`Profile Image Updated!! ✅`);
           setLoading(false);
           userRefetching();
@@ -119,8 +120,8 @@ const Settings = () => {
   useEffect(() => {
     if (userData) {
       form.reset({
-        first_name: userData?.first_name,
-        last_name: userData?.last_name,
+        first_name: userData?.firstName,
+        last_name: userData?.lastName,
         city: userData?.city,
         address: userData?.address,
         country: userData?.country,
@@ -146,8 +147,8 @@ const Settings = () => {
       : null;
 
     const formdata = {
-      first_name: data.first_name || null,
-      last_name: data.last_name || null,
+      firstName: data.first_name || null,
+      lastName: data.last_name || null,
       city: data.city || null,
       address: data.address || null,
       phone: data.phone || null,
@@ -201,7 +202,7 @@ const Settings = () => {
                     ))}
                   </>
                 ) : (
-                  <AvatarImage src={userData?.profile_image} />
+                  <AvatarImage key={userData?.profilePhoto} src={userData?.profilePhoto} />
                 )}
                 <AvatarFallback>
                   <IoPersonOutline className="h-14 w-14" />
@@ -426,7 +427,7 @@ const Settings = () => {
                           <FormItem className="">
                             <FormLabel>Gender</FormLabel>
                             <FormControl>
-                              <>
+                              <div>
                                 {userData ? (
                                   <>
                                     {userData?.gender === "male" ? (
@@ -548,7 +549,7 @@ const Settings = () => {
                                     </FormItem>
                                   </RadioGroup>
                                 )}
-                              </>
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

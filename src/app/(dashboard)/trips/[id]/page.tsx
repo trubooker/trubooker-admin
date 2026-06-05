@@ -48,9 +48,9 @@ const SingleTrip = () => {
   } = useGetSingleTripQuery({
     trip: id,
   });
-  console.log(data);
   const details = data?.data; //array
   const deets = details?.vehicle;
+  console.log(details)
   return (
     <div>
       {isFetching || loading ? (
@@ -120,11 +120,11 @@ const SingleTrip = () => {
                               Departure
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.departure_location === null ||
+                              {details?.origin === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.departure_location
+                                details?.origin
                               )}
                             </span>
                           </div>
@@ -133,11 +133,11 @@ const SingleTrip = () => {
                               Destination
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.arrival_destination?.name === null ||
+                              {details?.destination === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.arrival_destination?.name
+                                details?.destination
                               )}
                             </span>
                           </div>
@@ -149,14 +149,14 @@ const SingleTrip = () => {
                               Departure date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.departure_date === null || loading ? (
+                              {details?.departureTime === null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
                                     // Combine departure date and time into a Date object
                                     const departureDateTime = new Date(
-                                      `${details.departure_date}T${details.departure_time}`
+                                      `${details.departureTime}T${details.departureTime}`
                                     );
 
                                     // Check if the date is valid
@@ -186,14 +186,14 @@ const SingleTrip = () => {
                               Return date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.arrival_date === null || loading ? (
+                              {details?.arrivalTime === null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
                                     // Combine departure date and time into a Date object
                                     const departureDateTime = new Date(
-                                      `${details.arrival_date}T${details.arrival_time}`
+                                      `${details.arrivalTime}T${details.arrivalTime}`
                                     );
 
                                     // Check if the date is valid
@@ -225,8 +225,8 @@ const SingleTrip = () => {
                             Estimated duration
                           </span>
                           <span className="font-medium text-sm capitalize">
-                            {details?.departure_time === null ||
-                            details?.arrival_time === null ||
+                            {details?.departureTime === null ||
+                            details?.departureTime === null ||
                             loading ? (
                               <Skeleton className="h-4 mt-2 w-32 bg-gray-200" />
                             ) : (
@@ -234,16 +234,16 @@ const SingleTrip = () => {
                                 try {
                                   // Validate and construct date-time strings
                                   const departureDateTime =
-                                    details.departure_date &&
-                                    details.departure_time
+                                    details.departureTime &&
+                                    details.departureTime
                                       ? new Date(
-                                          `${details.departure_date}T${details.departure_time}`
+                                          `${details.departureTime}T${details.departureTime}`
                                         )
                                       : null;
                                   const arrivalDateTime =
-                                    details.arrival_date && details.arrival_time
+                                    details.departureTime && details.departureTime
                                       ? new Date(
-                                          `${details.arrival_date}T${details.arrival_time}`
+                                          `${details.arrival_date}T${details.departureTime}`
                                         )
                                       : null;
 
