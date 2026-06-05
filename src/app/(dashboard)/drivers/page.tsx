@@ -36,19 +36,19 @@ const Drivers = () => {
   // Get parameters from URL or use defaults
   const urlPage = searchParams.get('page');
   const urlSearch = searchParams.get('search') || "";
-  const urlPerPage = searchParams.get('per_page');
+  const urlLimit = searchParams.get('limit');
   
   const [page, setPage] = useState(urlPage ? parseInt(urlPage) : 1);
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [docStatusFilter, setDocStatusFilter] = useState<string>("all");
-  const [perPage, setPerPage] = useState(urlPerPage ? parseInt(urlPerPage) : 10);
+  const [limit, setLimit] = useState(urlLimit ? parseInt(urlLimit) : 10);
   
   // Log the query parameters being sent to the API
   console.log("📤 Sending API request with parameters:", {
     page,
     search: searchQuery,
-    per_page: perPage
+    limit: limit
   });
   
   const {
@@ -56,24 +56,26 @@ const Drivers = () => {
     data: userData,
     isFetching,
     error,
-  } = useGetDriversQuery({ page, search: searchQuery, per_page: perPage });
+  } = useGetDriversQuery({ page, search: searchQuery, limit: limit });
+  console.log(userData)
   
   // Log document status data
   useEffect(() => {
-    if (userData?.data && userData.data.length > 0) {
+    if (userData?.result?.data && userData?.result?.data?.length > 0) {
       console.log("📊 Document Status Summary:");
       const statusCounts: Record<string, number> = {};
-      userData.data.forEach((driver: any) => {
-        const status = driver.vehicle_document_status || 'no status';
+      userData.result.data.forEach((driver: any) => {
+        const status = driver.kycStatus || 'no status';
+        console.log('status:', status)
         statusCounts[status] = (statusCounts[status] || 0) + 1;
       });
       console.log("Status counts:", statusCounts);
     }
   }, [userData]);
 
-  const DriverListData = userData?.data;
-  const totalPages = userData?.meta?.last_page;
-  const totalDrivers = userData?.meta?.total || 0;
+  const DriverListData = userData?.result?.data.user;
+  const totalPages = userData?.result?.meta?.pageCount ?? 1 ;
+  const totalDrivers = userData?.result?.meta?.totalRecords ?? 0;
   
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
@@ -84,8 +86,8 @@ const Drivers = () => {
       if (searchQuery) {
         params.set('search', searchQuery);
       }
-      if (perPage !== 10) {
-        params.set('per_page', perPage.toString());
+      if (limit !== 10) {
+        params.set('limit', limit.toString());
       }
       router.push(`/drivers?${params.toString()}`, { scroll: false });
     }
@@ -94,12 +96,12 @@ const Drivers = () => {
   const handlePerPageChange = (newPerPage: string) => {
     console.log("🔄 Changing items per page to:", newPerPage);
     const perPageValue = parseInt(newPerPage);
-    setPerPage(perPageValue);
+    setLimit(perPageValue);
     setPage(1);
     
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', '1');
-    params.set('per_page', perPageValue.toString());
+    params.set('limit', perPageValue.toString());
     if (searchQuery) {
       params.set('search', searchQuery);
     }
@@ -107,6 +109,8 @@ const Drivers = () => {
   };
   
   const [filteredDrivers, setFilteredDrivers] = useState(DriverListData);
+
+  console.log('filtered', filteredDrivers)
 
   useEffect(() => {
     if (DriverListData) {
@@ -126,12 +130,12 @@ const Drivers = () => {
       } else {
         params.delete('search');
       }
-      if (perPage !== 10) {
-        params.set('per_page', perPage.toString());
+      if (limit !== 10) {
+        params.set('per_page', limit.toString());
       }
       router.push(`/drivers?${params.toString()}`, { scroll: false });
     }, 300),
-    [router, searchParams, perPage]
+    [router, searchParams, limit]
   );
 
   const handleSearch = (query: string) => {
@@ -152,7 +156,7 @@ const Drivers = () => {
     docStatusFilter === "all"
       ? statusFilteredData
       : statusFilteredData?.filter(
-          (driver: any) => driver.vehicle_document_status === docStatusFilter
+          (driver: any) => driver.kycStatus === docStatusFilter
         );
 
   // Function to format document status for display
@@ -182,8 +186,8 @@ const Drivers = () => {
   };
 
   // Statistics for document status
-const docStatusStats: DocStatusStats = userData?.data?.reduce((acc: DocStatusStats, driver: any) => {
-  const status = driver.vehicle_document_status || 'no status';
+const docStatusStats: DocStatusStats = userData?.result?.data?.reduce((acc: DocStatusStats, driver: any) => {
+  const status = driver.kycStatus || 'no status';
   acc[status] = (acc[status] || 0) + 1;
   return acc;
 }, {}) || {};
@@ -218,7 +222,7 @@ const docStatusStats: DocStatusStats = userData?.data?.reduce((acc: DocStatusSta
               <div className="flex flex-wrap items-center gap-3">
                 <div>
                   <Select
-                    value={perPage.toString()}
+                    value={limit.toString()}
                     onValueChange={handlePerPageChange}
                   >
                     <SelectTrigger className="w-[140px]">
