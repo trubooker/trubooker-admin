@@ -8,6 +8,18 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/blog/:path*",
+        destination: "https://blog.prizeless.ng/:path*",
+      },
+      {
+        source: "/(.*)",
+        destination: "/index.html",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
