@@ -7,7 +7,7 @@ const driversApi = driversApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getDriversDocuments: builder.query({
       query: (driverId: string) => ({
-        url: `/admin/drivers/fetch-drivers-document/${driverId}`,
+        url: `/v1/admin/drivers/fetch-drivers-document/${driverId}`,
         method: "GET",
       }),
       providesTags: ["Drivers"],
@@ -37,12 +37,20 @@ const driversApi = driversApiConfig.injectEndpoints({
     }),
 
     getDrivers: builder.query({
-      query: ({ page, search, limit = 10 }) => ({
-        url: `/v1/admin/drivers?page=${page}&search=${search}&limit=${limit}`,
-        method: "GET",
-      }),
-      providesTags: ["Drivers"],
-    }),
+  query: ({ page, search = "", limit = 10 }) => ({
+    url: `/v1/admin/drivers?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+
+    // getDrivers: builder.query({
+    //   query: ({ page, search, limit = 10 }) => ({
+    //     url: `/v1/admin/drivers?page=${page}&search=${search}&limit=${limit}`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["Drivers"],
+    // }),
 
     getOneDriver: builder.query({
       query: (driver) => ({
@@ -69,9 +77,8 @@ const driversApi = driversApiConfig.injectEndpoints({
     }),
 // Temporary debug version
 addDriversDocument: builder.mutation({
-  query: (formData) => {
+  query: ({id, formData}) => {
     // Log the raw FormData entries
-    console.log("🔍 MUTATION RECEIVED FORM DATA:");
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
         console.log(`  ${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
@@ -81,7 +88,7 @@ addDriversDocument: builder.mutation({
     }
     
     return {
-      url: `/v1/admin/drivers/add-document`,
+      url: `/v1/admin/drivers/add-document/${id}`,
       method: "POST",
       body: formData,
       // Don't set Content-Type

@@ -30,7 +30,7 @@ const ViewDriver = () => {
   const id = String(params.driverId);
   const router = useRouter();
   
-  console.log("🆔 Driver ID from params:", id);
+  //console.log("🆔 Driver ID from params:", id);
   
   const {
     isLoading: loading,
@@ -42,27 +42,28 @@ const ViewDriver = () => {
   const [mutate, { isLoading: loadingToggle }] =
     useToggleDriverStatusMutation();
 
+    console.log('userData for [id]', userData)
   const toggleDriverStatus = async () => {
-    console.log("🔄 Toggling driver status for ID:", id);
+    //console.log("🔄 Toggling driver status for ID:", id);
     try {
       await mutate(id).unwrap();
-      console.log("✅ Driver status toggled successfully");
+      //console.log("✅ Driver status toggled successfully");
     } catch (error) {
-      console.error("❌ Failed to toggle status:", error);
+      //console.error("❌ Failed to toggle status:", error);
     }
   };
 
   // ===== COMPREHENSIVE CONSOLE LOGS =====
-  console.log("📥 COMPLETE API RESPONSE (userData):", userData);
+  //console.log("📥 COMPLETE API RESPONSE (userData):", userData);
 
   
   if (userData) {
-    console.log("🔍 COMPLETE DATA STRUCTURE ANALYSIS:");
-    console.log("1. Root level keys:", Object.keys(userData));
+    // console.log("🔍 COMPLETE DATA STRUCTURE ANALYSIS:");
+    // console.log("1. Root level keys:", Object.keys(userData));
     
     if (userData.data) {
-      console.log("2. Data property type:", typeof userData.data);
-      console.log("3. Data object keys:", Object.keys(userData.data));
+      // console.log("2. Data property type:", typeof userData.data);
+      // console.log("3. Data object keys:", Object.keys(userData.data));
       
       // Log ALL properties in data object
       for (const [key, value] of Object.entries(userData.data)) {
@@ -75,101 +76,104 @@ const ViewDriver = () => {
       
       // Detailed profile logging
       if (userData.data.profile) {
-        console.log("4. PROFILE DETAILS:");
-        console.log("   Profile object:", userData.data.profile);
-        console.log("   Profile keys:", Object.keys(userData.data.profile));
-        console.log("   Profile ID:", userData.data.profile.id);
-        console.log("   Profile status:", userData.data.profile.status);
-        console.log("   Profile balance:", userData.data.profile.current_balance);
+        // console.log("4. PROFILE DETAILS:");
+        // console.log("   Profile object:", userData.data.profile);
+        // console.log("   Profile keys:", Object.keys(userData.data.profile));
+        // console.log("   Profile ID:", userData.data.profile.id);
+        // console.log("   Profile status:", userData.data.profile.status);
+        // console.log("   Profile balance:", userData.data.profile.current_balance);
       } else {
-        console.log("4. PROFILE: Not found or undefined");
+        //console.log("4. PROFILE: Not found or undefined");
       }
       
       // Detailed vehicles logging
       if (userData.data.vehicles) {
-        console.log("5. VEHICLES:");
-        console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
-        console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
+        // console.log("5. VEHICLES:");
+        // console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
+        // console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
         if (userData.data.vehicles?.length > 0) {
-          console.log("   First vehicle:", userData.data.vehicles[0]);
+          //console.log("   First vehicle:", userData.data.vehicles[0]);
         }
       } else {
-        console.log("5. VEHICLES: Not found or undefined");
+        //console.log("5. VEHICLES: Not found or undefined");
       }
       
       // Detailed reviews logging
       if (userData.data.reviews) {
-        console.log("6. REVIEWS/Feedback:");
-        console.log("   Reviews count:", userData.data.reviews?.length || 0);
-        console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
+        // console.log("6. REVIEWS/Feedback:");
+        // console.log("   Reviews count:", userData.data.reviews?.length || 0);
+        // console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
       } else {
-        console.log("6. REVIEWS: Not found or undefined");
+        //console.log("6. REVIEWS: Not found or undefined");
       }
       
       // Detailed trip history logging
       if (userData.data.trip_history) {
-        console.log("7. TRIP HISTORY:");
-        console.log("   Trip history count:", userData.data.trip_history?.length || 0);
-        console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
+        // console.log("7. TRIP HISTORY:");
+        // console.log("   Trip history count:", userData.data.trip_history?.length || 0);
+        // console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
       } else {
-        console.log("7. TRIP HISTORY: Not found or undefined");
+        //console.log("7. TRIP HISTORY: Not found or undefined");
       }
       
       // Check for any other properties
-      console.log("8. OTHER PROPERTIES IN DATA:");
+      //console.log("8. OTHER PROPERTIES IN DATA:");
       const knownProps = ['profile', 'vehicles', 'reviews', 'trip_history'];
       const otherProps = Object.keys(userData.data).filter(key => !knownProps.includes(key));
       if (otherProps.length > 0) {
         otherProps.forEach(prop => {
-          console.log(`   - ${prop}:`, userData.data[prop]);
+          //console.log(`   - ${prop}:`, userData.data[prop]);
         });
       } else {
-        console.log("   No other properties found");
+        //console.log("   No other properties found");
       }
     } else {
-      console.log("2. Data property: undefined or null");
+      //console.log("2. Data property: undefined or null");
     }
     
     // Log meta and links if they exist
     if (userData.meta) {
-      console.log("9. META DATA:", userData.meta);
+      //console.log("9. META DATA:", userData.meta);
     }
     if (userData.links) {
-      console.log("10. LINKS DATA:", userData.links);
+      //console.log("10. LINKS DATA:", userData.links);
     }
   } else {
-    console.log("📭 No userData received from API");
+    //console.log("📭 No userData received from API");
   }
 
   // Add safe access with optional chaining and fallbacks
-  const profile = userData?.data?.profile || {};
-  const vehicle = userData?.data?.vehicles || [];
+  const driver = userData?.result || {};
+  const profile = driver?.user || {};
+  //const vehicle = userData?.result?.vehicle || [];
+  const rawVehicle = userData?.result?.vehicle;
+const vehicle = rawVehicle ? [rawVehicle] : [];
   const feedback = userData?.data?.reviews || [];
-  const th = userData?.data?.trip_history || [];
+  const th = userData?.result?.tripHistory || [];
 
   // Log extracted data
-  console.log("📋 EXTRACTED DATA:");
-  console.log("- Profile object:", profile);
-  console.log("- Profile keys:", Object.keys(profile));
-  console.log("- Vehicles array length:", vehicle.length);
-  console.log("- Feedback array length:", feedback.length);
-  console.log("- Trip history array length:", th.length);
+  // console.log("📋 EXTRACTED DATA:");
+  // console.log("- Profile object:", profile);
+  // console.log("- Profile keys:", Object.keys(profile));
+  // console.log("- Vehicles array length:", vehicle.length);
+  // console.log("- Feedback array length:", feedback.length);
+   console.log("- Trip history array length:", th.length);
   
   // Safe name display
-  const driverName = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Unknown Driver';
+  const driverName = `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || 'Unknown Driver';
   console.log("👤 Driver name:", driverName);
   
   // Safe date display
-  const joinDate = profile?.created_at 
-    ? new Date(profile.created_at).toLocaleDateString("en-US", {
+  const joinDate = profile?.createdAt 
+    ? new Date(profile.createdAt).toLocaleDateString("en-US", {
         day: "numeric",
         month: "short",
         year: "numeric",
       })
     : 'N/A';
-  console.log("📅 Join date:", joinDate);
+  // console.log("📅 Join date:", joinDate);
   
-  console.log("🔄 Loading states - isLoading:", loading, "isFetching:", isFetching);
+  // console.log("🔄 Loading states - isLoading:", loading, "isFetching:", isFetching);
 
   // Handle error state
   if (error) {
@@ -206,7 +210,7 @@ const ViewDriver = () => {
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage src={profile?.profile_image} />
+                <AvatarImage src={profile?.profileImage} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -250,9 +254,9 @@ const ViewDriver = () => {
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave />
-                {profile?.current_balance === null || profile?.current_balance === undefined
+                {driver?.currentBalance === null || driver?.currentBalance === undefined
                   ? "NGN 0.00"
-                  : formatCurrency(Number(profile.current_balance), "NGN")}
+                  : formatCurrency(Number(driver.currentBalance), "NGN")}
               </div>
               {profile?.status === "active" ? (
                 <Modal
@@ -303,9 +307,9 @@ const ViewDriver = () => {
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave />
-              {profile?.current_balance === null || profile?.current_balance === undefined
+              {driver?.currentBalance === null || driver?.currentBalance === undefined
                 ? "NGN 0.00"
-                : formatCurrency(Number(profile.current_balance), "NGN")}
+                : formatCurrency(Number(driver.currentBalance), "NGN")}
             </div>
           </div>
           <ProfileVehicleDocs_Info

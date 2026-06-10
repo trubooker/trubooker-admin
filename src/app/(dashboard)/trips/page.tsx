@@ -67,7 +67,6 @@ const Trips = () => {
     type: "completed",
     page: completedPage,
   });
-
   // Upcoming ----------------------------------------------------------
   const totalUpcomingPage = upcoming?.meta?.last_page;
   const upcomingData = upcoming?.data;

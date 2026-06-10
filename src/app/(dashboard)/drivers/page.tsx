@@ -30,127 +30,92 @@ interface DocStatusStats {
 }
 
 const Drivers = () => {
-  const router = useRouter();
+   const router = useRouter();
   const searchParams = useSearchParams();
-  
+ 
   // Get parameters from URL or use defaults
-  const urlPage = searchParams.get('page');
-  const urlSearch = searchParams.get('search') || "";
-  const urlLimit = searchParams.get('limit');
-  
+  const urlPage = searchParams.get("page");
+  const urlSearch = searchParams.get("search") || "";
+  const urlLimit = searchParams.get("limit");
+ 
   const [page, setPage] = useState(urlPage ? parseInt(urlPage) : 1);
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [docStatusFilter, setDocStatusFilter] = useState<string>("all");
   const [limit, setLimit] = useState(urlLimit ? parseInt(urlLimit) : 10);
-  
-  // Log the query parameters being sent to the API
-  console.log("📤 Sending API request with parameters:", {
-    page,
-    search: searchQuery,
-    limit: limit
-  });
-  
+ 
   const {
     isLoading: loading,
     data: userData,
     isFetching,
     error,
   } = useGetDriversQuery({ page, search: searchQuery, limit: limit });
-  console.log(userData)
-  
-  // Log document status data
-  useEffect(() => {
-    if (userData?.result?.data && userData?.result?.data?.length > 0) {
-      console.log("📊 Document Status Summary:");
-      const statusCounts: Record<string, number> = {};
-      userData.result.data.forEach((driver: any) => {
-        const status = driver.kycStatus || 'no status';
-        console.log('status:', status)
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-      });
-      console.log("Status counts:", statusCounts);
-    }
-  }, [userData]);
-
-  const DriverListData = userData?.result?.data.user;
-  const totalPages = userData?.result?.meta?.pageCount ?? 1 ;
+ 
+  // Source of truth — read straight from the query, no mirror state
+  const DriverListData = userData?.result?.data;
+ 
+  // NOTE: verify these against your actual meta object (see message below the code).
+  const totalPages = userData?.result?.meta?.pageCount ?? 1;
   const totalDrivers = userData?.result?.meta?.totalRecords ?? 0;
-  
+ 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
-      console.log("🔄 Changing page to:", pageNumber);
       setPage(pageNumber);
       const params = new URLSearchParams(searchParams.toString());
-      params.set('page', pageNumber.toString());
+      params.set("page", pageNumber.toString());
       if (searchQuery) {
-        params.set('search', searchQuery);
+        params.set("search", searchQuery);
       }
       if (limit !== 10) {
-        params.set('limit', limit.toString());
+        params.set("limit", limit.toString());
       }
       router.push(`/drivers?${params.toString()}`, { scroll: false });
     }
   };
-  
+ 
   const handlePerPageChange = (newPerPage: string) => {
-    console.log("🔄 Changing items per page to:", newPerPage);
     const perPageValue = parseInt(newPerPage);
     setLimit(perPageValue);
     setPage(1);
-    
+ 
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', '1');
-    params.set('limit', perPageValue.toString());
+    params.set("page", "1");
+    params.set("limit", perPageValue.toString());
     if (searchQuery) {
-      params.set('search', searchQuery);
+      params.set("search", searchQuery);
     }
     router.push(`/drivers?${params.toString()}`, { scroll: false });
   };
-  
-  const [filteredDrivers, setFilteredDrivers] = useState(DriverListData);
-
-  console.log('filtered', filteredDrivers)
-
-  useEffect(() => {
-    if (DriverListData) {
-      setFilteredDrivers(DriverListData);
-    }
-  }, [DriverListData]);
-
+ 
   const debounceSearch = useCallback(
     debounce((query: string) => {
-      console.log("🔍 Debounced search with query:", query);
       setSearchQuery(query);
       setPage(1);
       const params = new URLSearchParams(searchParams.toString());
-      params.set('page', '1');
+      params.set("page", "1");
       if (query) {
-        params.set('search', query);
+        params.set("search", query);
       } else {
-        params.delete('search');
+        params.delete("search");
       }
       if (limit !== 10) {
-        params.set('per_page', limit.toString());
+        params.set("per_page", limit.toString());
       }
       router.push(`/drivers?${params.toString()}`, { scroll: false });
     }, 300),
     [router, searchParams, limit]
   );
-
+ 
   const handleSearch = (query: string) => {
-    console.log("⌨️ Handle search called with:", query);
     debounceSearch(query);
   };
-
-  // Apply status filter
+ 
+  // Apply status filter — derived directly from DriverListData (recomputes every render)
   const statusFilteredData =
     statusFilter === "all"
-      ? filteredDrivers
-      : filteredDrivers?.filter(
-          (driver: any) => driver.status === statusFilter
-        );
-  
+      ? DriverListData
+      : DriverListData?.filter((driver: any) => driver.status === statusFilter);
+ 
   // Apply document status filter
   const docStatusFilteredData =
     docStatusFilter === "all"
@@ -158,39 +123,44 @@ const Drivers = () => {
       : statusFilteredData?.filter(
           (driver: any) => driver.kycStatus === docStatusFilter
         );
-
+ 
+    console.log('doc filter data', docStatusFilteredData)
   // Function to format document status for display
   const formatDocStatus = (status: string) => {
     return status
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
-
+ 
   // Get icon for document status filter
   const getDocStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved':
+      case "approved":
         return <Check className="w-3 h-3 mr-2" />;
-      case 'pending':
+      case "pending":
         return <Clock className="w-3 h-3 mr-2" />;
-      case 'rejected':
+      case "rejected":
         return <X className="w-3 h-3 mr-2" />;
-      case 'no documents uploaded':
+      case "no documents uploaded":
         return <FileText className="w-3 h-3 mr-2" />;
-      case 'no vehicle uploaded':
+      case "not_started":
+        return <FileText className="w-3 h-3 mr-2" />;
+      case "no vehicle uploaded":
         return <Car className="w-3 h-3 mr-2" />;
       default:
         return <FaFilter className="w-3 h-3 mr-2" />;
     }
   };
+ 
+  // Statistics for document status — derived from the query data
+  const docStatusStats: DocStatusStats =
+    DriverListData?.reduce((acc: DocStatusStats, driver: any) => {
+      const status = driver.kycStatus || "no status";
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {}) || {};
 
-  // Statistics for document status
-const docStatusStats: DocStatusStats = userData?.result?.data?.reduce((acc: DocStatusStats, driver: any) => {
-  const status = driver.kycStatus || 'no status';
-  acc[status] = (acc[status] || 0) + 1;
-  return acc;
-}, {}) || {};
 
   return (
     <div className="flex flex-col h-fit w-full">

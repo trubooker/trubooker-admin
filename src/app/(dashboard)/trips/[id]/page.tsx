@@ -48,9 +48,9 @@ const SingleTrip = () => {
   } = useGetSingleTripQuery({
     trip: id,
   });
-  const details = data?.data; //array
+  const details = data?.result; //array
   const deets = details?.vehicle;
-  console.log(details)
+  console.log('detals',details)
   return (
     <div>
       {isFetching || loading ? (
@@ -422,17 +422,17 @@ const SingleTrip = () => {
                               Full name
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.vehicle?.driver?.first_name === null ||
+                              {details?.driver?.user?.firstName === null ||
                               loading ||
-                              details?.vehicle?.driver?.first_name === null ? (
+                              details?.driver?.user?.firstName === null ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 <div className="flex items-center gap-x-2">
                                   <span>
-                                    {details?.vehicle?.driver?.first_name}
+                                    {details?.driver?.user?.firstName}
                                   </span>
                                   <span>
-                                    {details?.vehicle?.driver?.last_name}
+                                    {details?.driver?.user?.lastName}
                                   </span>
                                 </div>
                               )}
@@ -445,12 +445,12 @@ const SingleTrip = () => {
                               Email
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.vehicle?.driver?.email === null ||
+                              {details?.driver?.user?.email === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 <div className="flex items-center gap-x-2">
-                                  <span>{details?.vehicle?.driver?.email}</span>
+                                  <span>{details?.driver?.user?.email}</span>
                                 </div>
                               )}
                             </span>
@@ -657,7 +657,7 @@ const SingleTrip = () => {
                 <div className="grid xl:grid-cols-3 grid-cols-1 mt-3 gap-4 ">
                   <div className="col-span-2 h-[500px]">
                     <MapComponent
-                      busStops={details?.bus_stop}
+                      //busStops={details?.bus_stop}
                       busstop_latlong={details?.busstop_latlong}
                       departure={details?.departure_latlong}
                       arrival={details?.arrival_destination}

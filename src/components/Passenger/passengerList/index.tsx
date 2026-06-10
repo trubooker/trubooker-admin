@@ -30,6 +30,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
   const [selectedPassenger, setSelectedPassenger] = useState<any>(null);
   const [actionType, setActionType] = useState<"activate" | "deactivate">("activate");
 
+
   const handleToggleStatus = async (passengerId: string, currentStatus: string) => {
     try {
       await toggleStatus(passengerId).unwrap();
@@ -51,7 +52,7 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
 
   const handleSuspendClick = (passenger: any) => {
     setSelectedPassenger(passenger);
-    setActionType(passenger.status === "active" ? "deactivate" : "activate");
+    setActionType(passenger.user.status === "active" ? "deactivate" : "activate");
   };
 
   // Helper to render verification icon
@@ -95,40 +96,40 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                 <TableCell className="py-5 text-left">
                   <div className="w-full flex gap-x-3 items-center">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={data?.profile_image} />
+                      <AvatarImage src={data?.user.profileImage} />
                       <AvatarFallback>
                         <IoPersonOutline />
                       </AvatarFallback>
                     </Avatar>
                     <span className="w-full flex flex-col xl:flex-row text-start gap-x-2 gap-y-1 text-gray-500">
-                      <span className="font-medium">{data.name}</span>
+                      <span className="font-medium">{data.user.firstName}</span>
                     </span>
                   </div>
                 </TableCell>
                 <TableCell className="py-5 text-center text-gray-600">
-                  {data.email}
+                  {data.user.email}
                 </TableCell>
                 <TableCell className="py-5 text-center text-gray-600">
-                  {data.phone_number}
+                  {data.user.phone}
                 </TableCell>
                 <TableCell className="py-5 text-center">
                   <div className="flex justify-center">
-                    {renderVerificationIcon(data.email_verified)}
+                    {renderVerificationIcon(data.user.isEmailVerified)}
                   </div>
                 </TableCell>
                 <TableCell className="py-5 text-center">
                   <div className="flex justify-center">
-                    {renderVerificationIcon(data.phone_verified)}
+                    {renderVerificationIcon(data.user.isPhoneVerified)}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-center">
-                    {data.status === "active" ? (
+                    {data.user.status === "active" ? (
                       <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                         <span className="font-semibold text-xs">Active</span>
                       </div>
-                    ) : data.status === "inactive" ? (
+                    ) : data.user.status === "inactive" ? (
                       <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                         <span className="font-semibold text-xs">Suspended</span>
@@ -156,14 +157,14 @@ export function PassengerList({ data: Data, isFetching, loading }: any) {
                       >
                         View Details
                       </DropdownMenuItem>
-                      {data.status !== "deleted" && (
+                      {data.user.status !== "deleted" && (
                         <DropdownMenuItem
                           className={`w-full text-center cursor-pointer ${
-                            data.status === "active" ? "text-red-600" : "text-green-600"
+                            data.user.status === "active" ? "text-red-600" : "text-green-600"
                           }`}
                           onClick={() => handleSuspendClick(data)}
                         >
-                          {data.status === "active" ? "Deactivate" : "Activate"}
+                          {data.user.status === "active" ? "Deactivate" : "Activate"}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>

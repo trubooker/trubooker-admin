@@ -43,13 +43,13 @@ export function RefKinProfileTable({
                     <TableCell className="py-5 font-medium w-1/3 text-left">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src={data?.profile_picture} />
+                          <AvatarImage src={data?.profileImage} />
                           <AvatarFallback>
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
                         <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
-                          <span>{data.name}</span>
+                          <span>{data.firstName}</span>
                           {/* <span>{data.last_name}</span> */}
                         </span>
                       </div>

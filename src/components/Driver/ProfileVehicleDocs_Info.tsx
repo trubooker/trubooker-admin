@@ -130,13 +130,16 @@ const ProfileVehicleDocs_Info = ({
 
   // Safe profile data
   const safeProfile = profile || {};
+
+  console.log('safe profile',th)
+
   
   // Safe vehicle data - ensure it's an array
   const safeVehicle = Array.isArray(vehicle) ? vehicle : [];
   
   // Safe feedback data - ensure it's an array
   const safeFeedback = Array.isArray(feedback) ? feedback : [];
-  
+  console.log('driver doc', driverDocs)
   // Safe trip history data
   const safeTripHistory = Array.isArray(th) ? th : [];
 
@@ -304,7 +307,7 @@ const ProfileVehicleDocs_Info = ({
       console.log("Request method: POST");
       console.log("Request body: FormData with", Array.from(formData.entries()).length, "entries");
       
-      const response = await addDocument(formData).unwrap();
+      const response = await addDocument({ id: driverId, formData }).unwrap();
       console.log("✅ Document added successfully:", response);
       toast.success("Document added successfully");
       refetchDocs();
@@ -345,30 +348,31 @@ const ProfileVehicleDocs_Info = ({
     const formData = new FormData();
     
     // Get the document being updated
-    const doc = selectedDoc || driverDocs?.data?.find((d: any) => d.id === docId);
+    const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
+    console.log('docs', doc)
     
-    if (doc?.verification_type === "vehicle") {
+    if (doc?.verificationType === "vehicle") {
       formData.append(`photos[0]`, {
         uri: documentFile.uri,
         type: documentFile.type || "image/jpeg",
         name: documentFile.name || `vehicle_photo_${Date.now()}.jpg`,
       } as any);
     } 
-    else if (doc?.verification_type === "registration_doc") {
+    else if (doc?.verificationType === "registration_doc") {
       formData.append("reg_docs", {
         uri: documentFile.uri,
         type: documentFile.type || "image/jpeg",
         name: documentFile.name || `registration_${Date.now()}.jpg`,
       } as any);
     }
-    else if (doc?.verification_type === "insurance") {
+    else if (doc?.verificationType === "insurance") {
       formData.append("vehicle_insurance", {
         uri: documentFile.uri,
         type: documentFile.type || "image/jpeg",
         name: documentFile.name || `insurance_${Date.now()}.jpg`,
       } as any);
     }
-    else if (doc?.verification_type === "license") {
+    else if (doc?.verificationType === "license") {
       formData.append("drivers_license", {
         uri: documentFile.uri,
         type: documentFile.type || "image/jpeg",
@@ -434,17 +438,27 @@ const ProfileVehicleDocs_Info = ({
     }
   };
 
-  const getDocumentTypeLabel = (doc: any) => {
-    if (doc?.document_type_label) return doc.document_type_label;
+  // const getDocumentTypeLabel = (doc: any) => {
+  //   if (doc?.documentType) return doc.documentType;
     
-    switch(doc?.verification_type) {
-      case "license": return "Driver's License";
-      case "insurance": return "Vehicle Insurance";
-      case "registration_doc": return "Registration Document";
-      case "vehicle": return "Vehicle Photo";
-      default: return doc?.verification_type || 'Document';
-    }
-  };
+  //   switch(doc?.documentType) {
+  //     case "license": return "Driver's License";
+  //     case "insurance": return "Vehicle Insurance";
+  //     case "registration_doc": return "Registration Document";
+  //     case "vehicle": return "Vehicle Photo";
+  //     default: return doc?.documentType || 'Document';
+  //   }
+  // };
+const getDocumentTypeLabel = (doc: any) => {
+  const type = doc?.documentType || doc?.verificationType || '';
+  
+  if (type.includes('license')) return "Driver's License";
+  if (type.includes('insurance')) return "Vehicle Insurance";
+  if (type.includes('registration') || type.includes('reg')) return "Registration Document";
+  if (type.includes('vehicle')) return "Vehicle Photo";
+  
+  return type.replace(/_/g, ' ') || 'Document';
+};
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -458,7 +472,14 @@ const ProfileVehicleDocs_Info = ({
   };
 
   const docs: any[] = driverDocs?.data || [];
-  const history: any[] = documentHistory?.data || [];
+  //const history: any[] = documentHistory?.result || [];
+  const rawHistory = documentHistory?.result;
+const history: any[] = rawHistory
+  ? Array.isArray(rawHistory)
+    ? rawHistory
+    : Object.values(rawHistory)  
+  : [];
+  console.log('history', history)
 
   return (
     <div className="w-full">
@@ -479,12 +500,12 @@ const ProfileVehicleDocs_Info = ({
                       Full name
                     </span>
                     <span className="font-medium text-sm">
-                      {(!safeProfile?.first_name && !safeProfile?.last_name) ? (
+                      {(!safeProfile?.firstName && !safeProfile?.lastName) ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
                         <div className="flex gap-x-2">
-                          <span> {safeProfile?.first_name || 'N/A'}</span>
-                          <span> {safeProfile?.last_name || ''}</span>
+                          <span> {safeProfile?.firstName || 'N/A'}</span>
+                          <span> {safeProfile?.lastName || ''}</span>
                         </div>
                       )}
                     </span>
@@ -594,10 +615,10 @@ const ProfileVehicleDocs_Info = ({
                       Referral code
                     </span>
                     <span className="font-medium text-sm">
-                      {!safeProfile?.referral ? (
+                      {!safeProfile?.referralCode ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.referral || 'Not provided'
+                        safeProfile?.referralCode || 'Not provided'
                       )}
                     </span>
                   </div>
@@ -649,10 +670,10 @@ const ProfileVehicleDocs_Info = ({
                                       Vehicle Type
                                     </span>
                                     <span className="font-medium text-sm">
-                                      {!deets?.vehicle_type?.name ? (
+                                      {!deets?.type ? (
                                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                       ) : (
-                                        deets?.vehicle_type?.name || 'Not specified'
+                                        deets?.type || 'Not specified'
                                       )}
                                     </span>
                                   </div>
@@ -696,10 +717,10 @@ const ProfileVehicleDocs_Info = ({
                                 License plate number
                               </span>
                               <span className="font-medium text-sm">
-                                {!deets?.license_plate_number ? (
+                                {!deets?.plateNumber ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  deets?.license_plate_number || 'Not specified'
+                                  deets?.plateNumber || 'Not specified'
                                 )}
                               </span>
                             </div>
@@ -752,8 +773,8 @@ const ProfileVehicleDocs_Info = ({
                             
                             <TabsContent value="vehiclePhotos">
                               <div className="w-full grid grid-cols-1 pt-5 gap-4">
-                                {deets?.photos && deets.photos.length > 0 ? (
-                                  deets.photos.map((photo: string, photoIndex: number) => (
+                                {deets?.vehiclePhoto && deets.vehiclePhoto.length > 0 ? (
+                                  deets.vehiclePhoto.map((photo: string, photoIndex: number) => (
                                     <div key={photoIndex}>
                                       <Link href={photo || '#'} target="_blank">
                                         <span className="font-medium text-sm">
@@ -888,7 +909,7 @@ const ProfileVehicleDocs_Info = ({
                                     <Link href={doc?.link || '#'} target="_blank" className="flex-1">
                                       <span className="font-medium text-sm">
                                         <span className="flex gap-x-2 items-start">
-                                          {getDocumentIcon(doc?.verification_type)}
+                                          {getDocumentIcon(doc?.verificationType)}
                                           <div className="flex flex-col">
                                             <div className="text-sm font-bold items-center flex gap-x-2 text-[#333F53] capitalize">
                                               {getDocumentTypeLabel(doc)}
@@ -903,7 +924,7 @@ const ProfileVehicleDocs_Info = ({
                                               </div>
                                             )}
                                             <div className="text-[11px] mt-1 text-gray-500">
-                                              Added: {formatDate(doc?.created_at)}
+                                              Added: {formatDate(doc?.createdAt)}
                                             </div>
                                           </div>
                                         </span>
@@ -1181,7 +1202,7 @@ const ProfileVehicleDocs_Info = ({
                                       <SelectContent>
                                         {safeVehicle.map((v: any) => (
                                           <SelectItem key={v.id} value={v.id}>
-                                            {v.model} - {v.license_plate_number}
+                                            {v.model} - {v.licensePlateNumber}
                                           </SelectItem>
                                         ))}
                                       </SelectContent>
@@ -1257,19 +1278,19 @@ const ProfileVehicleDocs_Info = ({
                                 </div>
                                 
                                 <p className="text-xs text-gray-500 mt-1">
-                                  {formatDate(item?.created_at)}
+                                  {formatDate(item?.createdAt)}
                                 </p>
                                 
-                                {item?.reason && (
+                                {item?.rejectionReason && (
                                   <div className="mt-2 text-xs bg-red-50 border border-red-100 rounded p-2">
                                     <span className="font-medium text-red-700">Rejection reason:</span>
-                                    <span className="text-red-600 ml-1">{item.reason}</span>
+                                    <span className="text-red-600 ml-1">{item.rejectionReason}</span>
                                   </div>
                                 )}
 
-                                {item?.link && (
+                                {item?.documentUrl && (
                                   <Link 
-                                    href={item.link} 
+                                    href={item.documentUrl} 
                                     target="_blank" 
                                     className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
                                   >
@@ -1280,7 +1301,7 @@ const ProfileVehicleDocs_Info = ({
                                 <div className="mt-2 flex flex-wrap gap-2 text-[10px] text-gray-400">
                                   <span>ID: {item?.id}</span>
                                   <span>•</span>
-                                  <span>Type: {item?.verifiable_type}</span>
+                                  <span>Type: {item?.driverId}</span>
                                 </div>
                               </div>
                             </div>
@@ -1342,7 +1363,7 @@ const ProfileVehicleDocs_Info = ({
                     <div className="my-6">
                       <div className="flex w-full items-start space-x-4">
                         <Avatar className="lg:w-14 h-10 lg:h-14 w-10">
-                          <AvatarImage src={actions?.profile_picture} />
+                          <AvatarImage src={actions?.profileImage} />
                           <AvatarFallback>
                             <IoPersonOutline className="w-5 h-5" />
                           </AvatarFallback>

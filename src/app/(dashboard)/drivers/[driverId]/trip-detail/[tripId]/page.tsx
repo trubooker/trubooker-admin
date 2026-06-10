@@ -35,18 +35,20 @@ const Slug = () => {
   const params = useParams();
   const id = String(params.tripId);
   const { isLoading: loading, data, isFetching } = useGetTripDetailsQuery(id);
-  const tripData = data?.data;
+  const tripData = data?.result;
   const [page, setPage] = useState(1);
-  const totalPages = tripData?.data?.active_trips?.last_page;
-  const details = tripData?.trip_details; //array
+  const totalPages = tripData?.active_trips?.last_page;
+  const details = tripData; //array
   const passengers = tripData?.passengers; //array
+
+  console.log('trip data', tripData)
 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
-
+console.log("na this", data)
   return (
     <div>
       {isFetching || loading ? (
@@ -95,7 +97,7 @@ const Slug = () => {
         <>
           <Goback
             formerPage={`Driver`}
-            presentPage={`Trip Id - #${details?.id}`}
+            presentPage={`Trip Id - #${details?.driverId}`}
           />
 
           <div className="flex xl:flex-row flex-col w-full mt-5 gap-4">
@@ -116,11 +118,11 @@ const Slug = () => {
                               Departure
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.departure_location === null ||
+                              {details?.departureLocation === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.departure_location
+                                details?.departureLocation
                               )}
                             </span>
                           </div>
@@ -129,11 +131,11 @@ const Slug = () => {
                               Destination
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.arrival_destination?.name === null ||
+                              {details?.arrivalDestination === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.arrival_destination?.name
+                                details?.arrivalDestination
                               )}
                             </span>
                           </div>
@@ -145,14 +147,14 @@ const Slug = () => {
                               Departure date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.departure_date === null || loading ? (
+                              {details?.departureDate === null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
                                     // Combine departure date and time into a Date object
                                     const departureDateTime = new Date(
-                                      `${details.departure_date}T${details.departure_time}`
+                                      `${details.departureDate}T${details.departureTime}`
                                     );
 
                                     // Check if the date is valid
@@ -182,14 +184,14 @@ const Slug = () => {
                               Return date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.arrival_date === null || loading ? (
+                              {details?.arrivalDate === null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
                                     // Combine departure date and time into a Date object
                                     const departureDateTime = new Date(
-                                      `${details.arrival_date}T${details.arrival_time}`
+                                      `${details.arrivalDate}T${details.arrivalTime}`
                                     );
 
                                     // Check if the date is valid
@@ -221,8 +223,8 @@ const Slug = () => {
                             Estimated duration
                           </span>
                           <span className="font-medium text-sm capitalize">
-                            {details?.departure_time === null ||
-                            details?.arrival_time === null ||
+                            {details?.departureTime === null ||
+                            details?.arrivalTime === null ||
                             loading ? (
                               <Skeleton className="h-4 mt-2 w-32 bg-gray-200" />
                             ) : (
@@ -230,16 +232,16 @@ const Slug = () => {
                                 try {
                                   // Validate and construct date-time strings
                                   const departureDateTime =
-                                    details.departure_date &&
-                                    details.departure_time
+                                    details.departureDate &&
+                                    details.departureTime
                                       ? new Date(
-                                          `${details.departure_date}T${details.departure_time}`
+                                          `${details.departureDate}T${details.departureTime}`
                                         )
                                       : null;
                                   const arrivalDateTime =
-                                    details.arrival_date && details.arrival_time
+                                    details.arrivalDate && details.arrivalTime
                                       ? new Date(
-                                          `${details.arrival_date}T${details.arrival_time}`
+                                          `${details.arrivalDate}T${details.arrivalTime}`
                                         )
                                       : null;
 
@@ -323,7 +325,7 @@ const Slug = () => {
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
                                       formatCurrency(
-                                        details?.trip_specification?.price
+                                        details?.price
                                       )
                                     )}
                                   </span>
@@ -418,17 +420,17 @@ const Slug = () => {
                               Full name
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.vehicle?.driver?.first_name === null ||
+                              {details?.driver?.user.firstName === null ||
                               loading ||
-                              details?.vehicle?.driver?.first_name === null ? (
+                              details?.driver?.user.firstName === null ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 <div className="flex items-center gap-x-2">
                                   <span>
-                                    {details?.vehicle?.driver?.first_name}
+                                    {details?.driver?.user.firstName}
                                   </span>
                                   <span>
-                                    {details?.vehicle?.driver?.last_name}
+                                    {details?.driver?.user.lastName}
                                   </span>
                                 </div>
                               )}
@@ -441,12 +443,12 @@ const Slug = () => {
                               Email
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.vehicle?.driver?.email === null ||
+                              {details?.driver?.user.email === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 <div className="flex items-center gap-x-2">
-                                  <span>{details?.vehicle?.driver?.email}</span>
+                                  <span>{details?.driver?.user.email}</span>
                                 </div>
                               )}
                             </span>
@@ -465,14 +467,14 @@ const Slug = () => {
               <div className="grid xl:grid-cols-3 grid-cols-1 mt-3 gap-4 ">
                 <div className="col-span-2 h-[500px]">
                   <MapComponent
-                    busStops={details?.bus_stop}
-                    busstop_latlong={details?.busstop_latlong}
-                    departure={details?.departure_latlong}
-                    arrival={details?.arrival_destination}
+                    //busStops={details?.busStop}
+                    busstop_latlong={details?.busstopLatlong}
+                    departure={details?.departureLatlong}
+                    arrival={details?.arrivalDestination?.[0]}
                   />
                 </div>
                 <div>
-                  <Timeline stops={details?.bus_stop} station={details} />
+                  <Timeline stops={details?.busStop} station={details} />
                 </div>
               </div>
             </div>

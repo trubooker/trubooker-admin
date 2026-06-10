@@ -13,6 +13,8 @@ import { LineChartDisplay } from "@/components/charts/LineChart";
 import * as data from "@/constants";
 import { useGetDashboardQuery } from "@/redux/services/Slices/dashboardApiSlice";
 
+
+
 import {
   Table,
   TableBody,
@@ -37,10 +39,13 @@ const Dashboard = () => {
 const { data: info, isLoading: loading, isFetching } = useGetDashboardQuery({ page });
 
 const result = info?.result;
-const userData = result?.activeTrips?.data || [];          
+
+const userData = info?.result?.activeTrips?.data || [];          
 const totalPages = result?.activeTrips?.meta?.pageCount ?? 0; 
 const stats = result?.users;
+
 const graphData = result?.graphData ?? [];
+console.log('graph data', graphData)
 const totalRevenue = result?.finance?.totalRevenue;
 
   const onPageChange = (pageNumber: number) => {
@@ -49,7 +54,6 @@ const totalRevenue = result?.finance?.totalRevenue;
     }
   };
   const router = useRouter();
-
   return (
     <div className="flex flex-col h-fit w-full  gap-4">
       <div className="flex flex-col xl:flex-row w-full gap-4">
@@ -143,7 +147,7 @@ const totalRevenue = result?.finance?.totalRevenue;
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            <Overview data={result} loading={loading} />
+            <Overview data={result?.data} loading={loading} />
           </div>
         </div>
         <div className="xl:w-[40%]">
@@ -254,14 +258,14 @@ const totalRevenue = result?.finance?.totalRevenue;
                       <TableCell className=" py-5 font-medium text-left me-4">
                         <div className="w-full flex gap-x-3 items-center">
                           <Avatar className="w-8 h-8">
-                            <AvatarImage src={data?.profile_picture} />
+                            <AvatarImage src={data?.driver.user.profileImage} />
                             <AvatarFallback>
                               <IoPersonOutline />
                             </AvatarFallback>
                           </Avatar>
                           <span className="w-full flex flex-col xl:flex-row gap-x-2 gap-y-1 text-gray-500">
                             <span className="capitalize">
-                              {data.driver?.name}{" "}
+                              {data.driver?.user.firstName}{" "}
                             </span>
                             {/* <span>{data.last_name}</span> */}
                           </span>
@@ -270,10 +274,10 @@ const totalRevenue = result?.finance?.totalRevenue;
 
                       <TableCell className="w-1/7 py-5 text-left">
                         <div className="flex flex-col">
-                          <span> {data.departure_location}</span>
+                          <span> {data.departureLocation}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
-                            {data.departure_date}
+                            {data.departureDate}
                           </small>
                         </div>
                       </TableCell>
@@ -283,15 +287,15 @@ const totalRevenue = result?.finance?.totalRevenue;
                           <span> {data.arrival_location?.address}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
-                            {data.arrival_date}, {data?.arrival_time}
+                            {data.arrivalDate}, {data?.arrivalTime}
                           </small>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Latitude:</span>{" "}
-                            {data.arrival_location?.latitude}
+                            {data.departureLatlong[0]}
                           </small>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Longitude:</span>{" "}
-                            {data.arrival_location?.longitude}
+                            {data.departureLatlong[1]}
                           </small>
                         </div>
                       </TableCell>
@@ -317,7 +321,7 @@ const totalRevenue = result?.finance?.totalRevenue;
                         <Button
                           onClick={() =>
                             router.push(
-                              `/drivers/${data.driver?.id}/trip-detail/${data.id}`
+                              `/drivers/${data.driver?.userId}/trip-detail/${data.id}`
                             )
                           }
                           className="rounded-xl  text-blue-600 hover:bg-blue-100 bg-blue-200 py-3 text-xs"

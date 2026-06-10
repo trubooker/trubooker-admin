@@ -62,16 +62,16 @@ export function DriverTable({
             <>
               {DriverTableData?.map((data: any) => (
                 <TableRow
-                  key={data.trip_id}
+                  key={data.id}
                   className="text-xs lg:text-sm w-full justify-start"
                 >
                   {/* <TableCell># {data?.trip_id}</TableCell> */}
                   <TableCell className="w-1/7 py-5 text-left ">
                     <div className="flex flex-col">
-                      <span> {data.departure_location}</span>
+                      <span> {data.departureLocation}</span>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Date:</span>{" "}
-                        {data.departure_date}, {data?.departure_time}
+                        {data.departureDate}, {data?.departureTime}
                       </small>
                     </div>
                   </TableCell>
@@ -80,21 +80,21 @@ export function DriverTable({
                       <span> {data.arrival_location?.address}</span>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Date:</span>{" "}
-                        {data.arrival_date}, {data?.arrival_time}
+                        {data.arrivalDate}, {data?.arrivalTime}
                       </small>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Latitude:</span>{" "}
-                        {data.arrival_location?.latitude}
+                        {data.departureLatlong[0]}
                       </small>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Longitude:</span>{" "}
-                        {data.arrival_location?.longitude}
+                        {data.departureLatlong[1]}
                       </small>
                     </div>
                   </TableCell>
 
                   <TableCell className="w-1/7 py-5 text-center">
-                    {formatCurrency(data?.amount)}
+                    {formatCurrency(data?.price)}
                   </TableCell>
                   <TableCell>
                     {data.status === "completed" ? (
@@ -118,7 +118,12 @@ export function DriverTable({
                         <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
                         <span className="font-semibold text-xs">Past</span>
                       </div>
-                    ) : (
+                    ) : data.status === "active" ? (
+                      <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#5af542]">
+                        <span className="w-2 h-2 bg-[#5af542] rounded-full"></span>
+                        <span className="font-semibold text-xs">Active</span>
+                      </div>
+                    ):(
                       ""
                     )}
                   </TableCell>
@@ -139,7 +144,7 @@ export function DriverTable({
                           // onClick={() => handleDelete(data?.trip_id)}
                           onClick={() =>
                             router.push(
-                              `/drivers/${driverId}/trip-detail/${data?.trip_id}`
+                              `/drivers/${driverId}/trip-detail/${data?.id}`
                             )
                           }
                         >

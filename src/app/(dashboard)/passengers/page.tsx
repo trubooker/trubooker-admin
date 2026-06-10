@@ -23,6 +23,7 @@ import { PassengerList } from "@/components/Passenger/passengerList";
 import { useGetPassengersQuery } from "@/redux/services/Slices/passenger.ApiSlice";
 import { FaSort } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { Passenger } from "@/types";
 
 const Passengers = () => {
   const [page, setPage] = useState(1);
@@ -33,8 +34,10 @@ const Passengers = () => {
     isFetching,
   } = useGetPassengersQuery({ page, search: searchQuery });
 
-  const PassengerListData = userData?.data;
-  const totalPages = userData?.meta?.last_page;
+  const PassengerListData = userData?.result?.data;
+  const meta = userData?.result?.meta;
+const totalPages = meta ? Math.ceil(meta.count / meta.limit) : 1;
+  //const totalPages = userData?.result?.meta?.last_page;
   
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
@@ -68,14 +71,17 @@ const Passengers = () => {
     statusFilter === "all"
       ? filteredStudents
       : filteredStudents?.filter(
-          (passenger: any) => passenger.status === statusFilter
+          (passenger: any) => passenger.user.status === statusFilter
         );
 
   // Helper to count verified users
-  const verifiedCount = {
-    emailVerified: filteredStudents?.filter((p: any) => p.email_verified).length || 0,
-    phoneVerified: filteredStudents?.filter((p: any) => p.phone_verified).length || 0,
-  };
+const verifiedCount = {
+  emailVerified:
+    filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified).length || 0,
+  phoneVerified:
+    filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified).length || 0,
+};
+
 
   return (
     <div className="flex flex-col h-fit w-full">

@@ -7,7 +7,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getAgents: builder.query({
       query: ({ page, search }) => ({
-        url: `/admin/agents?page=${page}&search=${search}`,
+        url: `/v1/admin/agents?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Agents"],
@@ -15,7 +15,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 
     getOneAgent: builder.query({
       query: (agent) => ({
-        url: `/admin/agents/${agent}`,
+        url: `/v1/admin/agent/${agent}`,
         method: "GET",
       }),
       providesTags: ["Agents"],
@@ -23,7 +23,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 
     getAgentReferrals: builder.query({
       query: ({agent, page}) => ({
-        url: `/admin/agents/referrals/${agent}?page=${page}`,
+        url: `/v1/admin/agents-referral/${agent}?page=${page}`,
         method: "GET",
       }),
       providesTags: ["Agents"],
@@ -31,7 +31,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 
     toggleAgentStatus: builder.mutation({
       query: (agent) => ({
-        url: `/admin/agents/toggle-status/${agent}`,
+        url: `/v1/admin/toggle-agents/${agent}`,
         method: "PATCH",
       }),
       invalidatesTags: ["Agents"],
