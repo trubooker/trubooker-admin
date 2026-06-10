@@ -53,12 +53,12 @@ const AnnouncementTable = ({
                         {notification.title}
                       </TableCell>
                       <TableCell className=" py-5 text-center capitalize">
-                        {notification.target === "agent"
+                        {notification.data.target === "agent"
                           ? "connector"
-                          : notification.target}
+                          : notification.data.target}
                       </TableCell>
                       <TableCell className=" py-5 text-[--primary] text-center">
-                        {new Date(notification?.created_at).toLocaleString(
+                        {new Date(notification?.createdAt).toLocaleString(
                           "en-GB",
                           {
                             day: "2-digit",
@@ -93,7 +93,7 @@ const AnnouncementTable = ({
                                 <p className="mb-4">
                                   <strong>Date Sent/Scheduled Date:</strong>{" "}
                                   {new Date(
-                                    notification?.created_at
+                                    notification?.createdAt
                                   ).toLocaleString("en-GB", {
                                     day: "2-digit",
                                     month: "short",
@@ -107,7 +107,7 @@ const AnnouncementTable = ({
                                 <p>
                                   <strong>Attachment:</strong>
                                 </p>
-                                {notification?.attachment ? (
+                                {notification?.data.fileUrl ? (
                                   // <div className="relative w-full object-cover h-[200px]">
                                   //   <Image
                                   //     src={notification?.attachment}
@@ -117,7 +117,7 @@ const AnnouncementTable = ({
                                   //   />
                                   // </div>
                                   <img
-                                    src={notification?.attachment}
+                                    src={notification?.data.fileUrl}
                                     alt={""}
                                     className="w-full h-96 object-cover rounded-md mb-4"
                                   />
