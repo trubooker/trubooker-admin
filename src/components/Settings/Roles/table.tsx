@@ -61,14 +61,14 @@ export function Roles_Table({ data: Data, isFetching, loading }: any) {
                     <TableCell className=" py-5 text-center text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src={data?.profile_picture} />
+                          <AvatarImage src={data?.profileImage} />
                           <AvatarFallback>
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
                         <span className="w-full flex justify-start text-left  flex-row gap-x-2 gap-y-1 text-gray-500">
-                          <span>{data.first_name} </span>
-                          <span>{data.last_name} </span>
+                          <span>{data.firstName} </span>
+                          <span>{data.lastName} </span>
                         </span>
                       </div>
                     </TableCell>

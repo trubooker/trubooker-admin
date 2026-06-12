@@ -7,7 +7,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     assignRoleToUser: builder.mutation({
       query: (body) => ({
-        url: `/admin/assign-role-to-user`,
+        url: `/v1/admin/assign-role-to-user`,
         method: "POST",
         body,
       }),
@@ -16,7 +16,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     inviteAdmin: builder.mutation({
       query: (body) => ({
-        url: `/admin/invite-admin`,
+        url: `/v1/admin/invite-admin`,
         method: "POST",
         body,
       }),
@@ -25,7 +25,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getRoles: builder.query({
       query: () => ({
-        url: `/admin/get-roles`,
+        url: `/v1/admin/get-roles`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -33,7 +33,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     groupUserByRoles: builder.query({
       query: () => ({
-        url: `/admin/group-users-by-role`,
+        url: `/v1/admin/group-users-by-role`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -41,7 +41,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getRolesById: builder.query({
       query: (id) => ({
-        url: `/admin/get-role-by-id/${id}`,
+        url: `/v1/admin/get-role-by-id/${id}`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -49,7 +49,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getPermissions: builder.query({
       query: () => ({
-        url: `/admin/get-permissions`,
+        url: `/v1/admin/get-permissions`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -57,7 +57,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getPermissionsById: builder.query({
       query: (id) => ({
-        url: `/admin/get-permission-by-id/${id}`,
+        url: `/v1/admin/get-permission-by-id/${id}`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -65,7 +65,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getUsersByRole: builder.query({
       query: ({ page, search }) => ({
-        url: `/admin/user-by-role?page=${page}&search=${search}`,
+        url: `/v1/admin/user-by-role?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Roles"],
@@ -73,7 +73,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     updateRoles: builder.mutation({
       query: ({ name, permissions, id }: any) => ({
-        url: `/admin/update-roles/${id}`,
+        url: `/v1/admin/update-roles/${id}`,
         method: "PUT",
         body: { name, permissions },
       }),

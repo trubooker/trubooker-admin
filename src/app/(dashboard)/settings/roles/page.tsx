@@ -23,8 +23,9 @@ const Roles = () => {
     isLoading: roleLoading,
     isFetching: roleFetching,
   } = useGetRolesQuery(null);
-  const role = data?.data;
+  const role = data?.result;
 
+  console.log('roles data', data)
   const {
     data: groupUsers,
     isLoading: groupUsersLoading,
@@ -66,7 +67,7 @@ const Roles = () => {
           </div>
         ) : (
           <div className="grid grid-rows-1 lg:grid-rows-none gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            {groupUsers?.data?.map((tot: any, index: number) => (
+            {groupUsers?.result?.map((tot: any, index: number) => (
               <Card
                 key={index}
                 className={`w-full border-none my-auto bg-white`}
