@@ -48,7 +48,7 @@ const MapComponent = ({ busstop_latlong, departure, arrival, arrivalName }: MapC
 
     const originPt = toLatLng(departure);
     if (!isValid(originPt)) {
-      console.error("Invalid/missing departure coordinate", originPt);
+      //console.error("Invalid/missing departure coordinate", originPt);
       return;
     }
 

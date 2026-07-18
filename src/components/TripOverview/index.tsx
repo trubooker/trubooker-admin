@@ -11,7 +11,7 @@ import { Skeleton } from "../ui/skeleton";
 
 interface Props {
   data: {
-    activeTrips: { data: any[]; meta: any } | any[];  // it's returning array not number
+    active_trips: { data: any[]; meta: any } | any[];  // it's returning array not number
     upcoming_trips: { data: any[]; meta: any } | any[];
     completed_trips: { data: any[]; meta: any } | any[];
     cancelled_trips: { data: any[]; meta: any } | any[];
@@ -39,7 +39,7 @@ const Overview: React.FC<Props> = ({ data, loading }) => {
             <div className="flex justify-between">
               <span className="font-semibold text-sm">Active Trips:</span>
               <span className="font-medium text-sm">
-               {loading ? <Skeleton className="h-4 w-[50px] bg-gray-200" /> : getCount(data?.activeTrips)}
+               {loading ? <Skeleton className="h-4 w-[50px] bg-gray-200" /> : getCount(data?.active_trips)}
               </span>
             </div>
             <div className="flex justify-between">

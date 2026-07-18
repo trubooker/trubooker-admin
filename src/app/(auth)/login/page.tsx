@@ -61,6 +61,7 @@ export default function LoginComponent() {
       setEmailError("");
       setPasswordError("");
       const response = await axios.post(`/api/login`, values);
+      console.log(response)
       if (response.status === 200) {
         form.setValue("email", "");
         form.setValue("password", "");

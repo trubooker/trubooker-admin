@@ -273,7 +273,7 @@ const Trips = () => {
                                 <div className="flex flex-col">
                                   <span>
                                     {" "}
-                                    {data.arrivalDestination[0]}
+                                    {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
@@ -289,7 +289,7 @@ const Trips = () => {
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.longitude}
+                                    {data.arrivalDestination?.[0]?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
@@ -477,7 +477,7 @@ const Trips = () => {
                                 <div className="flex flex-col">
                                   <span>
                                     {" "}
-                                    {data.arrivalDestination[0]}
+                                    {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
@@ -487,13 +487,13 @@ const Trips = () => {
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.latitude}
+                                     {data.arrivalDestination?.[0]?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.longitude}
+                                    {data.arrivalDestination?.[0]?.longitude}
                                   </small>
                                 </div>
                               </TableCell>

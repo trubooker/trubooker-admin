@@ -40,6 +40,8 @@ const { data: info, isLoading: loading, isFetching } = useGetDashboardQuery({ pa
 
 const result = info?.result;
 
+console.log("niyu result", result)
+
 const userData = info?.result?.activeTrips?.data || [];          
 const totalPages = result?.activeTrips?.meta?.pageCount ?? 0; 
 const stats = result?.users;
@@ -147,7 +149,7 @@ const totalRevenue = result?.finance?.totalRevenue;
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            <Overview data={result?.data} loading={loading} />
+            <Overview data={result?.overviews} loading={loading} />
           </div>
         </div>
         <div className="xl:w-[40%]">

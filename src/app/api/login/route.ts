@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
+    
   };
   
   const resData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/login-admin`, {
@@ -14,8 +15,8 @@ export async function POST(request: NextRequest) {
     headers,
     body: JSON.stringify(body),
   });
-
   const data = await resData.json();
+
   const token = data?.result?.accessToken;
 
   if (data?.success === true) {

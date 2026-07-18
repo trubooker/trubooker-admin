@@ -130,14 +130,23 @@ console.log("na this", data)
                             <span className="font-normal text-xs text-gray-500">
                               Destination
                             </span>
+
                             <span className="font-medium text-sm">
+                            {!details?.arrivalDestination?.length || loading ? (
+                              <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                            ) : (
+                              details.arrivalDestination[0]?.name
+                              // or use .address if you want the full "Wuse 2, Abuja, ..." string
+                            )}
+                          </span>
+                            {/* <span className="font-medium text-sm">
                               {details?.arrivalDestination === null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 details?.arrivalDestination
                               )}
-                            </span>
+                            </span> */}
                           </div>
                         </div>
 

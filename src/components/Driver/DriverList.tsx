@@ -142,7 +142,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
             </TableHeader>
             <TableBody>
               {Data?.map((data: any) => {
-                const statusDisplay = getStatusDisplay(data.user.status);
+                const statusDisplay = getStatusDisplay(data?.user?.status ?? 'unknown');
                 const docStatusColor = getDocStatusColor(data.kycComplete);
                 const docStatusIcon = getDocStatusIcon(data.kycComplete);
                 
@@ -226,7 +226,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                               }}
                               className="cursor-pointer hover:bg-gray-100"
                             >
-                              {data.user.status === 'active' ? 'Suspend' : 'Activate'}
+                              {data?.user?.status === 'active' ? 'Suspend' : 'Activate'}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
