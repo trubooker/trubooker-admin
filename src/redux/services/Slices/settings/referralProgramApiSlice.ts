@@ -7,8 +7,8 @@ const referralApi = referralApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     setPriceControl: builder.mutation({
       query: (body) => ({
-        url: `/admin/system-settings/set-price-control`,
-        method: "POST",
+        url: `/v1/admin/settings/price-control`,
+        method: "PATCH",
         body,
       }),
       invalidatesTags: ["Referral"],
@@ -16,7 +16,7 @@ const referralApi = referralApiConfig.injectEndpoints({
 
     setReferralProgram: builder.mutation({
       query: (body) => ({
-        url: `/admin/system-settings/set-referral-program`,
+        url: `/v1/admin/settings/referral-program`,
         method: "POST",
         body,
       }),
@@ -25,7 +25,7 @@ const referralApi = referralApiConfig.injectEndpoints({
 
     getSystemSettings: builder.query({
       query: () => ({
-        url: `/admin/system-settings`,
+        url: `/v1/admin/settings/get-all`,
         method: "GET",
       }),
       providesTags: ["Referral"],
@@ -33,7 +33,7 @@ const referralApi = referralApiConfig.injectEndpoints({
 
     getReferralPrograms: builder.query({
       query: () => ({
-        url: `/admin/referral-programs`,
+        url: `/v1/admin/settings/referral-program`,
         method: "GET",
       }),
       providesTags: ["Referral"],
@@ -41,7 +41,7 @@ const referralApi = referralApiConfig.injectEndpoints({
 
     getAnnouncements: builder.query({
       query: () => ({
-        url: `/admin/anoucements`,
+        url: `/v1/admin/anoucements`,
         method: "GET",
       }),
       providesTags: ["Referral"],

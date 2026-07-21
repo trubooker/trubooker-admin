@@ -24,6 +24,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 export function DriverList({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
 
+  console.log("my new", Data)
   // Function to get badge color for document status
   const getDocStatusColor = (status: string) => {
     switch (status) {
@@ -141,42 +142,42 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
             </TableHeader>
             <TableBody>
               {Data?.map((data: any) => {
-                const statusDisplay = getStatusDisplay(data.status);
-                const docStatusColor = getDocStatusColor(data.vehicle_document_status);
-                const docStatusIcon = getDocStatusIcon(data.vehicle_document_status);
+                const statusDisplay = getStatusDisplay(data?.user?.status ?? 'unknown');
+                const docStatusColor = getDocStatusColor(data.kycComplete);
+                const docStatusIcon = getDocStatusIcon(data.kycComplete);
                 
                 return (
                   <TableRow key={data.id} className="text-xs lg:text-sm w-full hover:bg-gray-50">
                     <TableCell className="py-4">
                       <div className="flex items-center gap-x-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={data?.profile_image} />
+                          <AvatarImage src={data?.user?.profileImage} />
                           <AvatarFallback className="bg-gray-200">
                             <IoPersonOutline className="w-5 h-5 text-gray-500" />
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-900">{data.name}</span>
+                          <span className="font-medium text-gray-900">{data?.user?.firstName}</span>
                         </div>
                       </div>
                     </TableCell>
                     
                     <TableCell className="py-4 text-center">
                       <div className="flex flex-col gap-1">
-                        <span className="text-sm text-gray-700">{data.email}</span>
-                        <span className="text-xs text-gray-500">{data.phone_number}</span>
+                        <span className="text-sm text-gray-700">{data?.user?.email}</span>
+                        <span className="text-xs text-gray-500">{data?.user?.phone}</span>
                       </div>
                     </TableCell>
                     
                     <TableCell className="py-4 text-center">
                       <div className="flex justify-center">
-                        {renderVerificationIcon(data.email_verified)}
+                        {renderVerificationIcon(data?.user?.isEmailVerified)}
                       </div>
                     </TableCell>
                     
                     <TableCell className="py-4 text-center">
                       <div className="flex justify-center">
-                        {renderVerificationIcon(data.phone_verified)}
+                        {renderVerificationIcon(data?.user?.isPhoneVerified)}
                       </div>
                     </TableCell>
                     
@@ -194,7 +195,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                         <div className={`flex items-center gap-x-2 px-3 py-1.5 rounded-full ${docStatusColor}`}>
                           {docStatusIcon}
                           <span className="font-semibold text-xs">
-                            {formatDocStatus(data.vehicle_document_status)}
+                            {formatDocStatus(data?.kycComplete)}
                           </span>
                         </div>
                       </div>
@@ -219,13 +220,13 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                             <DropdownMenuItem
                               onClick={() => {
                                 // Toggle driver status
-                                const newStatus = data.status === 'active' ? 'inactive' : 'active';
+                                const newStatus = data.user.status === 'active' ? 'inactive' : 'active';
                                 console.log(`Toggle ${data.id} status to ${newStatus}`);
                                 // You would call your API here
                               }}
                               className="cursor-pointer hover:bg-gray-100"
                             >
-                              {data.status === 'active' ? 'Suspend' : 'Activate'}
+                              {data?.user?.status === 'active' ? 'Suspend' : 'Activate'}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

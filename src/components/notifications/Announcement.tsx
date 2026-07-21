@@ -23,7 +23,7 @@ const Announcement = () => {
 
   console.log("Announcement", data);
 
-  const announcement = data?.data;
+  const announcement = data?.result;
   return (
     <div className="flex flex-col h-fit w-full">
       <div className="flex flex-col xl:flex-row w-full">

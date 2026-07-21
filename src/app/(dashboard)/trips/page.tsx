@@ -68,9 +68,12 @@ const Trips = () => {
     page: completedPage,
   });
 
+  console.log('upcoming', upcoming)
+   console.log('completed', completed)
+   console.log('past', past)
   // Upcoming ----------------------------------------------------------
-  const totalUpcomingPage = upcoming?.meta?.last_page;
-  const upcomingData = upcoming?.data;
+  const totalUpcomingPage = upcoming?.result.meta?.previousPage;
+  const upcomingData = upcoming?.result.data;
   const onUpcomingChange = (pageNumber: number) => {
     if (!upcomingLoading && pageNumber !== upcomingPage) {
       setUpcomingPage(pageNumber);
@@ -96,8 +99,8 @@ const Trips = () => {
   };
 
   // Past --------------------------------------------------
-  const totalPastPages = past?.meta?.last_page;
-  const pastData = past?.data;
+  const totalPastPages = past?.result.meta?.previousPage;
+  const pastData = past?.result.data;
   const onPastPageChange = (pageNumber: number) => {
     if (!pastLoading && pageNumber !== pastPage) {
       setPastPage(pageNumber);
@@ -123,8 +126,8 @@ const Trips = () => {
   };
 
   // Completed --------------------------------------------------
-  const totalCompletedPages = completed?.meta?.last_page;
-  const completedData = completed?.data;
+  const totalCompletedPages = completed?.result.meta?.previousPage;
+  const completedData = completed?.result.data;
   const onCompletedPageChange = (pageNumber: number) => {
     if (!completedLoading && pageNumber !== completedPage) {
       setCompletedPage(pageNumber);
@@ -245,23 +248,23 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departure_location}</span>
+                                  <span> {data.departureLocation}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departure_date},{" "}
-                                    {data?.departure_time}
+                                    {data.departureDate},{" "}
+                                    {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.latitude}
+                                    {data.departureLatlong[0]}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.longitude}
+                                    {data.departureLatlong[1]}
                                   </small>
                                 </div>
                               </TableCell>
@@ -270,29 +273,29 @@ const Trips = () => {
                                 <div className="flex flex-col">
                                   <span>
                                     {" "}
-                                    {data.arrival_destination?.address}
+                                    {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.arrival_date}, {data?.arrival_time}
+                                    {data.arrivalDate}, {data?.arrivalTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.latitude}
+                                    {data.busstopLatlong[0]}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.longitude}
+                                    {data.arrivalDestination?.[0]?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data.booking_closing_date},{" "}
-                                {data?.booking_closing_time}{" "}
+                                {data.bookingClosingDate},{" "}
+                                {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
                                 {data?.duration}
@@ -449,23 +452,23 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departure_location}</span>
+                                  <span> {data.departureLocation}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departure_date},{" "}
-                                    {data?.departure_time}
+                                    {data.departureDate},{" "}
+                                    {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.latitude}
+                                    {data.departureLatlong[0]}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.longitude}
+                                    {data.departureLatlong[1]}
                                   </small>
                                 </div>
                               </TableCell>
@@ -474,29 +477,29 @@ const Trips = () => {
                                 <div className="flex flex-col">
                                   <span>
                                     {" "}
-                                    {data.arrival_destination?.address}
+                                    {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.arrival_date}, {data?.arrival_time}
+                                    {data.arrivalDate}, {data?.arrivalTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.latitude}
+                                     {data.arrivalDestination?.[0]?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.longitude}
+                                    {data.arrivalDestination?.[0]?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data.booking_closing_date},{" "}
-                                {data?.booking_closing_time}{" "}
+                                {data.bookingClosingDate},{" "}
+                                {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
                                 {data?.duration}
@@ -653,23 +656,23 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departure_location}</span>
+                                  <span> {data.departureLocation}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departure_date},{" "}
-                                    {data?.departure_time}
+                                    {data.departureDate},{" "}
+                                    {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.latitude}
+                                    {data.departureLatlong[0]}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departure_latlong?.longitude}
+                                    {data.departureLatlong[1]}
                                   </small>
                                 </div>
                               </TableCell>
@@ -682,7 +685,7 @@ const Trips = () => {
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.arrival_date}, {data?.arrival_time}
+                                    {data.arrivalDate}, {data?.arrivalTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
@@ -699,8 +702,8 @@ const Trips = () => {
                                 </div>
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data.booking_closing_date},{" "}
-                                {data?.booking_closing_time}{" "}
+                                {data.bookingClosingDate},{" "}
+                                {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
                                 {data?.duration}

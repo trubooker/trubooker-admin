@@ -29,7 +29,9 @@ const RolesTable = ({ role }: any) => {
     isFetching: userByRoleFetching,
   } = useGetUsersByRoleQuery({ page, search: searchQuery });
 
-  const usersByRole = data?.data;
+  const usersByRole = data?.result.data;
+
+  console.log("user by role", data)
 
   const totalPages = data?.meta?.last_page;
 

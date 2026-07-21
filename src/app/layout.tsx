@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import StoreProvider from "@/redux/providers";
+
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -19,8 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={montserrat.className}>{children}</body>
+      <body className={montserrat.className}>
+                <StoreProvider>
+
+        {children}
+                </StoreProvider>
+
+        </body>
     </html>
+    
   );
 }

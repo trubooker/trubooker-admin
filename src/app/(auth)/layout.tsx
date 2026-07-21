@@ -21,12 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <StoreProvider>
-      <html lang="en" suppressHydrationWarning={true}>
-        <body className={montserrat.className}>
-          {children} <Toaster />
-        </body>
-      </html>
-    </StoreProvider>
+<>
+          {children}
+           <Toaster />
+    
+    </>
   );
 }

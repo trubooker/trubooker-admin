@@ -5,7 +5,7 @@ const dashboardApi = dashboardApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getDashboard: builder.query({
       query: ({ page }: any) => ({
-        url: `/admin/dashboard?page=${page}`,
+        url: `/v1/admin/dashboard?page=${page}`,
         method: "GET",
       }),
       providesTags: ["Dashboard"],

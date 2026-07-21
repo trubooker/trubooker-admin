@@ -36,11 +36,10 @@ const ViewPassenger = () => {
     data: userData,
     isFetching,
   } = useGetOnePassengerQuery(id);
-  console.log("SinglePassenger", userData);
-  const profile = userData?.data?.profile;
-  const nok = userData?.data?.next_of_kin;
-  const referrals = userData?.data?.refferals;
-  const th = userData?.data?.trip_history;
+  const profile = userData?.result?.user;
+  const nok = userData?.result?.next_of_kin;
+  const referrals = userData?.result;
+  const th = userData?.result?.trip_history;
 
   const [mutate, { isLoading: loadingToggle }] =
     useTogglePassengerStatusMutation();
@@ -55,12 +54,12 @@ const ViewPassenger = () => {
         <div>
           <Goback
             formerPage={"Passenger"}
-            presentPage={`${profile?.first_name} ${profile?.last_name}`}
+            presentPage={`${profile?.firstName} ${profile?.lastName}`}
           />
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage src={profile?.profile_image} />
+                <AvatarImage src={profile?.profileImage} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -68,7 +67,7 @@ const ViewPassenger = () => {
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                 <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
                   <span className="text-xl font-extrabold capitalize text-start">
-                    {profile?.first_name} {profile?.last_name}
+                    {profile?.firstName} {profile?.lastName}
                   </span>
                   <>
                     {profile?.status === "active" ? (
@@ -143,7 +142,7 @@ const ViewPassenger = () => {
 
               <span className="text-left lg:text-right lg:me-5 text-sm">
                 Joined{" "}
-                {new Date(profile?.created_at).toLocaleDateString("en-US", {
+                {new Date(profile?.createdAt).toLocaleDateString("en-US", {
                   day: "numeric",
                   month: "short",
                   year: "numeric",

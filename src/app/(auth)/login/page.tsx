@@ -61,6 +61,7 @@ export default function LoginComponent() {
       setEmailError("");
       setPasswordError("");
       const response = await axios.post(`/api/login`, values);
+      console.log(response)
       if (response.status === 200) {
         form.setValue("email", "");
         form.setValue("password", "");
@@ -72,8 +73,8 @@ export default function LoginComponent() {
       setPasswordError("");
       setLoading(false);
       if (error?.status === 400) {
-        setEmailError(error.response?.data?.message?.email[0]);
-        setPasswordError(error.response?.data?.message?.password[0]);
+        setEmailError(error.response?.data?.message);
+        setPasswordError(error.response?.data?.message);
       }
       if (error.status === 401) {
         toast.error(error?.response?.data?.message);

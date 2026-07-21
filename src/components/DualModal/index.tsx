@@ -81,7 +81,7 @@ export const Modal: FC<Props> = ({
               {enhancedContent}
               <ScrollBar orientation="vertical" />
             </ScrollArea>
-            <DialogClose className={`w-full ${classname}`}>
+            <DialogClose asChild className={`w-full ${classname}`} >
               <Button
                 className="w-full bg-[--danger] hover:bg-[--danger-btn] text-white"
                 type="button"

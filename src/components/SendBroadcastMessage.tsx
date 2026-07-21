@@ -122,65 +122,115 @@ const SendBroadcastMessage = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEndDate, selectedEndTime]);
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    setIsLoading(true);
+  // const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  //   setIsLoading(true);
 
+  //   if (!selectedEndDate || !selectedEndTime) {
+  //     toast.error("Please select both end date and time");
+  //     return;
+  //   }
+
+  //   if (
+  //     !calculatedDuration ||
+  //     calculatedDuration.includes("must be in the future")
+  //   ) {
+  //     toast.error("End date/time must be in the future.");
+  //     return;
+  //   }
+
+  //   const formattedDuration = formatDurationForAPI(calculatedDuration);
+
+  //   const formData = new FormData();
+  //   formData.append("title", data?.title);
+  //   formData.append("body", data?.body);
+  //   formData.append("duration", formattedDuration);
+  //   formData.append("target", data?.target);
+  //   if (imageUrl.length > 0 && imageUrl[0].file) {
+  //     // If a new file is added, append it
+  //     formData.append("file", imageUrl[0].file);
+  //   } else {
+  //     ("");
+  //   }
+
+  //   console.log(formattedDuration);
+
+  //   const token = await fetchToken();
+  //   const headers = {
+  //     Authorization: `Bearer ${token?.data?.token}`,
+  //     Accept: "application/json",
+  //   };
+  //   const res = await fetch(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/anoucements/create`,
+  //     {
+  //       method: "POST",
+  //       headers,
+  //       body: formData,
+  //     }
+  //   );
+
+  //   const resdata = await res.json();
+  //   if (resdata?.status == "success") {
+  //     setIsLoading(false);
+  //     toast.success("Success");
+  //     onModalClose?.();
+  //   }
+  //   if (resdata?.status == "error") {
+  //     setIsLoading(false);
+  //     toast.error("Error Occured");
+  //     onModalClose?.();
+  //   }
+  // };
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  setIsLoading(true);
+
+  try {
     if (!selectedEndDate || !selectedEndTime) {
       toast.error("Please select both end date and time");
+      setIsLoading(false);
       return;
     }
 
-    if (
-      !calculatedDuration ||
-      calculatedDuration.includes("must be in the future")
-    ) {
+    if (!calculatedDuration || calculatedDuration.includes("must be in the future")) {
       toast.error("End date/time must be in the future.");
+      setIsLoading(false);
       return;
     }
 
     const formattedDuration = formatDurationForAPI(calculatedDuration);
-
     const formData = new FormData();
     formData.append("title", data?.title);
     formData.append("body", data?.body);
     formData.append("duration", formattedDuration);
     formData.append("target", data?.target);
     if (imageUrl.length > 0 && imageUrl[0].file) {
-      // If a new file is added, append it
-      formData.append("attachment", imageUrl[0].file);
-    } else {
-      ("");
+      formData.append("file", imageUrl[0].file);
     }
-
-    console.log(formattedDuration);
 
     const token = await fetchToken();
     const headers = {
       Authorization: `Bearer ${token?.data?.token}`,
       Accept: "application/json",
     };
+
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/anoucements/create`,
-      {
-        method: "POST",
-        headers,
-        body: formData,
-      }
+      `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/anoucements/create`,
+      { method: "POST", headers, body: formData }
     );
 
-    const resdata = await res.json();
-    if (resdata?.status == "success") {
-      setIsLoading(false);
-      toast.success("Success");
-      onModalClose?.();
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData?.message || "Something went wrong");
     }
-    if (resdata?.status == "error") {
-      setIsLoading(false);
-      toast.error("Error Occured");
-      onModalClose?.();
-    }
-  };
 
+    toast.success("Announcement sent successfully");
+    onModalClose?.();
+  } catch (error: any) {
+    toast.error(error?.message || "Error occurred");
+  } finally {
+    setIsLoading(false); // always runs no matter what
+  }
+};
   const {
     getRootProps: getImage2RootProps,
     getInputProps: getImage2InputProps,

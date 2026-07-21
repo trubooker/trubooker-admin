@@ -40,7 +40,6 @@ const dynamicBaseQuery: BaseQueryFn<
   
   // Check if the body is FormData
   if (fetchArgs.body instanceof FormData) {
-    console.log("📦 Detected FormData request, removing Content-Type header");
     
     // Create a custom request without Content-Type
     const customFetch = async (url: string, options: RequestInit) => {

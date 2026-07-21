@@ -14,7 +14,7 @@ import { formatCurrency } from "@/lib/utils";
 
 export function Tab({ data: AgentTableData, isFetching, loading }: any) {
 
-  const denom_amount: number = 3000;
+  const denom_amount: number = 500;
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}

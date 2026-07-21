@@ -7,7 +7,7 @@ const driversApi = driversApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getDriversDocuments: builder.query({
       query: (driverId: string) => ({
-        url: `/admin/drivers/fetch-drivers-document/${driverId}`,
+        url: `/v1/admin/drivers/fetch-drivers-document/${driverId}`,
         method: "GET",
       }),
       providesTags: ["Drivers"],
@@ -15,7 +15,7 @@ const driversApi = driversApiConfig.injectEndpoints({
 
     approveDriversDocuments: builder.mutation({
       query: (documentVerificationId: string) => ({
-        url: `/admin/drivers/approve-document/${documentVerificationId}`,
+        url: `/v1/admin/documents/${documentVerificationId}/approve`,
         method: "POST",
       }),
       invalidatesTags: ["Drivers"],
@@ -29,7 +29,7 @@ const driversApi = driversApiConfig.injectEndpoints({
         documentVerificationId: string;
         reason: string;
       }) => ({
-        url: `/admin/drivers/reject-document/${documentVerificationId}`,
+        url: `/v1/admin/documents/${documentVerificationId}/reject`,
         method: "POST",
         body: { reason },
       }),
@@ -37,16 +37,24 @@ const driversApi = driversApiConfig.injectEndpoints({
     }),
 
     getDrivers: builder.query({
-      query: ({ page, search, per_page = 10 }) => ({
-        url: `/admin/drivers?page=${page}&search=${search}&per_page=${per_page}`,
-        method: "GET",
-      }),
-      providesTags: ["Drivers"],
-    }),
+  query: ({ page, search = "", limit = 10 }) => ({
+    url: `/v1/admin/drivers?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+
+    // getDrivers: builder.query({
+    //   query: ({ page, search, limit = 10 }) => ({
+    //     url: `/v1/admin/drivers?page=${page}&search=${search}&limit=${limit}`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["Drivers"],
+    // }),
 
     getOneDriver: builder.query({
       query: (driver) => ({
-        url: `/admin/drivers/${driver}`,
+        url: `/v1/admin/drivers/${driver}`,
         method: "GET",
       }),
       providesTags: ["Drivers"],
@@ -54,7 +62,7 @@ const driversApi = driversApiConfig.injectEndpoints({
 
     getTripDetails: builder.query({
       query: (trip) => ({
-        url: `/admin/drivers/trip/${trip}`,
+        url: `/v1/admin/trips/${trip}`,
         method: "GET",
       }),
       providesTags: ["Drivers"],
@@ -62,16 +70,15 @@ const driversApi = driversApiConfig.injectEndpoints({
 
     toggleDriverStatus: builder.mutation({
       query: (driver) => ({
-        url: `/admin/drivers/toggle-status/${driver}`,
+        url: `/v1/admin/drivers/toggle-status/${driver}`,
         method: "PATCH",
       }),
       invalidatesTags: ["Drivers"],
     }),
 // Temporary debug version
 addDriversDocument: builder.mutation({
-  query: (formData) => {
+  query: ({id, formData}) => {
     // Log the raw FormData entries
-    console.log("🔍 MUTATION RECEIVED FORM DATA:");
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
         console.log(`  ${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
@@ -81,7 +88,7 @@ addDriversDocument: builder.mutation({
     }
     
     return {
-      url: `/admin/drivers/add-document`,
+      url: `/v1/admin/drivers/add-document/${id}`,
       method: "POST",
       body: formData,
       // Don't set Content-Type
@@ -92,7 +99,7 @@ addDriversDocument: builder.mutation({
 
 updateDriversDocument: builder.mutation({
   query: ({ id, formData }) => ({
-    url: `/admin/drivers/update-document/${id}`,
+    url: `/v1/admin/drivers/update-document/${id}`,
     method: "POST",
     body: formData,
   }),
@@ -101,7 +108,7 @@ updateDriversDocument: builder.mutation({
 
 deleteDriversDocument: builder.mutation({
   query: (id) => ({
-    url: `/admin/drivers/delete-document/${id}`,
+    url: `/v1/admin/drivers/delete-document/${id}`,
     method: "DELETE",
   }),
   invalidatesTags: ["Drivers"],
@@ -109,7 +116,7 @@ deleteDriversDocument: builder.mutation({
 
 getDocumentHistory: builder.query({
   query: (driverId) => ({
-    url: `/admin/drivers/document-history/${driverId}`,
+    url: `/v1/admin/drivers/document-history/${driverId}`,
     method: "GET",
   }),
   providesTags: ["Drivers"],

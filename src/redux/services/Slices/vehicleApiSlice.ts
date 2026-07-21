@@ -42,7 +42,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     getDriverVehicles: builder.query({
       query: (driverId) => ({
-        url: `/admin/drivers/vehicles/${driverId}`,
+        url: `/v1/admin/drivers/vehicles/${driverId}`,
         method: "GET",
       }),
       providesTags: ["Vehicles"],

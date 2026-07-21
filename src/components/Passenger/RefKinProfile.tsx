@@ -27,20 +27,20 @@ interface Props {
     address: string | null;
     city: string | null;
     country: string | null;
-    created_at: string | null;
-    deleted_at: string | null;
+    createdAt: string | null;
+    deletedAt: string | null;
     dob: string | null;
     email: string | null;
     email_verified_at: string | null;
-    first_name: string | null;
+    firstName: string | null;
     gender: string | null;
-    last_name: string | null;
+    lastName: string | null;
     phone: string | null;
     referral: string | null;
     referred_by: string | null;
     type: string | null;
     status: string | null;
-    updated_at: string | null;
+    updatedAt: string | null;
   };
 }
 
@@ -81,13 +81,13 @@ const RefKinProfile: FC<Props> = ({ ref, nok, profile }) => {
                           Full name
                         </span>
                         <span className="font-medium text-sm capitalize">
-                          {profile?.first_name === null ||
-                          profile?.last_name === null ? (
+                          {profile?.firstName === null ||
+                          profile?.lastName === null ? (
                             <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                           ) : (
                             <div className="flex gap-x-2">
-                              <span> {profile?.first_name}</span>
-                              <span> {profile?.last_name}</span>
+                              <span> {profile?.firstName}</span>
+                              <span> {profile?.lastName}</span>
                             </div>
                           )}
                         </span>

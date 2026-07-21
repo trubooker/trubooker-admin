@@ -30,7 +30,7 @@ const Broadcast = () => {
   console.log("SystemSettings", userData);
   console.log(data);
 
-  const SystemSettingsListData = userData?.data;
+  const SystemSettingsListData = userData?.result;
 
   return (
     <div className="lg:w-8/12 w-full px-4 pt-4 bg-white rounded-xl shadow-sm">
