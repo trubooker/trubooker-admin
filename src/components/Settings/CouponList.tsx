@@ -361,7 +361,7 @@ const CouponList: React.FC<CouponListProps> = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <ViewCouponModal couponId={coupon.id}>
+                          <ViewCouponModal couponId={typeof coupon.id === 'number' ? coupon.id : Number(coupon.id)}>
                             <DropdownMenuItem
                               onSelect={(e) => e.preventDefault()}
                             >
@@ -378,7 +378,7 @@ const CouponList: React.FC<CouponListProps> = ({
                           </DropdownMenuItem>
 
                           <EditCouponModal
-                            couponId={coupon.id}
+                            couponId={typeof coupon.id === 'number' ? coupon.id : Number(coupon.id)}
                             onSuccess={refetch}
                           >
                             <DropdownMenuItem
