@@ -276,7 +276,7 @@ const totalRevenue = result?.finance?.totalRevenue;
 
                       <TableCell className="w-1/7 py-5 text-left">
                         <div className="flex flex-col">
-                          <span> {data.departureLocation}</span>
+                          <span> {data.departureLocation?.state}</span>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Date:</span>{" "}
                             {data.departureDate}
@@ -293,11 +293,11 @@ const totalRevenue = result?.finance?.totalRevenue;
                           </small>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Latitude:</span>{" "}
-                            {data.departureLatlong[0]}
+                            {data.departureLocation?.latitude}
                           </small>
                           <small className="mt-1 font-light flex gap-x-2">
                             <span className="font-normal">Longitude:</span>{" "}
-                            {data.departureLatlong[1]}
+                            {data.departureLocation?.longitude}
                           </small>
                         </div>
                       </TableCell>

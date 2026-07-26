@@ -34,8 +34,10 @@ const Agent = () => {
   } = useGetAgentsQuery({ page, search: searchQuery });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const AgentListData = userData?.data;
-  const totalPages = userData?.meta?.last_page;
+  const AgentListData = userData?.result?.data;
+    console.log("connector", AgentListData)
+
+  const totalPages = userData?.result?.meta?.previousPage;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);

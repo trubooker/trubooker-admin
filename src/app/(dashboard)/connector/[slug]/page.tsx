@@ -38,7 +38,8 @@ const ViewAgent = () => {
     await mutate(id).unwrap().then();
   };
 
-  const profile = userData?.data?.profile; // object
+  const profile = userData?.result?.user; // object
+  console.log("userdata_niyu", userData)
   const agent_ref = userData?.data?.agent_referrals; // array
   const referral = userData?.data?.refferals; // array
   const earning_overview = userData?.data?.earning_overview; // object
@@ -49,12 +50,12 @@ const ViewAgent = () => {
         <div>
           <Goback
             formerPage={"Connectors"}
-            presentPage={`${profile?.first_name} ${profile?.last_name}`}
+            presentPage={`${profile?.firstName} ${profile?.lastName}`}
           />
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage src={profile?.profile_image} />
+                <AvatarImage src={profile?.profileImage} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>

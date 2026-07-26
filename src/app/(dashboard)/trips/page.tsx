@@ -29,8 +29,67 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import { useGetAllTripsQuery } from "@/redux/services/Slices/tripsApiSlice";
 import { debounce } from "lodash";
+import { formatDistanceStrict } from "date-fns";
 import Search from "@/components/SearchBar";
 import Pagination from "@/components/Pagination";
+
+// Compute a human-readable duration from the trip's date/time fields.
+// The API doesn't return a `duration` field, so we derive it.
+const getTripDuration = (data: any) => {
+  try {
+    if (data?.duration) return data.duration;
+    if (
+      !data?.departureDate ||
+      !data?.departureTime ||
+      !data?.arrivalDate ||
+      !data?.arrivalTime
+    ) {
+      return "N/A";
+    }
+    const dep = new Date(`${data.departureDate}T${data.departureTime}`);
+    const arr = new Date(`${data.arrivalDate}T${data.arrivalTime}`);
+    if (isNaN(dep.getTime()) || isNaN(arr.getTime())) return "N/A";
+    return formatDistanceStrict(dep, arr);
+  } catch {
+    return "N/A";
+  }
+};
+
+// Single source of truth for status colors, driven by the actual status value
+// so the same status always looks identical across every tab.
+const STATUS_STYLES: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
+  active: { bg: "#CCFFCD", text: "#00B771", label: "Active" },
+  completed: { bg: "#E6F4FF", text: "#1E90FF", label: "Completed" },
+  upcoming: { bg: "#FFF4E6", text: "#FFA500", label: "Upcoming" },
+  pending: { bg: "#FFF4E6", text: "#FFA500", label: "Pending" },
+  cancelled: { bg: "#FFE6E6", text: "#FF4500", label: "Cancelled" },
+  past: { bg: "#F1F1F1", text: "#6B7280", label: "Past" },
+};
+
+const StatusBadge = ({ status }: { status?: string }) => {
+  const key = (status || "").toLowerCase();
+  const style =
+    STATUS_STYLES[key] || {
+      bg: "#F1F1F1",
+      text: "#6B7280",
+      label: status || "N/A",
+    };
+  return (
+    <div
+      className="flex items-center mx-auto gap-x-2 py-1 px-3 rounded-full justify-center min-w-[100px]"
+      style={{ backgroundColor: style.bg, color: style.text }}
+    >
+      <span
+        className="w-2 h-2 rounded-full"
+        style={{ backgroundColor: style.text }}
+      ></span>
+      <span className="font-semibold capitalize text-xs">{style.label}</span>
+    </div>
+  );
+};
 
 const Trips = () => {
   const router = useRouter();
@@ -68,9 +127,9 @@ const Trips = () => {
     page: completedPage,
   });
 
-  console.log('upcoming', upcoming)
-   console.log('completed', completed)
-   console.log('past', past)
+  console.log("upcoming", upcoming);
+  console.log("completed", completed);
+  console.log("past", past);
   // Upcoming ----------------------------------------------------------
   const totalUpcomingPage = upcoming?.result.meta?.previousPage;
   const upcomingData = upcoming?.result.data;
@@ -248,31 +307,29 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation}</span>
+                                  <span> {data.departureLocation?.state}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departureDate},{" "}
-                                    {data?.departureTime}
+                                    {data.departureDate}, {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departureLatlong[0]}
+                                    {data.departureLocation?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departureLatlong[1]}
+                                    {data.departureLocation?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
 
-                              <TableCell className="w-1/7 py-5 text-left ">
+                              <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
                                   <span>
-                                    {" "}
                                     {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
@@ -283,7 +340,7 @@ const Trips = () => {
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.busstopLatlong[0]}
+                                    {data.arrivalDestination?.[0]?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
@@ -298,16 +355,11 @@ const Trips = () => {
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data?.duration}
+                                {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
-                                  <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                  <span className="font-semibold capitalize text-xs">
-                                    {data?.status}
-                                  </span>
-                                </div>
+                                <StatusBadge status={data?.status} />
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>
@@ -452,23 +504,22 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation}</span>
+                                  <span> {data.departureLocation?.state}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departureDate},{" "}
-                                    {data?.departureTime}
+                                    {data.departureDate}, {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departureLatlong[0]}
+                                    {data.departureLocation?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departureLatlong[1]}
+                                    {data.departureLocation?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
@@ -476,7 +527,6 @@ const Trips = () => {
                               <TableCell className="w-1/7 py-5 text-left ">
                                 <div className="flex flex-col">
                                   <span>
-                                    {" "}
                                     {data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
@@ -487,7 +537,7 @@ const Trips = () => {
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                     {data.arrivalDestination?.[0]?.latitude}
+                                    {data.arrivalDestination?.[0]?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
@@ -502,16 +552,11 @@ const Trips = () => {
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data?.duration}
+                                {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFE6E6] text-[#FF4500]">
-                                  <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
-                                  <span className="font-semibold capitalize text-xs">
-                                    {data?.status}
-                                  </span>
-                                </div>
+                                <StatusBadge status={data?.status} />
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>
@@ -656,23 +701,22 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation}</span>
+                                  <span> {data.departureLocation?.state}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
-                                    {data.departureDate},{" "}
-                                    {data?.departureTime}
+                                    {data.departureDate}, {data?.departureTime}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.departureLatlong[0]}
+                                    {data.departureLocation?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.departureLatlong[1]}
+                                    {data.departureLocation?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
@@ -680,8 +724,8 @@ const Trips = () => {
                               <TableCell className="w-1/7 py-5 text-left ">
                                 <div className="flex flex-col">
                                   <span>
-                                    {" "}
-                                    {data.arrival_destination?.address}
+                                    {data.arrivalDestination?.[0]?.address ??
+                                      data.arrivalDestination?.[0]?.name}
                                   </span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
@@ -691,13 +735,13 @@ const Trips = () => {
                                     <span className="font-normal">
                                       Latitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.latitude}
+                                    {data.arrivalDestination?.[0]?.latitude}
                                   </small>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">
                                       Longitude:
                                     </span>{" "}
-                                    {data.arrival_destination?.longitude}
+                                    {data.arrivalDestination?.[0]?.longitude}
                                   </small>
                                 </div>
                               </TableCell>
@@ -706,16 +750,11 @@ const Trips = () => {
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
                               <TableCell className="w-1/6  py-5">
-                                {data?.duration}
+                                {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
-                                <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#CCFFCD] text-[#00B771]">
-                                  <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
-                                  <span className="font-semibold capitalize text-xs">
-                                    {data?.status}
-                                  </span>
-                                </div>
+                                <StatusBadge status={data?.status} />
                               </TableCell>
                               <TableCell className=" py-5 text-center w-[100px]">
                                 <DropdownMenu>

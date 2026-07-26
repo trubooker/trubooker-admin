@@ -48,9 +48,21 @@ const SingleTrip = () => {
   } = useGetSingleTripQuery({
     trip: id,
   });
-  const details = data?.result; //array
+  const details = data?.result; // trip object
   const deets = details?.vehicle;
-  console.log('detals',details)
+
+  // First stop in the arrival destinations array (API returns an array)
+  const arrival = details?.arrivalDestination?.[0];
+  // Trip specification is an array too — take the first entry
+  const spec = details?.tripSpecification?.[0];
+
+  // Driver rating summary (only rating data the endpoint returns)
+  const driver = details?.driver;
+  const avgRating = Number(driver?.averageRating ?? 0);
+  const ratingCount = Number(driver?.ratingCount ?? 0);
+
+  console.log("details", details);
+
   return (
     <div>
       {isFetching || loading ? (
@@ -120,11 +132,10 @@ const SingleTrip = () => {
                               Departure
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.origin === null ||
-                              loading ? (
+                              {details?.departureLocation == null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.origin
+                                details?.departureLocation
                               )}
                             </span>
                           </div>
@@ -133,11 +144,10 @@ const SingleTrip = () => {
                               Destination
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.destination === null ||
-                              loading ? (
+                              {arrival == null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.destination
+                                arrival?.address
                               )}
                             </span>
                           </div>
@@ -149,25 +159,22 @@ const SingleTrip = () => {
                               Departure date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.departureTime === null || loading ? (
+                              {details?.departureTime == null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
-                                    // Combine departure date and time into a Date object
+                                    // Combine departure DATE and departure TIME
                                     const departureDateTime = new Date(
-                                      `${details.departureTime}T${details.departureTime}`
+                                      `${details.departureDate}T${details.departureTime}`
                                     );
 
-                                    // Check if the date is valid
                                     if (isNaN(departureDateTime.getTime())) {
                                       return "Invalid date or time";
                                     }
 
-                                    // Format the date and time as 'YYYY-MM-DD, hh:mm A'
                                     const formattedDeparture = format(
                                       departureDateTime,
-                                      // "yyyy-MM-dd, hh:mm a"
                                       "yyyy-MM-dd"
                                     );
 
@@ -186,29 +193,26 @@ const SingleTrip = () => {
                               Return date
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.arrivalTime === null || loading ? (
+                              {details?.arrivalTime == null || loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 (() => {
                                   try {
-                                    // Combine departure date and time into a Date object
-                                    const departureDateTime = new Date(
-                                      `${details.arrivalTime}T${details.arrivalTime}`
+                                    // Combine arrival DATE and arrival TIME
+                                    const arrivalDateTime = new Date(
+                                      `${details.arrivalDate}T${details.arrivalTime}`
                                     );
 
-                                    // Check if the date is valid
-                                    if (isNaN(departureDateTime.getTime())) {
+                                    if (isNaN(arrivalDateTime.getTime())) {
                                       return "Invalid date or time";
                                     }
 
-                                    // Format the date and time as 'YYYY-MM-DD, hh:mm A'
-                                    const formattedDeparture = format(
-                                      departureDateTime,
-                                      // "yyyy-MM-dd, hh:mm a"
+                                    const formattedArrival = format(
+                                      arrivalDateTime,
                                       "yyyy-MM-dd"
                                     );
 
-                                    return <>{formattedDeparture}</>;
+                                    return <>{formattedArrival}</>;
                                   } catch (error) {
                                     return (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
@@ -225,39 +229,33 @@ const SingleTrip = () => {
                             Estimated duration
                           </span>
                           <span className="font-medium text-sm capitalize">
-                            {details?.departureTime === null ||
-                            details?.departureTime === null ||
-                            loading ? (
+                            {details?.departureTime == null || loading ? (
                               <Skeleton className="h-4 mt-2 w-32 bg-gray-200" />
                             ) : (
                               (() => {
                                 try {
-                                  // Validate and construct date-time strings
                                   const departureDateTime =
-                                    details.departureTime &&
-                                    details.departureTime
+                                    details.departureDate && details.departureTime
                                       ? new Date(
-                                          `${details.departureTime}T${details.departureTime}`
+                                          `${details.departureDate}T${details.departureTime}`
                                         )
                                       : null;
                                   const arrivalDateTime =
-                                    details.departureTime && details.departureTime
+                                    details.arrivalDate && details.arrivalTime
                                       ? new Date(
-                                          `${details.arrival_date}T${details.departureTime}`
+                                          `${details.arrivalDate}T${details.arrivalTime}`
                                         )
                                       : null;
 
-                                  // Ensure valid dates
                                   if (
                                     !departureDateTime ||
                                     !arrivalDateTime ||
                                     isNaN(departureDateTime.getTime()) ||
                                     isNaN(arrivalDateTime.getTime())
                                   ) {
-                                    return "Invalid date or time";
+                                    return details?.duration || "N/A";
                                   }
 
-                                  // Calculate the difference
                                   const duration = formatDistanceStrict(
                                     departureDateTime,
                                     arrivalDateTime
@@ -290,14 +288,12 @@ const SingleTrip = () => {
                                     No. of Luggages
                                   </span>
                                   <span className="font-medium text-sm capitalize">
-                                    {details?.trip_specification === null ||
-                                    loading ? (
+                                    {spec == null || loading ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
-                                      Number(
-                                        details?.trip_specification
-                                          ?.luggage_size
-                                      )
+                                      // NOTE: verify the nested key by expanding
+                                      // tripSpecification[0] in the console.
+                                      Number(spec?.luggage_size ?? 0)
                                     )}
                                   </span>
                                 </div>
@@ -306,13 +302,11 @@ const SingleTrip = () => {
                                     Unit charge for extra luggage
                                   </span>
                                   <span className="font-medium text-sm capitalize">
-                                    {details?.trip_specification === null ||
-                                    loading ? (
+                                    {spec == null || loading ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
                                       formatCurrency(
-                                        details?.trip_specification
-                                          ?.charge_for_extra_luggage
+                                        spec?.charge_for_extra_luggage
                                       )
                                     )}
                                   </span>
@@ -322,13 +316,11 @@ const SingleTrip = () => {
                                     Total Price
                                   </span>
                                   <span className="font-medium text-sm capitalize">
-                                    {details?.trip_specification === null ||
-                                    loading ? (
+                                    {details?.price == null || loading ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
-                                      formatCurrency(
-                                        details?.trip_specification?.price
-                                      )
+                                      // Top-level `price` is confirmed on the trip object
+                                      formatCurrency(details?.price)
                                     )}
                                   </span>
                                 </div>
@@ -338,7 +330,7 @@ const SingleTrip = () => {
 
                           <div className="text-end">
                             <span className="font-medium text-sm text-start capitalize">
-                              {details?.status === null || loading ? (
+                              {details?.status == null || loading ? (
                                 <Skeleton className="h-6 w-20 bg-gray-200" />
                               ) : (
                                 <>
@@ -356,11 +348,12 @@ const SingleTrip = () => {
                                         Completed
                                       </span>
                                     </div>
-                                  ) : details?.status === "pending" ? (
+                                  ) : details?.status === "pending" ||
+                                    details?.status === "upcoming" ? (
                                     <div className="flex items-center gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[#FFA500]">
                                       <span className="w-2 h-2 bg-[#FFA500] rounded-full"></span>
-                                      <span className="font-semibold text-xs">
-                                        Pending
+                                      <span className="font-semibold text-xs capitalize">
+                                        {details?.status}
                                       </span>
                                     </div>
                                   ) : details?.status === "cancelled" ? (
@@ -386,15 +379,14 @@ const SingleTrip = () => {
                             </span>
                             <Separator className="my-3" />
                             <span className="font-medium text-sm">
-                              {details?.reason_for_trip_cancellation ===
-                              null ? (
+                              {details?.reasonForTripCancellation == null ? (
                                 <div className="w-full text-center italic text-gray-400">
                                   Nil
                                 </div>
                               ) : loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
-                                details?.reason_for_trip_cancellation
+                                details?.reasonForTripCancellation
                               )}
                             </span>
                           </div>
@@ -422,18 +414,13 @@ const SingleTrip = () => {
                               Full name
                             </span>
                             <span className="font-medium text-sm capitalize">
-                              {details?.driver?.user?.firstName === null ||
-                              loading ||
-                              details?.driver?.user?.firstName === null ? (
+                              {details?.driver?.user?.firstName == null ||
+                              loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
                                 <div className="flex items-center gap-x-2">
-                                  <span>
-                                    {details?.driver?.user?.firstName}
-                                  </span>
-                                  <span>
-                                    {details?.driver?.user?.lastName}
-                                  </span>
+                                  <span>{details?.driver?.user?.firstName}</span>
+                                  <span>{details?.driver?.user?.lastName}</span>
                                 </div>
                               )}
                             </span>
@@ -445,7 +432,7 @@ const SingleTrip = () => {
                               Email
                             </span>
                             <span className="font-medium text-sm">
-                              {details?.driver?.user?.email === null ||
+                              {details?.driver?.user?.email == null ||
                               loading ? (
                                 <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                               ) : (
@@ -470,12 +457,7 @@ const SingleTrip = () => {
                   </CardHeader>
                   <CardContent>
                     <div>
-                      <Accordion
-                        type="single"
-                        collapsible
-                        // defaultValue="item-1"
-                        className="w-full"
-                      >
+                      <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value={`item-1`} className="">
                           <AccordionTrigger className="my-3">
                             <Table className="w-full">
@@ -487,10 +469,12 @@ const SingleTrip = () => {
                                         Vehicle Type
                                       </span>
                                       <span className="font-medium text-sm">
-                                        {deets?.vehicle_type?.name === null ? (
+                                        {/* NOTE: expand `vehicle` in console to
+                                            confirm these nested keys. */}
+                                        {deets?.type == null ? (
                                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                         ) : (
-                                          deets?.vehicle_type?.name
+                                          deets?.type
                                         )}
                                       </span>
                                     </div>
@@ -502,7 +486,7 @@ const SingleTrip = () => {
                                         Vehicle Model
                                       </span>
                                       <span className="font-medium text-sm">
-                                        {deets?.model === null ? (
+                                        {deets?.model == null ? (
                                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                         ) : (
                                           deets?.model
@@ -522,10 +506,10 @@ const SingleTrip = () => {
                                     License plate number
                                   </span>
                                   <span className="font-medium text-sm">
-                                    {deets?.license_plate_number === null ? (
+                                    {deets?.plateNumber == null ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
-                                      deets?.license_plate_number
+                                      deets?.plateNumber
                                     )}
                                   </span>
                                 </div>
@@ -534,7 +518,7 @@ const SingleTrip = () => {
                                     Vehicle capacity
                                   </span>
                                   <span className="font-medium text-sm">
-                                    {deets?.capacity === null ? (
+                                    {deets?.capacity == null ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
                                       deets?.capacity
@@ -549,7 +533,7 @@ const SingleTrip = () => {
                                     Vehicle colour
                                   </span>
                                   <span className="font-medium text-sm">
-                                    {deets?.color === null ? (
+                                    {deets?.color == null ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
                                       deets?.color
@@ -561,7 +545,7 @@ const SingleTrip = () => {
                                     Insurance
                                   </span>
                                   <span className="font-medium text-sm">
-                                    {deets?.insurance === null ? (
+                                    {deets?.insurance == null ? (
                                       <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                     ) : (
                                       deets?.insurance
@@ -584,7 +568,7 @@ const SingleTrip = () => {
                                 </TabsList>
                                 <TabsContent value="vehiclePhotos">
                                   <div className="w-full grid grid-cols-1 pt-5 gap-4">
-                                    {deets?.photos?.map(
+                                    {deets?.vehiclePhoto?.map(
                                       (i: any, index: number) => (
                                         <div key={index}>
                                           <Link href={i} target="_blank">
@@ -598,8 +582,7 @@ const SingleTrip = () => {
                                                 />
 
                                                 <div className="text-sm font-medium text-[#333F53]">
-                                                  Vehicle photo {index + 1}
-                                                  .png
+                                                  Vehicle photo {index + 1}.png
                                                 </div>
                                               </span>
                                             </span>
@@ -611,18 +594,21 @@ const SingleTrip = () => {
                                 </TabsContent>
                                 <TabsContent value="features">
                                   <div className="w-full grid grid-cols-1 pt-5 mt-5 gap-8">
-                                    {deets?.features?.length > 1 ? (
+                                    {/* Features live at trip level as `vehicleFeatures` */}
+                                    {details?.vehicleFeatures?.length > 1 ? (
                                       <div>
                                         <span className="font-medium text-sm">
                                           <span className="flex gap-x-2 items-center">
                                             <div className="text-sm font-medium text-[#333F53]">
-                                              {deets.features.join(", ")}
+                                              {details.vehicleFeatures.join(
+                                                ", "
+                                              )}
                                             </div>
                                           </span>
                                         </span>
                                       </div>
                                     ) : (
-                                      deets?.features?.map(
+                                      details?.vehicleFeatures?.map(
                                         (i: any, index: number) => (
                                           <div key={index}>
                                             <span className="font-medium text-sm">
@@ -657,18 +643,18 @@ const SingleTrip = () => {
                 <div className="grid xl:grid-cols-3 grid-cols-1 mt-3 gap-4 ">
                   <div className="col-span-2 h-[500px]">
                     <MapComponent
-                      //busStops={details?.bus_stop}
-                      busstop_latlong={details?.busstop_latlong}
-                      departure={details?.departure_latlong}
-                      arrival={details?.arrival_destination}
+                      busstop_latlong={details?.busstopLatlong}
+                      departure={details?.departureLatlong}
+                      arrival={details?.arrivalDestination}
                     />
                   </div>
                   <div>
-                    <Timeline stops={details?.bus_stop} station={details} />
+                    <Timeline stops={details?.busStop} station={details} />
                   </div>
                 </div>
               </div>
-              {/* feedback  */}
+              {/* Driver rating summary — the endpoint returns no review list,
+                  only driver.averageRating and driver.ratingCount */}
               <Card className="w-full overflow-auto h-[500px]">
                 <CardHeader className="lg-white text-left">
                   <CardTitle className="text-lg text-gray-500">
@@ -676,47 +662,39 @@ const SingleTrip = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {details?.users_review?.length > 0 ? (
-                    <>
-                      {details?.users_review?.map((actions: any) => (
-                        <div key={actions.id}>
-                          <Separator />
-                          <div className="my-6">
-                            <div className="flex w-full items-start space-x-4">
-                              <Avatar className="lg:w-14 h-10 lg:h-14 w-10">
-                                <AvatarImage src={actions?.profile_picture} />
-                                <AvatarFallback>
-                                  <IoPersonOutline className="w-5 h-5" />
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="">
-                                <p className="text-gray-800 font-bold text-sm">
-                                  {actions?.passenger}
-                                </p>
-                                {/* <p className="text-xs text-gray-500">
-                            {actions.email}
-                          </p> */}
-                                <span className="flex items-center gap-x-3">
-                                  {actions?.rating}.0{" "}
-                                  <StarRatings
-                                    rating={actions?.rating}
-                                    numberOfStars={5}
-                                    name="rating"
-                                    starRatedColor="#F5A623"
-                                    starDimension="20px"
-                                    starSpacing="3px"
-                                    starEmptyColor="grey"
-                                  />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-sm mt-3">
-                              {actions?.comment}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </>
+                  {ratingCount > 0 ? (
+                    <div className="flex w-full items-center gap-x-4 mt-4">
+                      <Avatar className="lg:w-14 h-10 lg:h-14 w-10">
+                        <AvatarImage
+                          src={details?.driver?.user?.profileImage}
+                        />
+                        <AvatarFallback>
+                          <IoPersonOutline className="w-5 h-5" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col gap-y-1">
+                        <p className="text-gray-800 font-bold text-sm capitalize">
+                          {details?.driver?.user?.firstName}{" "}
+                          {details?.driver?.user?.lastName}
+                        </p>
+                        <span className="flex items-center gap-x-3">
+                          {avgRating.toFixed(1)}{" "}
+                          <StarRatings
+                            rating={avgRating}
+                            numberOfStars={5}
+                            name="rating"
+                            starRatedColor="#F5A623"
+                            starDimension="20px"
+                            starSpacing="3px"
+                            starEmptyColor="grey"
+                          />
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Based on {ratingCount} review
+                          {ratingCount === 1 ? "" : "s"}
+                        </span>
+                      </div>
+                    </div>
                   ) : (
                     <div className="flex items-center w-full h-[400px] flex-col justify-center">
                       <Image

@@ -23,7 +23,7 @@ const agentsApi = agentsApiConfig.injectEndpoints({
 
     getAgentReferrals: builder.query({
       query: ({agent, page}) => ({
-        url: `/v1/admin/agents-referral/${agent}?page=${page}`,
+        url: `/v1/admin/agent-referral/${agent}?page=${page}`,
         method: "GET",
       }),
       providesTags: ["Agents"],
