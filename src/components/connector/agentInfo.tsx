@@ -16,6 +16,8 @@ const AgentInfo = ({
   isFetching,
   params,
 }: any) => {
+
+  console.log("profile", profile)
   return (
     <div className="w-full">
       <div className="gap-4 flex xl:flex-row flex-col w-full">
@@ -35,13 +37,13 @@ const AgentInfo = ({
                         Full name
                       </span>
                       <span className="font-medium text-sm capitalize">
-                        {profile?.first_name === null ||
-                        profile?.last_name === null ? (
+                        {profile?.firstName === null ||
+                        profile?.lastName === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
                           <div className="flex gap-x-2">
-                            <span> {profile?.first_name}</span>
-                            <span> {profile?.last_name}</span>
+                            <span> {profile?.firstName}</span>
+                            <span> {profile?.lastName}</span>
                           </div>
                         )}
                       </span>
@@ -147,10 +149,10 @@ const AgentInfo = ({
                         Referral code
                       </span>
                       <span className="font-medium text-sm">
-                        {profile?.referral === null ? (
+                        {profile?.referralCode === null ? (
                           <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                         ) : (
-                          profile?.referral
+                          profile?.referralCode
                         )}
                       </span>
                     </div>

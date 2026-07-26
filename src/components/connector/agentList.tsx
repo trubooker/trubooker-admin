@@ -53,21 +53,21 @@ export function AgentList({ data: Data, isFetching, loading }: any) {
                     <TableCell className=" py-5 text-left text-[--primary]">
                       <div className="w-full flex gap-x-3 items-center">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src={data?.profile_picture} />
+                          <AvatarImage src={data?.user?.profileImage} />
                           <AvatarFallback>
                             <IoPersonOutline />
                           </AvatarFallback>
                         </Avatar>
                         <span className="w-full flex flex-col xl:flex-row text-start gap-x-2 gap-y-1 text-gray-500">
-                          <span>{data.name} </span>
+                          <span>{data?.user?.firstName} </span>
                         </span>
                       </div>
                     </TableCell>
                     <TableCell className=" py-5 text-center text-[--primary]">
-                      {data.email}
+                      {data?.user?.email}
                     </TableCell>
                     <TableCell className=" py-5 text-center">
-                      {data.phone_number}
+                      {data?.user?.phone}
                     </TableCell>
                     <TableCell>
                       {data.status === "active" ? (
