@@ -25,12 +25,15 @@ const Notification = () => {
   });
 
   const notifications = data?.data || [];
+  console.log(notifications)
   const totalPages: number = notifications?.meta?.last_page || 0;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
+
+  console.log('notify data', data)
   return (
     <div className="flex flex-col w-full px-5">
       <div className="flex items-start justify-between gap-x-3 ">
