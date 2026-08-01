@@ -8,7 +8,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getVehicleTypes: builder.query({
       query: () => ({
-        url: `/vehicle-types`,
+        url: `/v1/admin/drivers/vehicles`,
         method: "GET",
       }),
       providesTags: ["VehicleTypes"],

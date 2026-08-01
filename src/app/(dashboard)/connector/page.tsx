@@ -27,29 +27,38 @@ import { FaSort } from "react-icons/fa";
 const Agent = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Step 1: status filter state. "all" means no filter sent to the API.
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  // NOTE: status is now sent to the API so filtering works across ALL
+  // records, not just the 10 currently loaded on this page. This assumes
+  // the /v1/admin/agents endpoint accepts a `status` query param — confirm
+  // with the backend and adjust the param name if it differs (e.g. filter[status]).
   const {
     isLoading: loading,
     data: userData,
     isFetching,
-  } = useGetAgentsQuery({ page, search: searchQuery });
+  } = useGetAgentsQuery({
+    page,
+    search: searchQuery,
+    status: statusFilter === "all" ? undefined : statusFilter,
+  });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const AgentListData = userData?.result?.data;
-    console.log("connector", AgentListData)
 
-  const totalPages = userData?.result?.meta?.previousPage;
+  // Correct field for number of pages. `pageCount` is what the API returns
+  // (previousPage is a boolean/pointer, not a total — that was the bug).
+  const totalPages = userData?.result?.meta?.pageCount ?? 0;
+
+  // Correct field for the total record count across all pages, for the badge.
+  const totalRecords = userData?.result?.meta?.totalRecords ?? 0;
+
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
-  const [filteredStudents, setFilteredStudents] = useState(AgentListData);
-
-  useEffect(() => {
-    if (AgentListData) {
-      setFilteredStudents(AgentListData);
-    }
-  }, [AgentListData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
@@ -64,25 +73,17 @@ const Agent = () => {
     debounceSearch(query);
   };
 
-  // Step 1: Add a state for the selected status filter
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-
-  // Step 2: Filter data based on the selected status filter
-  const statusFilteredData =
-    statusFilter === "all"
-      ? filteredStudents
-      : filteredStudents?.filter(
-          (connector: any) => connector.status === statusFilter
-        );
+  const handleStatusFilter = (status: string) => {
+    setStatusFilter(status);
+    setPage(1); // reset to page 1 whenever the filter changes
+  };
 
   return (
     <div className="flex flex-col h-fit w-full">
-      {/* <div className="py-4">
-      </div> */}
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Connectors</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {AgentListData?.length}
+          {totalRecords}
         </div>
       </div>
       <div className="flex flex-col xl:flex-row w-full">
@@ -111,20 +112,19 @@ const Agent = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[180px]">
-                    <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+                    <DropdownMenuItem onClick={() => handleStatusFilter("all")}>
                       All
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setStatusFilter("active")}>
+                    <DropdownMenuItem onClick={() => handleStatusFilter("active")}>
                       Active
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setStatusFilter("inactive")}
-                    >
+                    <DropdownMenuItem onClick={() => handleStatusFilter("inactive")}>
                       Inactive
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setStatusFilter("deleted")}
-                    >
+                    <DropdownMenuItem onClick={() => handleStatusFilter("pending")}>
+                      Pending
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusFilter("deleted")}>
                       Deleted
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -132,47 +132,45 @@ const Agent = () => {
               </div>
             </div>
             {isFetching || loading ? (
-              <>
-                <Table className="">
-                  <TableHeader>
-                    <TableRow className="text-xs lg:text-sm">
-                      <TableHead className="font-bold w-1/6">Name</TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Email
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Phone Number
-                      </TableHead>
-                      <TableHead className="font-bold w-1/6 text-center">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-center font-bold w-1/6">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                      <TableRow key={i}>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <TableCell key={i}>
-                            <div>
-                              <div className="w-full rounded-md">
-                                <div>
-                                  <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                </div>
+              <Table>
+                <TableHeader>
+                  <TableRow className="text-xs lg:text-sm">
+                    <TableHead className="font-bold w-1/6">Name</TableHead>
+                    <TableHead className="font-bold w-1/6 text-center">
+                      Email
+                    </TableHead>
+                    <TableHead className="font-bold w-1/6 text-center">
+                      Phone Number
+                    </TableHead>
+                    <TableHead className="font-bold w-1/6 text-center">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-center font-bold w-1/6">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5, 6, 7].map((row) => (
+                    <TableRow key={row}>
+                      {[1, 2, 3, 4, 5].map((cell) => (
+                        <TableCell key={cell}>
+                          <div>
+                            <div className="w-full rounded-md">
+                              <div>
+                                <Skeleton className="h-4 w-1/7 bg-gray-400" />
                               </div>
                             </div>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </>
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             ) : (
               <AgentList
-                data={statusFilteredData}
+                data={AgentListData}
                 isFetching={isFetching}
                 loading={loading}
               />
