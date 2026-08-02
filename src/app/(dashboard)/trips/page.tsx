@@ -107,7 +107,7 @@ const Trips = () => {
     isLoading: upcomingLoading,
     isFetching: upcomingFetching,
   } = useGetAllTripsQuery({
-    type: "upcoming",
+    status: "upcoming",
     page: upcomingPage,
   });
   const {
@@ -115,7 +115,7 @@ const Trips = () => {
     isLoading: pastLoading,
     isFetching: pastFetching,
   } = useGetAllTripsQuery({
-    type: "past",
+    status: "past",
     page: pastPage,
   });
   const {
@@ -123,9 +123,11 @@ const Trips = () => {
     isLoading: completedLoading,
     isFetching: completedFetching,
   } = useGetAllTripsQuery({
-    type: "completed",
+    status: "completed",
     page: completedPage,
   });
+
+  
 
   console.log("upcoming", upcoming);
   console.log("completed", completed);
