@@ -38,7 +38,6 @@ const Passengers = () => {
   const meta = userData?.result?.meta;
 const totalPages = meta ? Math.ceil(meta.count / meta.limit) : 1;
   //const totalPages = userData?.result?.meta?.last_page;
-  
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);

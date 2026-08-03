@@ -309,7 +309,7 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation?.state}</span>
+                                  <span> {data.departureLocation}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
                                     {data.departureDate}, {data?.departureTime}

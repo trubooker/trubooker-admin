@@ -264,9 +264,10 @@ const ProfileVehicleDocs_Info = ({
     
     // Add required fields
     formData.append("driver_id", driverId);
-    formData.append("verification_type", documentType);
-    formData.append("verifiable_type", verifiableType);
-    formData.append("verifiable_id", verifiableType === "driver" ? driverId : verifiableId);
+    // formData.append("verification_type", documentType);
+    // formData.append("verifiable_type", verifiableType);
+    // formData.append("verifiable_id", verifiableType === "driver" ? driverId : verifiableId);
+    formData.append("documentType", documentType);
     
     if (documentName) {
       formData.append("name", documentName);
