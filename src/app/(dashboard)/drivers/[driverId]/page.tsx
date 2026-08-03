@@ -76,44 +76,44 @@ const ViewDriver = () => {
       
       // Detailed profile logging
       if (userData.data.profile) {
-        // console.log("4. PROFILE DETAILS:");
-        // console.log("   Profile object:", userData.data.profile);
-        // console.log("   Profile keys:", Object.keys(userData.data.profile));
-        // console.log("   Profile ID:", userData.data.profile.id);
-        // console.log("   Profile status:", userData.data.profile.status);
-        // console.log("   Profile balance:", userData.data.profile.current_balance);
+        console.log("4. PROFILE DETAILS:");
+        console.log("   Profile object:", userData.data.profile);
+        console.log("   Profile keys:", Object.keys(userData.data.profile));
+        console.log("   Profile ID:", userData.data.profile.id);
+        console.log("   Profile status:", userData.data.profile.status);
+        console.log("   Profile balance:", userData.data.profile.current_balance);
       } else {
-        //console.log("4. PROFILE: Not found or undefined");
+        console.log("4. PROFILE: Not found or undefined");
       }
       
       // Detailed vehicles logging
       if (userData.data.vehicles) {
-        // console.log("5. VEHICLES:");
-        // console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
-        // console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
+        console.log("5. VEHICLES:");
+        console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
+        console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
         if (userData.data.vehicles?.length > 0) {
-          //console.log("   First vehicle:", userData.data.vehicles[0]);
+          console.log("   First vehicle:", userData.data.vehicles[0]);
         }
       } else {
-        //console.log("5. VEHICLES: Not found or undefined");
+        console.log("5. VEHICLES: Not found or undefined");
       }
       
       // Detailed reviews logging
       if (userData.data.reviews) {
-        // console.log("6. REVIEWS/Feedback:");
-        // console.log("   Reviews count:", userData.data.reviews?.length || 0);
-        // console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
+        console.log("6. REVIEWS/Feedback:");
+        console.log("   Reviews count:", userData.data.reviews?.length || 0);
+        console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
       } else {
-        //console.log("6. REVIEWS: Not found or undefined");
+        console.log("6. REVIEWS: Not found or undefined");
       }
       
       // Detailed trip history logging
       if (userData.data.trip_history) {
-        // console.log("7. TRIP HISTORY:");
-        // console.log("   Trip history count:", userData.data.trip_history?.length || 0);
-        // console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
+        console.log("7. TRIP HISTORY:");
+        console.log("   Trip history count:", userData.data.trip_history?.length || 0);
+        console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
       } else {
-        //console.log("7. TRIP HISTORY: Not found or undefined");
+        console.log("7. TRIP HISTORY: Not found or undefined");
       }
       
       // Check for any other properties
@@ -152,11 +152,11 @@ const vehicle = rawVehicle ? [rawVehicle] : [];
   const th = userData?.result?.tripHistory || [];
 
   // Log extracted data
-  // console.log("📋 EXTRACTED DATA:");
-  // console.log("- Profile object:", profile);
-  // console.log("- Profile keys:", Object.keys(profile));
-  // console.log("- Vehicles array length:", vehicle.length);
-  // console.log("- Feedback array length:", feedback.length);
+  console.log("📋 EXTRACTED DATA:");
+  console.log("- Profile object:", profile);
+  console.log("- Profile keys:", Object.keys(profile));
+  console.log("- Vehicles array length:", vehicle.length);
+  console.log("- Feedback array length:", feedback.length);
    console.log("- Trip history array length:", th.length);
   
   // Safe name display
