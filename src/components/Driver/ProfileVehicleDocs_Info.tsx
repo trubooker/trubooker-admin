@@ -93,6 +93,33 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
+/**
+ * Normalizes an RTK Query response into a flat array, regardless of whether
+ * the backend nests the payload under `data`, `result`, `documents`, or
+ * returns an object keyed by id instead of an array.
+ *
+ * This is the core fix: previously `docs` only ever checked `driverDocs?.data`,
+ * so if the API actually returned e.g. `driverDocs.result` or
+ * `driverDocs.data.documents`, the current-documents list would silently be
+ * empty even though the document existed (and showed up fine in History,
+ * which already had this same defensive unwrapping).
+ */
+const extractArray = (response: any, keys: string[] = ["data", "result", "documents"]): any[] => {
+  if (!response) return [];
+
+  // If the top-level response is already an array, use it directly.
+  if (Array.isArray(response)) return response;
+
+  // Try each known key in order.
+  for (const key of keys) {
+    const value = response?.[key];
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === "object") return Object.values(value);
+  }
+
+  return [];
+};
+
 const ProfileVehicleDocs_Info = ({
   th = [],
   feedback = [],
@@ -131,17 +158,20 @@ const ProfileVehicleDocs_Info = ({
   // Safe profile data
   const safeProfile = profile || {};
 
-  console.log('safe profile',th)
-
-  
   // Safe vehicle data - ensure it's an array
   const safeVehicle = Array.isArray(vehicle) ? vehicle : [];
   
   // Safe feedback data - ensure it's an array
   const safeFeedback = Array.isArray(feedback) ? feedback : [];
-  console.log('driver doc', driverDocs)
+
   // Safe trip history data
   const safeTripHistory = Array.isArray(th) ? th : [];
+
+  // Debug logging - keep this on until you confirm the real shape in devtools,
+  // then feel free to remove it.
+  useEffect(() => {
+    console.log("📄 driverDocs raw response:", driverDocs);
+  }, [driverDocs]);
 
   // Debug logging for vehicle data
   useEffect(() => {
@@ -349,7 +379,7 @@ const ProfileVehicleDocs_Info = ({
     const formData = new FormData();
     
     // Get the document being updated
-    const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
+    const doc = selectedDoc || driverDocsArray.find((d: any) => d.id === docId);
     console.log('docs', doc)
     
     if (doc?.verificationType === "vehicle") {
@@ -439,27 +469,16 @@ const ProfileVehicleDocs_Info = ({
     }
   };
 
-  // const getDocumentTypeLabel = (doc: any) => {
-  //   if (doc?.documentType) return doc.documentType;
-    
-  //   switch(doc?.documentType) {
-  //     case "license": return "Driver's License";
-  //     case "insurance": return "Vehicle Insurance";
-  //     case "registration_doc": return "Registration Document";
-  //     case "vehicle": return "Vehicle Photo";
-  //     default: return doc?.documentType || 'Document';
-  //   }
-  // };
-const getDocumentTypeLabel = (doc: any) => {
-  const type = doc?.documentType || doc?.verificationType || '';
-  
-  if (type.includes('license')) return "Driver's License";
-  if (type.includes('insurance')) return "Vehicle Insurance";
-  if (type.includes('registration') || type.includes('reg')) return "Registration Document";
-  if (type.includes('vehicle')) return "Vehicle Photo";
-  
-  return type.replace(/_/g, ' ') || 'Document';
-};
+  const getDocumentTypeLabel = (doc: any) => {
+    const type = doc?.documentType || doc?.verificationType || '';
+
+    if (type.includes('license')) return "Driver's License";
+    if (type.includes('insurance')) return "Vehicle Insurance";
+    if (type.includes('registration') || type.includes('reg')) return "Registration Document";
+    if (type.includes('vehicle')) return "Vehicle Photo";
+
+    return type.replace(/_/g, ' ') || 'Document';
+  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
@@ -472,15 +491,23 @@ const getDocumentTypeLabel = (doc: any) => {
     });
   };
 
-  const docs: any[] = driverDocs?.data || [];
-  //const history: any[] = documentHistory?.result || [];
-  const rawHistory = documentHistory?.result;
-const history: any[] = rawHistory
-  ? Array.isArray(rawHistory)
-    ? rawHistory
-    : Object.values(rawHistory)  
-  : [];
-  console.log('history', history)
+  // ---------------------------------------------------------------------
+  // THE FIX:
+  // Previously this was `const docs: any[] = driverDocs?.data || [];`
+  // which only worked if the API response was shaped like { data: [...] }.
+  // If the backend actually returns { result: [...] } (matching the
+  // history endpoint) or nests it differently, `docs` silently ended up
+  // empty -> "No Documents" shown in Current tab, even though the same
+  // document appears fine in History (which already unwraps defensively).
+  //
+  // `extractArray` checks `data`, `result`, and `documents` in order, and
+  // also handles the case where the payload is an object keyed by id
+  // instead of a plain array.
+  // ---------------------------------------------------------------------
+  const docs: any[] = extractArray(driverDocs);
+  const driverDocsArray = docs; // alias used in handleUpdateDocument lookup
+
+  const history: any[] = extractArray(documentHistory);
 
   return (
     <div className="w-full">
