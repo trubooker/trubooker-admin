@@ -16,7 +16,7 @@ const driversApi = driversApiConfig.injectEndpoints({
     approveDriversDocuments: builder.mutation({
       query: (documentVerificationId: string) => ({
         url: `/v1/admin/documents/${documentVerificationId}/approve`,
-        method: "POST",
+        method: "PATCH",
       }),
       invalidatesTags: ["Drivers"],
     }),
@@ -30,7 +30,7 @@ const driversApi = driversApiConfig.injectEndpoints({
         reason: string;
       }) => ({
         url: `/v1/admin/documents/${documentVerificationId}/reject`,
-        method: "POST",
+        method: "PATCH",
         body: { reason },
       }),
       invalidatesTags: ["Drivers"],
