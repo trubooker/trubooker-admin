@@ -1004,7 +1004,7 @@ const ProfileVehicleDocs_Info = ({
                                               <div className="flex justify-end space-x-3 pt-5">
                                                 <Button
                                                   className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 w-full hover:bg-yellow-700 rounded-md disabled:bg-yellow-300"
-                                                  onClick={() => handleUpdateDocument(doc?.driverId)}
+                                                  onClick={() => handleUpdateDocument(doc?.id)}
                                                   disabled={isUploading || !documentFile}
                                                 >
                                                   {isUploading ? "Updating..." : "Update Document"}
