@@ -934,7 +934,7 @@ const ProfileVehicleDocs_Info = ({
                                   className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                                 >
                                   <div className="flex justify-between items-start">
-                                    <Link href={doc?.link || '#'} target="_blank" className="flex-1">
+                                    <Link href={doc?.documentUrl || '#'} target="_blank" className="flex-1">
                                       <span className="font-medium text-sm">
                                         <span className="flex gap-x-2 items-start">
                                           {getDocumentIcon(doc?.verificationType)}
@@ -1004,7 +1004,7 @@ const ProfileVehicleDocs_Info = ({
                                               <div className="flex justify-end space-x-3 pt-5">
                                                 <Button
                                                   className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 w-full hover:bg-yellow-700 rounded-md disabled:bg-yellow-300"
-                                                  onClick={() => handleUpdateDocument(doc?.id)}
+                                                  onClick={() => handleUpdateDocument(doc?.driverId)}
                                                   disabled={isUploading || !documentFile}
                                                 >
                                                   {isUploading ? "Updating..." : "Update Document"}
@@ -1034,7 +1034,8 @@ const ProfileVehicleDocs_Info = ({
                                             <div className="flex justify-end space-x-3 pt-4">
                                               <Button
                                                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 w-full hover:bg-red-700 rounded-md"
-                                                onClick={() => handleDeleteDocument(doc?.id)}
+                                                onClick={() => handleDeleteDocument(doc?.driverId
+)}
                                               >
                                                 Yes, Delete
                                               </Button>

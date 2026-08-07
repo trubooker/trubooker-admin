@@ -80,9 +80,11 @@ const ReferralProgramPage = () => {
     (setting: { key: string }) => setting.key === "referral_program"
   )[0];
 
-  const totalPages = info?.data?.referral_performance?.meta?.last_page;
-  const revenue = info?.data;
-  const ReferralProgramListData = info?.data?.referral_performance?.data;
+  const totalPages = info?.result?.referral_performance?.meta?.last_page;
+  const revenue = info?.result;
+  const ReferralProgramListData = info?.result?.referral_performance?.data;
+
+  console.log("info", info)
   
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
