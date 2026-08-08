@@ -269,10 +269,12 @@ const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = u
   const totalPhotos = photos.length + existingPhotos.length;
 
   // Get vehicle types array from response
-  const vehicleTypes = Object.values(vehicleTypesData?.result || {});
-  console.log("vehicle type", vehicleTypes)
-  console.log("vehicle type length", vehicleTypes.length)
+const vehicleTypes: VehicleType[] = Object.values(
+  vehicleTypesData?.result || {}
+) as VehicleType[];
 
+console.log("vehicle type", vehicleTypes);
+console.log("vehicle type length", vehicleTypes.length);
 
   // Create the modal content
   const modalContent = (
@@ -298,7 +300,7 @@ const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = u
 
               
               {vehicleTypes.length > 0 ? (
-                vehicleTypes.map((type: VehicleType) => (
+                vehicleTypes.map((type) => (
                   
                   <SelectItem key={type.id} value={type.id}>
                     
