@@ -40,10 +40,10 @@ const ViewAgent = () => {
 
   const profile = userData?.result?.user; // object
   console.log("userdata_niyu", userData)
-  const agent_ref = userData?.data?.agent_referrals; // array
-  const referral = userData?.data?.refferals; // array
-  const earning_overview = userData?.data?.earning_overview; // object
-  const withdrawal_req = userData?.data?.withdrawal_request; // array
+  const agent_ref = userData?.result?.agent_referrals; // array
+  const referral = userData?.result?.refferals; // array
+  const earning_overview = userData?.result?.earning_overview; // object
+  const withdrawal_req = userData?.result?.withdrawal_request; // array
   return (
     <>
       {!isFetching || !loading ? (
@@ -63,7 +63,7 @@ const ViewAgent = () => {
               <div className="w-full flex flex-col gap-x-2 gap-y-1 text-gray-500">
                 <div className="flex lg:flex-row flex-col lg:items-center justify-start lg:gap-x-5 gap-y-2">
                   <span className="text-xl font-extrabold  text-start">
-                    {profile?.first_name} {profile?.last_name}
+                    {profile?.firstName} {profile?.lastName}
                   </span>
                   <>
                     {profile?.status === "active" ? (
@@ -96,9 +96,9 @@ const ViewAgent = () => {
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave />
-                {profile?.current_balance === null
+                {profile?.currentBalance === null
                   ? "NGN 0.00"
-                  : formatCurrency(Number(profile?.current_balance), "NGN")}
+                  : formatCurrency(Number(profile?.currentBalance), "NGN")}
               </div>
               {profile?.status == "active" ? (
                 <Modal
@@ -145,7 +145,7 @@ const ViewAgent = () => {
               )}
               <span className="text-left lg:text-right lg:me-5 text-sm">
                 Joined{" "}
-                {new Date(profile?.created_at).toLocaleDateString("en-US", {
+                {new Date(profile?.createdAt).toLocaleDateString("en-US", {
                   day: "numeric",
                   month: "short",
                   year: "numeric",
@@ -154,9 +154,9 @@ const ViewAgent = () => {
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave />
-              {profile?.current_balance === null
+              {profile?.currentBalance === null
                 ? "NGN 0.00"
-                : formatCurrency(Number(profile?.current_balance), "NGN")}
+                : formatCurrency(Number(profile?.currentBalance), "NGN")}
             </div>
           </div>
           <AgentInfo
