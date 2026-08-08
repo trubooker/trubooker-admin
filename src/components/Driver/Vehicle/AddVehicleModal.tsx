@@ -269,7 +269,10 @@ const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = u
   const totalPhotos = photos.length + existingPhotos.length;
 
   // Get vehicle types array from response
-  const vehicleTypes = vehicleTypesData?.data || [];
+  const vehicleTypes = Object.values(vehicleTypesData?.result || {});
+  console.log("vehicle type", vehicleTypes)
+  console.log("vehicle type length", vehicleTypes.length)
+
 
   // Create the modal content
   const modalContent = (
@@ -282,17 +285,23 @@ const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = u
         ) : typesError ? (
           <div className="text-sm text-red-500">Error loading vehicle types</div>
         ) : (
+          
           <Select
             value={formData.vehicle_type_id}
             onValueChange={(value: string) => setFormData(prev => ({ ...prev, vehicle_type_id: value }))}
           >
+            
             <SelectTrigger>
               <SelectValue placeholder="Select vehicle type" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
+
+              
               {vehicleTypes.length > 0 ? (
                 vehicleTypes.map((type: VehicleType) => (
+                  
                   <SelectItem key={type.id} value={type.id}>
+                    
                     {type.name}
                   </SelectItem>
                 ))

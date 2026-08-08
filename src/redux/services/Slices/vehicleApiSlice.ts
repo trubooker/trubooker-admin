@@ -1,5 +1,7 @@
 import { api } from "../apiSlice";
 
+
+
 const vehicleApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Vehicles", "VehicleTypes"],
 });
@@ -16,7 +18,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     addVehicle: builder.mutation({
       query: (formData) => ({
-        url: `/admin/drivers/add-vehicle`,
+        url: `/v1/admin/drivers/add-vehicle`,
         method: "POST",
         body: formData,
       }),
@@ -25,7 +27,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     updateVehicle: builder.mutation({
       query: (formData) => ({
-        url: `/admin/drivers/update-vehicle`,
+        url: `/v1/admin/drivers/update-vehicle`,
         method: "POST",
         body: formData,
       }),
@@ -34,7 +36,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     deleteVehicle: builder.mutation({
       query: (vehicleId) => ({
-        url: `/admin/drivers/delete-vehicle/${vehicleId}`,
+        url: `/v1/admin/drivers/delete-vehicle/${vehicleId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Vehicles"],
