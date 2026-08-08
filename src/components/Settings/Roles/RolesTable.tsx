@@ -33,7 +33,7 @@ const RolesTable = ({ role }: any) => {
 
   console.log("user by role", data)
 
-  const totalPages = data?.meta?.last_page;
+  const totalPages = data?.result?.meta?.totalRecords;
 
   const onPageChange = (pageNumber: number) => {
     if (!userByRoleFetching && pageNumber !== page) {
