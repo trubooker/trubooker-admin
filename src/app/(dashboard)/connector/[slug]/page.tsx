@@ -38,7 +38,8 @@ const ViewAgent = () => {
     await mutate(id).unwrap().then();
   };
 
-  const profile = userData?.result?.user; // object
+  const profile = userData?.result?.user;
+   const top = userData?.result; // object
   console.log("userdata_niyu", userData)
   const agent_ref = userData?.result?.agent_referrals; // array
   const referral = userData?.result?.refferals; // array
@@ -66,18 +67,18 @@ const ViewAgent = () => {
                     {profile?.firstName} {profile?.lastName}
                   </span>
                   <>
-                    {profile?.status === "active" ? (
+                    {top?.status === "active" ? (
                       <div className="flex  text-start  items-center gap-x-2 p-1 rounded-full justify-center w-[80px] bg-[#CCFFCD] text-[#00B771]">
                         <span className="w-2 h-2 bg-[#00B771] rounded-full"></span>
                         <span className="font-semibold text-xs capitalize">
-                          {profile?.status}
+                          {top?.status}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center  text-start gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#FFF4E6] text-[--primary-orange]">
                         <span className="w-2 h-2 bg-[--primary-orange] rounded-full"></span>
                         <span className="font-semibold text-xs capitalize">
-                          {profile?.status}
+                          {top?.status}
                         </span>
                       </div>
                     )}
@@ -96,11 +97,11 @@ const ViewAgent = () => {
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave />
-                {profile?.currentBalance === null
+                {top?.currentBalance === null
                   ? "NGN 0.00"
-                  : formatCurrency(Number(profile?.currentBalance), "NGN")}
+                  : formatCurrency(Number(top?.currentBalance), "NGN")}
               </div>
-              {profile?.status == "active" ? (
+              {top?.status == "active" ? (
                 <Modal
                   trigger={
                     <Button
@@ -116,7 +117,7 @@ const ViewAgent = () => {
                   content={
                     <ToggleStatus
                       toggle={toggleAgentStatus}
-                      status={profile?.status}
+                      status={top?.status}
                       loading={loadingToggle}
                     />
                   }
@@ -137,7 +138,7 @@ const ViewAgent = () => {
                   content={
                     <ToggleStatus
                       toggle={toggleAgentStatus}
-                      status={profile?.status}
+                      status={top?.status}
                       loading={loadingToggle}
                     />
                   }
@@ -154,9 +155,9 @@ const ViewAgent = () => {
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave />
-              {profile?.currentBalance === null
+              {top?.currentBalance === null
                 ? "NGN 0.00"
-                : formatCurrency(Number(profile?.currentBalance), "NGN")}
+                : formatCurrency(Number(top?.currentBalance), "NGN")}
             </div>
           </div>
           <AgentInfo
