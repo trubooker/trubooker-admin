@@ -76,79 +76,52 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   other: "Other Document",
 };
 
-// Status badge component
-const StatusBadge = ({ status }: { status: string }) => {
+// Status badge component - Fixed version
+const StatusBadge = ({ status }: { status: any }) => {
+  // Convert status to string safely
+  const statusStr = typeof status === 'string' 
+    ? status 
+    : typeof status === 'object' && status !== null && status.text 
+      ? status.text 
+      : String(status || '');
+  
   const statusConfig: Record<string, { color: string; label: string }> = {
     approved: { color: "bg-green-100 text-green-800 border-green-200", label: "Approved" },
     pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending" },
     rejected: { color: "bg-red-100 text-red-800 border-red-200", label: "Rejected" },
+    verified: { color: "bg-green-100 text-green-800 border-green-200", label: "Verified" },
   };
 
-  const config = statusConfig[status] || { color: "bg-gray-100 text-gray-800 border-gray-200", label: status };
+  // Safely get the status key
+  const statusKey = statusStr?.toLowerCase?.() || statusStr;
+  
+  // Try to find matching config
+  let config = statusConfig[statusKey];
+  
+  // If not found, try to find by checking if the status string includes any known status
+  if (!config && typeof statusStr === 'string') {
+    const lowerStatus = statusStr.toLowerCase();
+    for (const [key, value] of Object.entries(statusConfig)) {
+      if (lowerStatus.includes(key) || lowerStatus === key) {
+        config = value;
+        break;
+      }
+    }
+  }
+  
+  // If still not found, use default
+  if (!config) {
+    config = { 
+      color: "bg-gray-100 text-gray-800 border-gray-200", 
+      label: typeof statusStr === 'string' ? statusStr : "Unknown" 
+    };
+  }
 
   return (
     <Badge className={`${config.color} border px-2 py-0.5 text-xs font-medium`} variant="outline">
       {config.label}
     </Badge>
   );
-};
-
-/**
- * Normalizes an RTK Query response into a flat array, regardless of whether
- * the backend nests the payload under `data`, `result`, `documents`, or
- * returns an object keyed by id instead of an array.
- */
-const extractArray = (response: any, keys: string[] = ["data", "result", "documents"]): any[] => {
-  if (!response) return [];
-
-  if (Array.isArray(response)) return response;
-
-  for (const key of keys) {
-    const value = response?.[key];
-    if (Array.isArray(value)) return value;
-    if (value && typeof value === "object") return Object.values(value);
-  }
-
-  return [];
-};
-
-/**
- * The dedicated documents endpoint (useGetDriversDocumentsQuery) isn't
- * returning the license doc — but the driver record itself already
- * embeds it under `licenseData`. This builds a doc-shaped object from
- * it so it renders in the same list. 
- * 
- * For approve/reject, we'll use a different approach since this 
- * document doesn't have a verification ID.
- */
-const buildLicenseDocFromProfile = (licenseData: any, driverLicenseUrl?: string) => {
-  if (!licenseData) return null;
-
-  const overallStatus = licenseData?.status?.overall_status;
-  const derivedStatus =
-    licenseData?.verificationState === "verified" || overallStatus === 1
-      ? "approved"
-      : licenseData?.rejectedAt
-      ? "rejected"
-      : "pending";
-
-  const documentUrl =
-    licenseData?.driverLicense ||
-    driverLicenseUrl ||
-    licenseData?.document_images?.images_front_side_url ||
-    null;
-
-  return {
-    id: `license-profile-${licenseData?.verifiedAt || licenseData?.submittedAt || "current"}`,
-    documentType: "license",
-    verificationType: "license",
-    documentUrl,
-    status: derivedStatus,
-    reason: licenseData?.rejectionReason || null,
-    createdAt: licenseData?.submittedAt || licenseData?.verifiedAt || null,
-    isProfileDerived: true, // flag so we know it came from profile
-    licenseData: licenseData, // store original license data for approve/reject
-  };
 };
 
 const ProfileVehicleDocs_Info = ({
@@ -159,8 +132,6 @@ const ProfileVehicleDocs_Info = ({
   loading,
   isFetching,
   driverId,
-  licenseData = null,
-  driverLicenseUrl = null,
 }: any) => {
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
@@ -193,31 +164,13 @@ const ProfileVehicleDocs_Info = ({
 
   // Safe vehicle data - ensure it's an array
   const safeVehicle = Array.isArray(vehicle) ? vehicle : [];
+  console.log("safevehicle", safeVehicle)
   
   // Safe feedback data - ensure it's an array
   const safeFeedback = Array.isArray(feedback) ? feedback : [];
-
+  
   // Safe trip history data
   const safeTripHistory = Array.isArray(th) ? th : [];
-
-  // Debug logging - keep this on until you confirm the real shape in devtools,
-  // then feel free to remove it.
-  useEffect(() => {
-    console.log("📄 driverDocs raw response:", driverDocs);
-  }, [driverDocs]);
-
-  // Debug logging for vehicle data
-  useEffect(() => {
-    if (safeVehicle.length > 0) {
-      console.log("🚗 Vehicle data received:", safeVehicle.map(v => ({
-        id: v.id,
-        model: v.model,
-        photos: v.photos,
-        photosCount: v.photos?.length,
-        vehicle_type: v.vehicle_type
-      })));
-    }
-  }, [safeVehicle]);
 
   // Set verifiable ID when vehicle data is available
   useEffect(() => {
@@ -226,24 +179,140 @@ const ProfileVehicleDocs_Info = ({
     }
   }, [vehicle]);
 
+  // Helper function to map API document data to a consistent format
+  const mapDocumentData = (doc: any) => {
+    // Check if document has the nested structure from the API
+    if (doc?.result?.document_images) {
+      // Extract status from the nested structure
+      let status = doc.verificationState || "pending";
+      
+      // If status is an object with a text property, extract it
+      if (typeof status === 'object' && status !== null && status.text) {
+        status = status.text;
+      }
+      
+      // Check for rejection status
+      if (doc.rejectedAt && !doc.verifiedAt) {
+        status = "rejected";
+      }
+      
+      // This is the main document object from the API
+      return {
+        id: doc.id || doc.document_id || doc._id,
+        verification_type: doc.document_type || "other",
+        document_type_label: doc.document_name || "Document",
+        status: status,
+        link: doc.driverLicense || doc.image_url || doc.images_front_side_url,
+        created_at: doc.submittedAt || doc.verifiedAt || doc.created_at || new Date().toISOString(),
+        reason: doc.rejectionReason || doc.reason,
+        name: doc.document_name || "Document",
+        verifiable_type: doc.verifiable_type || "driver",
+        // Store the full document for later use
+        _raw: doc
+      };
+    }
+    
+    // If it's a regular document object
+    let status = doc.status || doc.verificationState || "pending";
+    
+    // If status is an object with a text property, extract it
+    if (typeof status === 'object' && status !== null && status.text) {
+      status = status.text;
+    }
+    
+    // Check for rejection status
+    if (doc.rejectedAt && !doc.verifiedAt) {
+      status = "rejected";
+    }
+    
+    return {
+      id: doc.id || doc.document_id || doc._id,
+      verification_type: doc.verification_type || doc.document_type || "other",
+      document_type_label: doc.document_type_label || doc.document_name || "Document",
+      status: status,
+      link: doc.link || doc.driverLicense || doc.image_url || doc.images_front_side_url,
+      created_at: doc.created_at || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
+      reason: doc.reason || doc.rejectionReason,
+      name: doc.name || doc.document_name || "Document",
+      verifiable_type: doc.verifiable_type || "driver",
+      _raw: doc
+    };
+  };
+
+  // Function to extract vehicle documents and add them to the documents list
+const getVehicleDocuments = (vehicles: any[]) => {
+  const vehicleDocs: any[] = [];
+  
+  vehicles.forEach((vehicle: any, index: number) => {
+    // Check for insurance document
+    if (vehicle?.insurance) {
+      vehicleDocs.push({
+        id: `vehicle-insurance-${vehicle.id || index}`,
+        verification_type: "insurance",
+        document_type_label: "Vehicle Insurance",
+        status: vehicle.insuranceStatus || "verified",
+        link: vehicle.insurance,
+        created_at: vehicle.insuranceUploadedAt || vehicle.created_at || new Date().toISOString(),
+        name: `Insurance - ${vehicle.model || 'Vehicle'}`,
+        verifiable_type: "vehicle",
+        vehicleId: vehicle.id,
+        _raw: vehicle
+      });
+    }
+    
+    // Check for registration document
+    if (vehicle?.registrationDoc || vehicle?.registration_doc) {
+      const regDoc = vehicle.registrationDoc || vehicle.registration_doc;
+      vehicleDocs.push({
+        id: `vehicle-registration-${vehicle.id || index}`,
+        verification_type: "registration_doc",
+        document_type_label: "Registration Document",
+        status: vehicle.registrationStatus || "verified",
+        link: regDoc,
+        created_at: vehicle.registrationUploadedAt || vehicle.created_at || new Date().toISOString(),
+        name: `Registration - ${vehicle.model || 'Vehicle'}`,
+        verifiable_type: "vehicle",
+        vehicleId: vehicle.id,
+        _raw: vehicle
+      });
+    }
+    
+    // Check for vehicle photos - added back as documents
+    const photos = vehicle?.photos || 
+                  vehicle?.vehiclePhoto || 
+                  vehicle?.vehicle_photos || 
+                  vehicle?.images || 
+                  [];
+    
+    if (Array.isArray(photos) && photos.length > 0) {
+      photos.forEach((photo: string, photoIndex: number) => {
+        if (photo) {
+          vehicleDocs.push({
+            id: `vehicle-photo-${vehicle.id || index}-${photoIndex}`,
+            verification_type: "vehicle",
+            document_type_label: `Vehicle Photo ${photoIndex + 1}`,
+            status: "verified",
+            link: photo,
+            created_at: vehicle.created_at || new Date().toISOString(),
+            name: `Vehicle Photo ${photoIndex + 1} - ${vehicle.model || 'Vehicle'}`,
+            verifiable_type: "vehicle",
+            vehicleId: vehicle.id,
+            _raw: vehicle
+          });
+        }
+      });
+    }
+  });
+  
+  console.log("🚗 Vehicle documents extracted:", vehicleDocs);
+  return vehicleDocs;
+};
+
   const handleApproveDocument = async (
     id: string,
     onModalClose?: () => void
   ) => {
     try {
-      // Check if this is a profile-derived license document
-      const doc = mergedDocs.find((d: any) => d.id === id);
-      
-      if (doc?.isProfileDerived) {
-        // Handle profile license approval differently
-        // You'll need to call your API endpoint for approving driver license
-        // This is a placeholder - replace with actual API call
-        toast.success("License approved successfully (profile)");
-        // Refetch profile data or update state
-        onModalClose?.();
-        return;
-      }
-      
       await approveDocs(id)
         .unwrap()
         .then((res) => {
@@ -281,20 +350,6 @@ const ProfileVehicleDocs_Info = ({
     }
 
     try {
-      // Check if this is a profile-derived license document
-      const doc = mergedDocs.find((d: any) => d.id === id);
-      
-      if (doc?.isProfileDerived) {
-        // Handle profile license rejection differently
-        // You'll need to call your API endpoint for rejecting driver license
-        // This is a placeholder - replace with actual API call
-        toast.error("License rejected (profile)");
-        setReason("");
-        setReasonError("");
-        onModalClose?.();
-        return;
-      }
-      
       await rejectDocs({ reason: reason, documentVerificationId: id })
         .unwrap()
         .then((res) => {
@@ -314,6 +369,13 @@ const ProfileVehicleDocs_Info = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      console.log("📎 File selected:", {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: new Date(file.lastModified)
+      });
+      
       setDocumentFile(file);
     } else {
       setDocumentFile(null);
@@ -335,35 +397,36 @@ const ProfileVehicleDocs_Info = ({
 
     setIsUploading(true);
     const formData = new FormData();
-
+    
+    // Add required fields
     formData.append("driver_id", driverId);
-    formData.append("documentType", documentType);
+    formData.append("verification_type", documentType);
+    formData.append("verifiable_type", verifiableType);
+    formData.append("verifiable_id", verifiableType === "driver" ? driverId : verifiableId);
     
     if (documentName) {
       formData.append("name", documentName);
     }
 
-    // Get the actual File object from the input
     const fileInput = document.getElementById('docFile') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
       const actualFile = fileInput.files[0];
       formData.append("document", actualFile, actualFile.name);
     } else {
-      console.error("No file found in input");
       toast.error("Please select a file");
       setIsUploading(false);
       return;
     }
 
     try {
-      const response = await addDocument({ id: driverId, formData }).unwrap();
+      const response = await addDocument(formData).unwrap();
       toast.success("Document added successfully");
       refetchDocs();
       refetchHistory();
       resetDocumentForm();
       onModalClose?.();
     } catch (error: any) {
-      console.error("❌ Failed to add document:", error);
+      console.error("Failed to add document:", error);
       if (error?.data?.errors) {
         const validationErrors = error.data.errors;
         Object.keys(validationErrors).forEach(key => {
@@ -389,44 +452,23 @@ const ProfileVehicleDocs_Info = ({
 
     setIsUploading(true);
     const formData = new FormData();
-
-    // Get the document being updated
-    const doc = selectedDoc || driverDocsArray.find((d: any) => d.id === docId);
-
-    if (doc?.verificationType === "vehicle") {
-      formData.append(`photos[0]`, {
-        uri: documentFile.uri,
-        type: documentFile.type || "image/jpeg",
-        name: documentFile.name || `vehicle_photo_${Date.now()}.jpg`,
-      } as any);
+    
+    const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
+    
+    if (doc?.verification_type === "vehicle") {
+      formData.append(`photos[0]`, documentFile, documentFile.name);
     } 
-    else if (doc?.verificationType === "registration_doc") {
-      formData.append("reg_docs", {
-        uri: documentFile.uri,
-        type: documentFile.type || "image/jpeg",
-        name: documentFile.name || `registration_${Date.now()}.jpg`,
-      } as any);
+    else if (doc?.verification_type === "registration_doc") {
+      formData.append("reg_docs", documentFile, documentFile.name);
     }
-    else if (doc?.verificationType === "insurance") {
-      formData.append("vehicle_insurance", {
-        uri: documentFile.uri,
-        type: documentFile.type || "image/jpeg",
-        name: documentFile.name || `insurance_${Date.now()}.jpg`,
-      } as any);
+    else if (doc?.verification_type === "insurance") {
+      formData.append("vehicle_insurance", documentFile, documentFile.name);
     }
-    else if (doc?.verificationType === "license") {
-      formData.append("drivers_license", {
-        uri: documentFile.uri,
-        type: documentFile.type || "image/jpeg",
-        name: documentFile.name || `license_${Date.now()}.jpg`,
-      } as any);
+    else if (doc?.verification_type === "license") {
+      formData.append("drivers_license", documentFile, documentFile.name);
     }
     else {
-      formData.append("document", {
-        uri: documentFile.uri,
-        type: documentFile.type || "application/octet-stream",
-        name: documentFile.name || `document_${Date.now()}.pdf`,
-      } as any);
+      formData.append("document", documentFile, documentFile.name);
     }
     
     if (documentName) {
@@ -442,11 +484,7 @@ const ProfileVehicleDocs_Info = ({
       onModalClose?.();
     } catch (error: any) {
       console.error("Failed to update document:", error);
-      if (error?.data?.message) {
-        toast.error(error.data.message);
-      } else {
-        toast.error("Failed to update document");
-      }
+      toast.error(error?.data?.message || "Failed to update document");
     } finally {
       setIsUploading(false);
     }
@@ -481,45 +519,61 @@ const ProfileVehicleDocs_Info = ({
   };
 
   const getDocumentTypeLabel = (doc: any) => {
-    const type = doc?.documentType || doc?.verificationType || '';
-
-    if (type.includes('license')) return "Driver's License";
-    if (type.includes('insurance')) return "Vehicle Insurance";
-    if (type.includes('registration') || type.includes('reg')) return "Registration Document";
-    if (type.includes('vehicle')) return "Vehicle Photo";
-
-    return type.replace(/_/g, ' ') || 'Document';
+    if (doc?.document_type_label) return doc.document_type_label;
+    if (doc?.document_name) return doc.document_name;
+    
+    switch(doc?.verification_type) {
+      case "license": return "Driver's License";
+      case "insurance": return "Vehicle Insurance";
+      case "registration_doc": return "Registration Document";
+      case "vehicle": return "Vehicle Photo";
+      default: return doc?.verification_type || 'Document';
+    }
   };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "N/A";
+    }
   };
 
-  // ---------------------------------------------------------------------
-  const docs: any[] = extractArray(driverDocs);
-  const driverDocsArray = docs;
+  // Extract documents from the API response
+  let docs: any[] = [];
+  
+  // Check if driverDocs has the expected structure
+  if (driverDocs?.result) {
+    // If result is an array, use it directly
+    if (Array.isArray(driverDocs.result)) {
+      docs = driverDocs.result.map(mapDocumentData);
+    } 
+    // If result is a single object (like in your API response)
+    else if (typeof driverDocs.result === 'object') {
+      docs = [mapDocumentData(driverDocs.result)];
+    }
+  } 
+  // If driverDocs is an array directly
+  else if (Array.isArray(driverDocs)) {
+    docs = driverDocs.map(mapDocumentData);
+  }
+  
+  // Merge vehicle documents with driver documents
+  const vehicleDocs = getVehicleDocuments(safeVehicle);
+  const allDocs = [...docs, ...vehicleDocs];
+  
+  console.log("📄 Mapped driver documents:", docs);
+  console.log("🚗 Vehicle documents:", vehicleDocs);
+  console.log("📄 All documents combined:", allDocs);
 
-  // Fall back to the driver-embedded license data if the documents
-  // endpoint didn't already give us a license entry.
-  const licenseDocFromProfile = buildLicenseDocFromProfile(licenseData, driverLicenseUrl);
-  const hasLicenseFromApi = docs.some(
-    (d: any) => (d?.documentType || d?.verificationType) === "license"
-  );
-
-  const mergedDocs =
-    licenseDocFromProfile && !hasLicenseFromApi
-      ? [licenseDocFromProfile, ...docs]
-      : docs;
-
-  const history: any[] = extractArray(documentHistory);
-  // ---------------------------------------------------------------------
+  const history: any[] = documentHistory?.data || [];
 
   return (
     <div className="w-full">
@@ -709,10 +763,10 @@ const ProfileVehicleDocs_Info = ({
                                       Vehicle Type
                                     </span>
                                     <span className="font-medium text-sm">
-                                      {!deets?.type ? (
+                                      {!deets?.vehicle_type?.name && !deets?.type ? (
                                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                       ) : (
-                                        deets?.type || 'Not specified'
+                                        deets?.vehicle_type?.name || deets?.type || 'Not specified'
                                       )}
                                     </span>
                                   </div>
@@ -756,10 +810,10 @@ const ProfileVehicleDocs_Info = ({
                                 License plate number
                               </span>
                               <span className="font-medium text-sm">
-                                {!deets?.plateNumber ? (
+                                {!deets?.plateNumber && !deets?.license_plate_number ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  deets?.plateNumber || 'Not specified'
+                                  deets?.plateNumber || deets?.license_plate_number || 'Not specified'
                                 )}
                               </span>
                             </div>
@@ -798,7 +852,14 @@ const ProfileVehicleDocs_Info = ({
                                 {!deets?.insurance ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  deets?.insurance || 'Not provided'
+                                  <Link 
+                                    href={deets?.insurance || '#'} 
+                                    target="_blank" 
+                                    className="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                                  >
+                                    View Insurance
+                                    <FaExternalLinkAlt className="w-3 h-3" />
+                                  </Link>
                                 )}
                               </span>
                             </div>
@@ -812,37 +873,48 @@ const ProfileVehicleDocs_Info = ({
                             
                             <TabsContent value="vehiclePhotos">
                               <div className="w-full grid grid-cols-1 pt-5 gap-4">
-                                {deets?.vehiclePhoto && deets.vehiclePhoto.length > 0 ? (
-                                  deets.vehiclePhoto.map((photo: string, photoIndex: number) => (
-                                    <div key={photoIndex}>
-                                      <Link href={photo || '#'} target="_blank">
-                                        <span className="font-medium text-sm">
-                                          <span className="flex gap-x-2 items-center">
-                                            <Image
-                                              src={"/photoGrid.svg"}
-                                              alt="Vehicle Photo"
-                                              width={35}
-                                              height={35}
-                                            />
-                                            <div className="text-sm font-medium text-[#333F53]">
-                                              Vehicle photo {photoIndex + 1}
-                                            </div>
+                                {(() => {
+                                  // Try different possible photo field names
+                                  const photos = deets?.photos || 
+                                                deets?.vehiclePhoto || 
+                                                deets?.vehicle_photos || 
+                                                deets?.images || 
+                                                [];
+                                  
+                                  if (Array.isArray(photos) && photos.length > 0) {
+                                    return photos.map((photo: string, photoIndex: number) => (
+                                      <div key={photoIndex}>
+                                        <Link href={photo || '#'} target="_blank">
+                                          <span className="font-medium text-sm">
+                                            <span className="flex gap-x-2 items-center">
+                                              <Image
+                                                src={"/photoGrid.svg"}
+                                                alt="Vehicle Photo"
+                                                width={35}
+                                                height={35}
+                                              />
+                                              <div className="text-sm font-medium text-[#333F53]">
+                                                Vehicle photo {photoIndex + 1}
+                                              </div>
+                                            </span>
                                           </span>
-                                        </span>
-                                      </Link>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <div className="text-sm text-gray-500 text-center py-4">
-                                    No photos uploaded for this vehicle
-                                  </div>
-                                )}
+                                        </Link>
+                                      </div>
+                                    ));
+                                  } else {
+                                    return (
+                                      <div className="text-sm text-gray-500 text-center py-4">
+                                        No photos uploaded for this vehicle
+                                      </div>
+                                    );
+                                  }
+                                })()}
                               </div>
                             </TabsContent>
                             
                             <TabsContent value="features">
                               <div className="w-full pt-5">
-                                {deets?.features && deets.features.length > 0 ? (
+                                {deets?.features && Array.isArray(deets.features) && deets.features.length > 0 ? (
                                   <div className="flex flex-wrap gap-2">
                                     {deets.features.map((feature: string, idx: number) => {
                                       const featureDetails = AVAILABLE_FEATURES.find(
@@ -932,164 +1004,162 @@ const ProfileVehicleDocs_Info = ({
                     </div>
                   ) : (
                     <>
-                      {mergedDocs?.length > 0 ? (
+                      {allDocs?.length > 0 ? (
                         <div className="mb-3">
                           <div className="max-h-[500px] h-auto overflow-y-auto">
                             <div className="grid grid-cols-1 gap-8">
-                              {mergedDocs.map((doc: any, index: number) => (
+                              {allDocs.map((doc: any, index: number) => (
                                 <div
                                   key={doc?.id || index}
                                   className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                                 >
                                   <div className="flex justify-between items-start">
-                                    <Link href={doc?.documentUrl || '#'} target="_blank" className="flex-1">
+                                    <Link href={doc?.link || '#'} target="_blank" className="flex-1">
                                       <span className="font-medium text-sm">
                                         <span className="flex gap-x-2 items-start">
-                                          {getDocumentIcon(doc?.verificationType)}
+                                          {getDocumentIcon(doc?.verification_type)}
                                           <div className="flex flex-col">
                                             <div className="text-sm font-bold items-center flex gap-x-2 text-[#333F53] capitalize">
                                               {getDocumentTypeLabel(doc)}
-                                              <FaExternalLinkAlt className="w-3 h-3" />
+                                              {doc?.link && <FaExternalLinkAlt className="w-3 h-3" />}
                                             </div>
                                             <div className="text-xs mt-2">
                                               <StatusBadge status={doc?.status || 'unknown'} />
                                             </div>
+                                            {doc?.verifiable_type && (
+                                              <div className="text-[10px] mt-0.5 text-gray-400">
+                                                Type: {doc.verifiable_type}
+                                              </div>
+                                            )}
+                                            {doc?.vehicleId && (
+                                              <div className="text-[10px] mt-0.5 text-gray-400">
+                                                Vehicle ID: {doc.vehicleId}
+                                              </div>
+                                            )}
                                             {doc?.reason && (
                                               <div className="text-[11px] mt-1 text-red-500">
                                                 Reason: {doc.reason}
                                               </div>
                                             )}
                                             <div className="text-[11px] mt-1 text-gray-500">
-                                              Added: {formatDate(doc?.createdAt)}
+                                              Added: {formatDate(doc?.created_at)}
                                             </div>
-                                            {doc?.isProfileDerived && (
-                                              <div className="text-[10px] mt-1 text-blue-500">
-                                                Source: Driver Profile
-                                              </div>
-                                            )}
                                           </div>
                                         </span>
                                       </span>
                                     </Link>
 
-                                    {/* Show action buttons for ALL documents, but handle differently for profile-derived ones */}
+                                    {/* Show edit/delete for all documents */}
                                     <div className="flex gap-2 ml-2">
-                                      {/* Only show Update and Delete for non-profile documents */}
-                                      {!doc?.isProfileDerived && (
-                                        <>
-                                          <Modal
-                                            trigger={
-                                              <Button
-                                                className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md"
-                                                title="Update document"
-                                                onClick={() => {
-                                                  setSelectedDoc(doc);
-                                                  setDocumentName(doc?.name || '');
-                                                }}
-                                              >
-                                                <FaEdit className="w-4 h-4" />
-                                              </Button>
-                                            }
-                                            title="Update Document"
-                                            description={`Update ${getDocumentTypeLabel(doc)}`}
-                                            content={
-                                              <div className="flex flex-col space-y-4 lg:mb-4">
-                                                <div className="space-y-4">
-                                                  <div className="space-y-2">
-                                                    <Label htmlFor="updateDocName">Document Name (Optional)</Label>
-                                                    <Input
-                                                      id="updateDocName"
-                                                      value={documentName}
-                                                      onChange={(e) => setDocumentName(e.target.value)}
-                                                      placeholder="Enter document name"
-                                                    />
-                                                  </div>
-
-                                                  <div className="space-y-2">
-                                                    <Label htmlFor="updateDocFile">New Document File</Label>
-                                                    <Input
-                                                      id="updateDocFile"
-                                                      type="file"
-                                                      accept="image/*,.pdf"
-                                                      onChange={handleFileChange}
-                                                    />
-                                                    <p className="text-xs text-gray-500">
-                                                      Select a file to replace the current document
-                                                    </p>
-                                                  </div>
-
-                                                  <div className="flex justify-end space-x-3 pt-5">
-                                                    <Button
-                                                      className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 w-full hover:bg-yellow-700 rounded-md disabled:bg-yellow-300"
-                                                      onClick={() => handleUpdateDocument(doc?.id)}
-                                                      disabled={isUploading || !documentFile}
-                                                    >
-                                                      {isUploading ? "Updating..." : "Update Document"}
-                                                    </Button>
-                                                  </div>
-                                                </div>
+                                      <Modal
+                                        trigger={
+                                          <Button
+                                            className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md"
+                                            title="Update document"
+                                            onClick={() => {
+                                              setSelectedDoc(doc);
+                                              setDocumentName(doc?.name || '');
+                                            }}
+                                          >
+                                            <FaEdit className="w-4 h-4" />
+                                          </Button>
+                                        }
+                                        title="Update Document"
+                                        description={`Update ${getDocumentTypeLabel(doc)}`}
+                                        content={
+                                          <div className="flex flex-col space-y-4 lg:mb-4">
+                                            <div className="space-y-4">
+                                              <div className="space-y-2">
+                                                <Label htmlFor="updateDocName">Document Name (Optional)</Label>
+                                                <Input
+                                                  id="updateDocName"
+                                                  value={documentName}
+                                                  onChange={(e) => setDocumentName(e.target.value)}
+                                                  placeholder="Enter document name"
+                                                />
                                               </div>
-                                            }
-                                          />
 
-                                          <Modal
-                                            trigger={
-                                              <Button
-                                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
-                                                title="Delete document"
-                                              >
-                                                <FaTrash className="w-4 h-4" />
-                                              </Button>
-                                            }
-                                            title="Delete Document"
-                                            description="Are you sure you want to delete this document?"
-                                            content={
-                                              <div className="flex flex-col space-y-4 lg:mb-4">
-                                                <p className="text-sm text-gray-600">
-                                                  This action cannot be undone. The document will be permanently removed.
+                                              <div className="space-y-2">
+                                                <Label htmlFor="updateDocFile">New Document File</Label>
+                                                <Input
+                                                  id="updateDocFile"
+                                                  type="file"
+                                                  accept="image/*,.pdf"
+                                                  onChange={handleFileChange}
+                                                />
+                                                <p className="text-xs text-gray-500">
+                                                  Select a file to replace the current document
                                                 </p>
-                                                <div className="flex justify-end space-x-3 pt-4">
-                                                  <Button
-                                                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 w-full hover:bg-red-700 rounded-md"
-                                                    onClick={() => handleDeleteDocument(doc?.id)}
-                                                  >
-                                                    Yes, Delete
-                                                  </Button>
-                                                </div>
                                               </div>
-                                            }
-                                          />
-                                        </>
-                                      )}
+
+                                              <div className="flex justify-end space-x-3 pt-5">
+                                                <Button
+                                                  className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 w-full hover:bg-yellow-700 rounded-md disabled:bg-yellow-300"
+                                                  onClick={() => handleUpdateDocument(doc?.id)}
+                                                  disabled={isUploading || !documentFile}
+                                                >
+                                                  {isUploading ? "Updating..." : "Update Document"}
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        }
+                                      />
+
+                                      <Modal
+                                        trigger={
+                                          <Button
+                                            className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
+                                            title="Delete document"
+                                          >
+                                            <FaTrash className="w-4 h-4" />
+                                          </Button>
+                                        }
+                                        title="Delete Document"
+                                        description="Are you sure you want to delete this document?"
+                                        content={
+                                          <div className="flex flex-col space-y-4 lg:mb-4">
+                                            <p className="text-sm text-gray-600">
+                                              This action cannot be undone. The document will be permanently removed.
+                                            </p>
+                                            <div className="flex justify-end space-x-3 pt-4">
+                                              <Button
+                                                className="px-4 py-2 text-sm font-medium text-white bg-red-600 w-full hover:bg-red-700 rounded-md"
+                                                onClick={() => handleDeleteDocument(doc?.id)}
+                                              >
+                                                Yes, Delete
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        }
+                                      />
                                     </div>
                                   </div>
 
-                                  {/* Approve and Reject buttons for ALL documents */}
+                                  {/* Show approve/reject for all documents */}
                                   <div className="mt-4 flex gap-x-2">
                                     <Modal
                                       trigger={
                                         <Button
-                                          disabled={doc?.status === "approved"}
+                                          disabled={doc?.status === "approved" || doc?.status === "verified"}
                                           className={`px-3 py-1.5 w-full text-xs font-bold rounded-md ${
-                                            doc?.status === "approved"
+                                            doc?.status === "approved" || doc?.status === "verified"
                                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                               : "bg-green-500 text-white hover:bg-green-600"
                                           }`}
                                         >
-                                          {doc?.status === "approved"
+                                          {doc?.status === "approved" || doc?.status === "verified"
                                             ? "Approved"
                                             : "Approve"}
                                         </Button>
                                       }
                                       title={"Approve Document"}
-                                      description={doc?.isProfileDerived ? "This will approve the driver's license from their profile" : ""}
+                                      description={""}
                                       content={
                                         <div className="flex flex-col space-y-4 lg:mb-4">
                                           <p className="text-sm text-gray-600">
-                                            {doc?.isProfileDerived 
-                                              ? "Are you sure you want to approve this driver's license? This action will update the driver's verification status."
-                                              : "Are you sure you want to approve this document? This action cannot be undone."
-                                            }
+                                            Are you sure you want to approve this
+                                            document? This action cannot be undone.
                                           </p>
                                           <div className="flex justify-end space-x-3 pt-4">
                                             <Button
@@ -1124,14 +1194,13 @@ const ProfileVehicleDocs_Info = ({
                                         </Button>
                                       }
                                       title={"Reject Document"}
-                                      description={doc?.isProfileDerived ? "This will reject the driver's license from their profile" : "Enter reason for rejection"}
+                                      description={"Enter reason for rejection"}
                                       content={
                                         <div className="flex flex-col space-y-4 lg:mb-4">
                                           <p className="text-sm text-gray-600 mb-2">
-                                            {doc?.isProfileDerived
-                                              ? "Please provide a reason for rejecting this driver's license. This will be shared with the driver."
-                                              : "Please provide a reason for rejecting this document. This will be shared with the driver."
-                                            }
+                                            Please provide a reason for rejecting this
+                                            document. This will be shared with the
+                                            driver.
                                           </p>
                                           <div className="space-y-4 mx-1">
                                             <div className="space-y-2">
@@ -1253,7 +1322,7 @@ const ProfileVehicleDocs_Info = ({
                                       <SelectContent>
                                         {safeVehicle.map((v: any) => (
                                           <SelectItem key={v.id} value={v.id}>
-                                            {v.model} - {v.licensePlateNumber}
+                                            {v.model} - {v.license_plate_number}
                                           </SelectItem>
                                         ))}
                                       </SelectContent>
@@ -1329,19 +1398,19 @@ const ProfileVehicleDocs_Info = ({
                                 </div>
                                 
                                 <p className="text-xs text-gray-500 mt-1">
-                                  {formatDate(item?.createdAt)}
+                                  {formatDate(item?.created_at)}
                                 </p>
                                 
-                                {item?.rejectionReason && (
+                                {item?.reason && (
                                   <div className="mt-2 text-xs bg-red-50 border border-red-100 rounded p-2">
                                     <span className="font-medium text-red-700">Rejection reason:</span>
-                                    <span className="text-red-600 ml-1">{item.rejectionReason}</span>
+                                    <span className="text-red-600 ml-1">{item.reason}</span>
                                   </div>
                                 )}
 
-                                {item?.documentUrl && (
+                                {item?.link && (
                                   <Link 
-                                    href={item.documentUrl} 
+                                    href={item.link} 
                                     target="_blank" 
                                     className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
                                   >
@@ -1352,7 +1421,7 @@ const ProfileVehicleDocs_Info = ({
                                 <div className="mt-2 flex flex-wrap gap-2 text-[10px] text-gray-400">
                                   <span>ID: {item?.id}</span>
                                   <span>•</span>
-                                  <span>Type: {item?.driverId}</span>
+                                  <span>Type: {item?.verifiable_type || 'driver'}</span>
                                 </div>
                               </div>
                             </div>
@@ -1414,7 +1483,7 @@ const ProfileVehicleDocs_Info = ({
                     <div className="my-6">
                       <div className="flex w-full items-start space-x-4">
                         <Avatar className="lg:w-14 h-10 lg:h-14 w-10">
-                          <AvatarImage src={actions?.profileImage} />
+                          <AvatarImage src={actions?.profile_picture} />
                           <AvatarFallback>
                             <IoPersonOutline className="w-5 h-5" />
                           </AvatarFallback>
