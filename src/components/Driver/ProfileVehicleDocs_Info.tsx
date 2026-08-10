@@ -304,7 +304,8 @@ const getVehicleDocuments = (vehicles: any[]) => {
     }
   });
   
-  console.log("🚗 Vehicle documents extracted:", vehicleDocs);
+  //hello 
+  console.log("🚗 Vehicle documents extracted:::", vehicleDocs);
   return vehicleDocs;
 };
 
