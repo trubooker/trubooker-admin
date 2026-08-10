@@ -39,6 +39,7 @@ const ViewDriver = () => {
     error,
   } = useGetOneDriverQuery(id);
 
+  console.log('one Driver', userData)
   // ---- Driver vehicles query (separate hook, separate variable names) ----
   const {
     isLoading: vehiclesLoading,
