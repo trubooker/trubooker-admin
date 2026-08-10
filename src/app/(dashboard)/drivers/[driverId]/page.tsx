@@ -65,6 +65,8 @@ const ViewDriver = () => {
   // Add safe access with optional chaining and fallbacks
   const driver = userData?.result || {};
   const profile = driver?.user || {};
+  const licenseData = driver?.licenseData || null;
+const driverLicenseUrl = driver?.driverLicense || null;
 
   // ---- Vehicle extraction from the new vehicles query ----
   // ⚠️ ADJUST THIS depending on your actual API response shape.
@@ -241,7 +243,19 @@ const ViewDriver = () => {
                 : formatCurrency(Number(driver.currentBalance), "NGN")}
             </div>
           </div>
+
           <ProfileVehicleDocs_Info
+  th={profile?.status === "active" ? th : []}
+  feedback={feedback}
+  vehicle={vehicle}
+  profile={profile}
+  loading={isPageLoading}
+  isFetching={isPageFetching}
+  driverId={id}
+  licenseData={licenseData}
+  driverLicenseUrl={driverLicenseUrl}
+/>
+          {/* <ProfileVehicleDocs_Info
             th={profile?.status === "active" ? th : []}
             feedback={feedback}
             vehicle={vehicle}
@@ -249,7 +263,7 @@ const ViewDriver = () => {
             loading={isPageLoading}
             isFetching={isPageFetching}
             driverId={id}
-          />
+          /> */}
         </div>
       ) : (
         <div>
