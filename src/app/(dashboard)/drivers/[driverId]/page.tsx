@@ -124,14 +124,15 @@ const ViewDriver = () => {
   // Extract feedback/reviews - try multiple paths
   let feedback: any[] = [];
   
-  if (userData?.data?.reviews && Array.isArray(userData.data.reviews)) {
-    feedback = userData.data.reviews;
+  console.log("userData/Niyu", userData)
+  if (userData?.result?.reviews && Array.isArray(userData.result.reviews)) {
+    feedback = userData?.result?.reviews;
   } else if (userData?.reviews && Array.isArray(userData.reviews)) {
-    feedback = userData.reviews;
+    feedback = userData?.reviews;
   } else if (userData?.result?.reviews && Array.isArray(userData.result.reviews)) {
-    feedback = userData.result.reviews;
-  } else if (userData?.data?.feedback && Array.isArray(userData.data.feedback)) {
-    feedback = userData.data.feedback;
+    feedback = userData?.result.reviews;
+  } else if (userData?.result?.feedback && Array.isArray(userData.result.feedback)) {
+    feedback = userData?.result.feedback;
   }
 
   console.log("💬 Feedback extracted:", feedback.length);
@@ -139,14 +140,14 @@ const ViewDriver = () => {
   // Extract trip history - try multiple paths
   let th: any[] = [];
   
-  if (userData?.data?.trip_history && Array.isArray(userData.data.trip_history)) {
-    th = userData.data.trip_history;
-  } else if (userData?.trip_history && Array.isArray(userData.trip_history)) {
-    th = userData.trip_history;
-  } else if (userData?.result?.trip_history && Array.isArray(userData.result.trip_history)) {
-    th = userData.result.trip_history;
-  } else if (userData?.data?.trips && Array.isArray(userData.data.trips)) {
-    th = userData.data.trips;
+  if (userData?.result?.tripHistory && Array.isArray(userData.result.tripHistory)) {
+    th = userData?.result?.tripHistory;
+  } else if (userData?.tripHistory && Array.isArray(userData.tripHistory)) {
+    th = userData.tripHistory;
+  } else if (userData?.result?.tripHistory && Array.isArray(userData.result.tripHistory)) {
+    th = userData.result.tripHistory;
+  } else if (userData?.result?.trips && Array.isArray(userData.result.trips)) {
+    th = userData.result.trips;
   }
 
   console.log("📋 Trip history extracted:", th.length);
@@ -159,12 +160,12 @@ const ViewDriver = () => {
   console.log(`- Trip History: ${th.length > 0 ? `✅ ${th.length} found` : '❌ Not found'}`);
 
   // Safe name display
-  const driverName = `${profile?.firstName || profile?.first_name || ''} ${profile?.lastName || profile?.last_name || ''}`.trim() || 'Unknown Driver';
+  const driverName = `${profile?.firstName || profile?.firstName || ''} ${profile?.lastName || profile?.lastName || ''}`.trim() || 'Unknown Driver';
   console.log("👤 Driver name:", driverName);
   
   // Safe date display
-  const joinDate = profile?.createdAt || profile?.created_at || profile?.joinDate
-    ? new Date(profile?.createdAt || profile?.created_at || profile?.joinDate).toLocaleDateString("en-US", {
+  const joinDate = profile?.createdAt || profile?.createdAt || profile?.joinDate
+    ? new Date(profile?.createdAt || profile?.createdAt || profile?.joinDate).toLocaleDateString("en-US", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -207,7 +208,7 @@ const ViewDriver = () => {
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage src={profile?.profileImage || profile?.profile_image || profile?.avatar} />
+                <AvatarImage src={profile?.profileImage || profile?.profileImage || profile?.avatar} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -310,7 +311,7 @@ const ViewDriver = () => {
             </div>
           </div>
           <ProfileVehicleDocs_Info
-            th={profile?.status === "active" ? th : []}
+            th={th}
             feedback={feedback}
             vehicle={vehicle}
             profile={profile}
