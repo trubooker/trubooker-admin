@@ -30,6 +30,10 @@ import {
   useDeleteDriversDocumentMutation,
   useGetDocumentHistoryQuery
 } from "@/redux/services/Slices/driverApiSlice";
+import {
+  useApproveVehicleMutation,
+  useRejectVehicleMutation,
+} from "@/redux/services/Slices/vehicleApiSlice";
 import { Button } from "../ui/button";
 import { Modal } from "../DualModal";
 import toast from "react-hot-toast";
@@ -155,6 +159,11 @@ const ProfileVehicleDocs_Info = ({
   const [rejectDocs, { isLoading: rejectLoading }] =
     useRejectDriversDocumentsMutation();
 
+  const [approveVehicle, { isLoading: approveVehicleLoading }] =
+    useApproveVehicleMutation();
+  const [rejectVehicle, { isLoading: rejectVehicleLoading }] =
+    useRejectVehicleMutation();
+
   const [addDocument] = useAddDriversDocumentMutation();
   const [updateDocument] = useUpdateDriversDocumentMutation();
   const [deleteDocument] = useDeleteDriversDocumentMutation();
@@ -178,6 +187,31 @@ const ProfileVehicleDocs_Info = ({
       setVerifiableId(safeVehicle[0].id);
     }
   }, [vehicle]);
+
+  // Helper function to upload file to server
+  const uploadFile = async (file: File): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Adjust this endpoint based on your actual file upload endpoint
+      const response = await fetch('/v1/admin/drivers/add-document', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload file');
+      }
+      
+      const data = await response.json();
+      // Adjust based on your API response structure
+      return data.url || data.fileUrl || data.data?.url;
+    } catch (error) {
+      console.error('File upload failed:', error);
+      throw new Error('Failed to upload file. Please try again.');
+    }
+  };
 
   // Helper function to map API document data to a consistent format
   const mapDocumentData = (doc: any) => {
@@ -239,82 +273,107 @@ const ProfileVehicleDocs_Info = ({
     };
   };
 
-  // Function to extract vehicle documents and add them to the documents list
-const getVehicleDocuments = (vehicles: any[]) => {
-  const vehicleDocs: any[] = [];
-  
-  vehicles.forEach((vehicle: any, index: number) => {
-    // Check for insurance document
-    if (vehicle?.insurance) {
-      vehicleDocs.push({
-        id: `vehicle-insurance-${vehicle.id || index}`,
-        verification_type: "insurance",
-        document_type_label: "Vehicle Insurance",
-        status: vehicle.insuranceStatus || "verified",
-        link: vehicle.insurance,
-        created_at: vehicle.insuranceUploadedAt || vehicle.created_at || new Date().toISOString(),
-        name: `Insurance - ${vehicle.model || 'Vehicle'}`,
-        verifiable_type: "vehicle",
-        vehicleId: vehicle.id,
-        _raw: vehicle
-      });
-    }
-    
-    // Check for registration document
-    if (vehicle?.registrationDoc || vehicle?.registration_doc) {
-      const regDoc = vehicle.registrationDoc || vehicle.registration_doc;
-      vehicleDocs.push({
-        id: `vehicle-registration-${vehicle.id || index}`,
-        verification_type: "registration_doc",
-        document_type_label: "Registration Document",
-        status: vehicle.registrationStatus || "verified",
-        link: regDoc,
-        created_at: vehicle.registrationUploadedAt || vehicle.created_at || new Date().toISOString(),
-        name: `Registration - ${vehicle.model || 'Vehicle'}`,
-        verifiable_type: "vehicle",
-        vehicleId: vehicle.id,
-        _raw: vehicle
-      });
-    }
-    
-    // Check for vehicle photos - added back as documents
-    const photos = vehicle?.photos || 
-                  vehicle?.vehiclePhoto || 
-                  vehicle?.vehicle_photos || 
-                  vehicle?.images || 
-                  [];
-    
-    if (Array.isArray(photos) && photos.length > 0) {
-      photos.forEach((photo: string, photoIndex: number) => {
-        if (photo) {
-          vehicleDocs.push({
-            id: `vehicle-photo-${vehicle.id || index}-${photoIndex}`,
-            verification_type: "vehicle",
-            document_type_label: `Vehicle Photo ${photoIndex + 1}`,
-            status: "verified",
-            link: photo,
-            created_at: vehicle.created_at || new Date().toISOString(),
-            name: `Vehicle Photo ${photoIndex + 1} - ${vehicle.model || 'Vehicle'}`,
-            verifiable_type: "vehicle",
-            vehicleId: vehicle.id,
-            _raw: vehicle
-          });
-        }
-      });
-    }
-  });
-  
-  //hello 
-  console.log("🚗 Vehicle documents extracted:::", vehicleDocs);
-  return vehicleDocs;
-};
+  // Function to extract vehicle documents and add them to the documents list.
+  // Status/reason now reflect the vehicle's real admin-review state
+  // (Vehicle.verificationStatus / Vehicle.rejectionReason) instead of being
+  // hardcoded to "verified".
+  const getVehicleDocuments = (vehicles: any[]) => {
+    const vehicleDocs: any[] = [];
 
+    vehicles.forEach((vehicle: any, index: number) => {
+      const vehicleStatus =
+        vehicle?.verificationStatus ||
+        (vehicle?.isVerified ? "approved" : "pending");
+      const vehicleReason = vehicle?.rejectionReason || undefined;
+
+      // Check for insurance document
+      if (vehicle?.insurance) {
+        vehicleDocs.push({
+          id: `vehicle-insurance-${vehicle.id || index}`,
+          verification_type: "insurance",
+          document_type_label: "Vehicle Insurance",
+          status: vehicleStatus,
+          reason: vehicleReason,
+          link: vehicle.insurance,
+          created_at: vehicle.insuranceUploadedAt || vehicle.created_at || new Date().toISOString(),
+          name: `Insurance - ${vehicle.model || 'Vehicle'}`,
+          verifiable_type: "vehicle",
+          vehicleId: vehicle.id,
+          _raw: vehicle
+        });
+      }
+
+      // Check for registration document
+      if (vehicle?.registrationDoc || vehicle?.registration_doc) {
+        const regDoc = vehicle.registrationDoc || vehicle.registration_doc;
+        vehicleDocs.push({
+          id: `vehicle-registration-${vehicle.id || index}`,
+          verification_type: "registration_doc",
+          document_type_label: "Registration Document",
+          status: vehicleStatus,
+          reason: vehicleReason,
+          link: regDoc,
+          created_at: vehicle.registrationUploadedAt || vehicle.created_at || new Date().toISOString(),
+          name: `Registration - ${vehicle.model || 'Vehicle'}`,
+          verifiable_type: "vehicle",
+          vehicleId: vehicle.id,
+          _raw: vehicle
+        });
+      }
+
+      // Check for vehicle photos - added back as documents
+      const photos = vehicle?.photos ||
+                    vehicle?.vehiclePhoto ||
+                    vehicle?.vehicle_photos ||
+                    vehicle?.images ||
+                    [];
+
+      if (Array.isArray(photos) && photos.length > 0) {
+        photos.forEach((photo: string, photoIndex: number) => {
+          if (photo) {
+            vehicleDocs.push({
+              id: `vehicle-photo-${vehicle.id || index}-${photoIndex}`,
+              verification_type: "vehicle",
+              document_type_label: `Vehicle Photo ${photoIndex + 1}`,
+              status: vehicleStatus,
+              reason: vehicleReason,
+              link: photo,
+              created_at: vehicle.created_at || new Date().toISOString(),
+              name: `Vehicle Photo ${photoIndex + 1} - ${vehicle.model || 'Vehicle'}`,
+              verifiable_type: "vehicle",
+              vehicleId: vehicle.id,
+              _raw: vehicle
+            });
+          }
+        });
+      }
+    });
+
+    console.log("🚗 Vehicle documents extracted:::", vehicleDocs);
+    return vehicleDocs;
+  };
+
+  // Approves the given document. Vehicle-type docs (insurance, registration,
+  // photos) all resolve to one vehicle, so this hits the vehicle endpoint
+  // instead of the driver-document endpoint when doc.verifiable_type === "vehicle".
   const handleApproveDocument = async (
-    id: string,
+    doc: any,
     onModalClose?: () => void
   ) => {
     try {
-      await approveDocs(id)
+      if (doc?.verifiable_type === "vehicle" && doc?.vehicleId) {
+        await approveVehicle(doc.vehicleId)
+          .unwrap()
+          .then(() => {
+            toast.success("Vehicle Approved");
+            refetchDocs();
+            refetchHistory();
+            onModalClose?.();
+          });
+        return;
+      }
+
+      await approveDocs(doc?.id)
         .unwrap()
         .then((res) => {
           toast.success("Document Approved");
@@ -337,13 +396,16 @@ const getVehicleDocuments = (vehicles: any[]) => {
     return true;
   };
 
+  // Rejects the given document. Vehicle-type docs route to the vehicle
+  // reject endpoint using doc.vehicleId; everything else goes through the
+  // existing driver-document reject endpoint.
   const handleDisapproveDocument = async ({
     reason,
-    id,
+    doc,
     onModalClose,
   }: {
     reason: string;
-    id: string;
+    doc: any;
     onModalClose?: () => void;
   }) => {
     if (!validateReason(reason)) {
@@ -351,7 +413,21 @@ const getVehicleDocuments = (vehicles: any[]) => {
     }
 
     try {
-      await rejectDocs({ reason: reason, documentVerificationId: id })
+      if (doc?.verifiable_type === "vehicle" && doc?.vehicleId) {
+        await rejectVehicle({ vehicleId: doc.vehicleId, reason })
+          .unwrap()
+          .then(() => {
+            toast.error("Vehicle Rejected");
+            setReason("");
+            setReasonError("");
+            refetchDocs();
+            refetchHistory();
+            onModalClose?.();
+          });
+        return;
+      }
+
+      await rejectDocs({ reason: reason, documentVerificationId: doc?.id })
         .unwrap()
         .then((res) => {
           toast.error("Document Rejected");
@@ -390,102 +466,145 @@ const getVehicleDocuments = (vehicles: any[]) => {
     setSelectedDoc(null);
   };
 
-  const handleAddDocument = async (onModalClose?: () => void) => {
-    if (!documentFile || !documentType) {
-      toast.error("Please select a file and document type");
-      return;
-    }
+const handleAddDocument = async (onModalClose?: () => void) => {
+  const fileInput = document.getElementById('docFile') as HTMLInputElement;
+  const file = fileInput?.files?.[0];
 
-    setIsUploading(true);
+  if (!file) {
+    toast.error("Please select a file");
+    return;
+  }
+
+  if (!documentType) {
+    toast.error("Please select a document type");
+    return;
+  }
+
+  // If document belongs to a vehicle, verifiableId must be selected
+  if (verifiableType === 'vehicle' && !verifiableId) {
+    toast.error("Please select a vehicle");
+    return;
+  }
+
+  setIsUploading(true);
+  let toastId = toast.loading("Uploading document...");
+
+  try {
     const formData = new FormData();
-    
-    // Add required fields
-    formData.append("driver_id", driverId);
-    formData.append("verification_type", documentType);
-    formData.append("verifiable_type", verifiableType);
-    formData.append("verifiable_id", verifiableType === "driver" ? driverId : verifiableId);
-    
+
+    // Required file field (matches FileInterceptor('document'))
+    formData.append('document', file);
+    formData.append('documentType', documentType);
+
     if (documentName) {
-      formData.append("name", documentName);
+      formData.append('name', documentName);
     }
 
-    const fileInput = document.getElementById('docFile') as HTMLInputElement;
-    if (fileInput && fileInput.files && fileInput.files[0]) {
-      const actualFile = fileInput.files[0];
-      formData.append("document", actualFile, actualFile.name);
-    } else {
-      toast.error("Please select a file");
-      setIsUploading(false);
-      return;
+    // --- ADD THESE LINES TO SEND VEHICLE INFO ---
+    formData.append('verifiableType', verifiableType);
+    if (verifiableType === 'vehicle') {
+      // Use 'vehicleId' because the backend error says it's required
+      formData.append('vehicleId', verifiableId);
+      // Also send verifiableId if the backend expects it
+      formData.append('verifiableId', verifiableId);
+    }
+    // -------------------------------------------
+
+    const response = await addDocument({
+      id: driverId,
+      formData: formData
+    }).unwrap();
+
+    toast.success("Document added successfully", { id: toastId });
+    refetchDocs();
+    refetchHistory();
+    resetDocumentForm();
+
+    if (fileInput) {
+      fileInput.value = '';
     }
 
-    try {
-      const response = await addDocument(formData).unwrap();
-      toast.success("Document added successfully");
-      refetchDocs();
-      refetchHistory();
-      resetDocumentForm();
-      onModalClose?.();
-    } catch (error: any) {
-      console.error("Failed to add document:", error);
-      if (error?.data?.errors) {
-        const validationErrors = error.data.errors;
-        Object.keys(validationErrors).forEach(key => {
-          toast.error(`${key}: ${validationErrors[key][0]}`);
+    onModalClose?.();
+  } catch (error: any) {
+    console.error("❌ Failed to add document:", error);
+    if (error?.data?.errors) {
+      const errors = error.data.errors;
+      if (Array.isArray(errors)) {
+        errors.forEach((err: any) => {
+          toast.error(`${err.field || err.path || 'Error'}: ${err.message}`, { id: toastId });
         });
-      } else if (error?.data?.message) {
-        toast.error(error.data.message);
-      } else if (error?.message) {
-        toast.error(error.message);
-      } else {
-        toast.error("Failed to add document");
+      } else if (typeof errors === 'object') {
+        Object.keys(errors).forEach(key => {
+          toast.error(`${key}: ${errors[key]}`, { id: toastId });
+        });
       }
-    } finally {
-      setIsUploading(false);
+    } else if (error?.data?.message) {
+      toast.error(error.data.message, { id: toastId });
+    } else {
+      toast.error("Failed to add document. Please try again.", { id: toastId });
     }
-  };
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const handleUpdateDocument = async (docId: string, onModalClose?: () => void) => {
-    if (!documentFile) {
+    // Get file from input
+    const fileInput = document.getElementById('updateDocFile') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    
+    if (!file) {
       toast.error("Please select a file");
       return;
     }
 
     setIsUploading(true);
-    const formData = new FormData();
+    let toastId = toast.loading("Updating document...");
     
-    const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
-    
-    if (doc?.verification_type === "vehicle") {
-      formData.append(`photos[0]`, documentFile, documentFile.name);
-    } 
-    else if (doc?.verification_type === "registration_doc") {
-      formData.append("reg_docs", documentFile, documentFile.name);
-    }
-    else if (doc?.verification_type === "insurance") {
-      formData.append("vehicle_insurance", documentFile, documentFile.name);
-    }
-    else if (doc?.verification_type === "license") {
-      formData.append("drivers_license", documentFile, documentFile.name);
-    }
-    else {
-      formData.append("document", documentFile, documentFile.name);
-    }
-    
-    if (documentName) {
-      formData.append("name", documentName);
-    }
-
     try {
-      await updateDocument({ id: docId, formData }).unwrap();
-      toast.success("Document updated successfully");
+      // Step 1: Upload the file to get a URL
+      let fileUrl: string;
+      try {
+        fileUrl = await uploadFile(file);
+        console.log("✅ File uploaded successfully:", fileUrl);
+      } catch (uploadError) {
+        toast.error("Failed to upload file. Please try again.", { id: toastId });
+        setIsUploading(false);
+        return;
+      }
+      
+      const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
+      
+      // Step 2: Prepare update data
+      const updateData = {
+        documents: [
+          {
+            documentType: doc?.verification_type || documentType,
+            documentUrl: fileUrl,
+            verificationData: {
+              name: documentName || doc?.name || doc?.document_name || "Document",
+              updatedAt: new Date().toISOString()
+            }
+          }
+        ]
+      };
+      
+      // Step 3: Send the update
+      await updateDocument({ id: docId, formData: updateData }).unwrap();
+      
+      toast.success("Document updated successfully", { id: toastId });
       refetchDocs();
       refetchHistory();
       resetDocumentForm();
+      
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      
       onModalClose?.();
     } catch (error: any) {
       console.error("Failed to update document:", error);
-      toast.error(error?.data?.message || "Failed to update document");
+      toast.error(error?.data?.message || "Failed to update document", { id: toastId });
     } finally {
       setIsUploading(false);
     }
@@ -789,18 +908,26 @@ const getVehicleDocuments = (vehicles: any[]) => {
                               </TableRow>
                             </TableHeader>
                           </Table>
-                          <AddVehicleModal 
-                            driverId={driverId}
-                            vehicle={deets}
-                            onSuccess={() => {
-                              console.log("Vehicle updated successfully");
-                            }}
-                            trigger={
-                              <Button className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md ml-2">
-                                <FaEdit className="w-4 h-4" />
-                              </Button>
-                            }
-                          />
+                          <div className="flex items-center gap-2 ml-2">
+                            <StatusBadge
+                              status={
+                                deets?.verificationStatus ||
+                                (deets?.isVerified ? "approved" : "pending")
+                              }
+                            />
+                            <AddVehicleModal
+                              driverId={driverId}
+                              vehicle={deets}
+                              onSuccess={() => {
+                                console.log("Vehicle updated successfully");
+                              }}
+                              trigger={
+                                <Button className="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">
+                                  <FaEdit className="w-4 h-4" />
+                                </Button>
+                              }
+                            />
+                          </div>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
@@ -864,6 +991,133 @@ const getVehicleDocuments = (vehicles: any[]) => {
                                 )}
                               </span>
                             </div>
+                          </div>
+
+                          {deets?.rejectionReason && (
+                            <div className="text-xs bg-red-50 border border-red-100 rounded p-2">
+                              <span className="font-medium text-red-700">Rejection reason:</span>
+                              <span className="text-red-600 ml-1">{deets.rejectionReason}</span>
+                            </div>
+                          )}
+
+                          {/* Vehicle-level approve/reject */}
+                          <div className="flex gap-x-2">
+                            <Modal
+                              trigger={
+                                <Button
+                                  disabled={
+                                    deets?.verificationStatus === "approved" ||
+                                    deets?.isVerified
+                                  }
+                                  className={`px-3 py-1.5 w-full text-xs font-bold rounded-md ${
+                                    deets?.verificationStatus === "approved" ||
+                                    deets?.isVerified
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                      : "bg-green-500 text-white hover:bg-green-600"
+                                  }`}
+                                >
+                                  {deets?.verificationStatus === "approved" ||
+                                  deets?.isVerified
+                                    ? "Vehicle Approved"
+                                    : "Approve Vehicle"}
+                                </Button>
+                              }
+                              title={"Approve Vehicle"}
+                              description={""}
+                              content={
+                                <div className="flex flex-col space-y-4 lg:mb-4">
+                                  <p className="text-sm text-gray-600">
+                                    Are you sure you want to approve this vehicle?
+                                  </p>
+                                  <div className="flex justify-end space-x-3 pt-4">
+                                    <Button
+                                      disabled={approveVehicleLoading}
+                                      className="px-4 py-2 text-sm font-medium text-white w-full bg-green-600 hover:bg-green-500 rounded-md"
+                                      onClick={() => {
+                                        handleApproveDocument({
+                                          verifiable_type: "vehicle",
+                                          vehicleId: deets?.id,
+                                        });
+                                      }}
+                                    >
+                                      {approveVehicleLoading
+                                        ? "Approving"
+                                        : "Yes, Approve"}
+                                    </Button>
+                                  </div>
+                                </div>
+                              }
+                            />
+
+                            <Modal
+                              trigger={
+                                <Button
+                                  disabled={deets?.verificationStatus === "rejected"}
+                                  className={`px-3 py-1.5 text-xs rounded-md w-full font-bold ${
+                                    deets?.verificationStatus === "rejected"
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                      : "bg-red-500 text-white hover:bg-red-600"
+                                  }`}
+                                >
+                                  {deets?.verificationStatus === "rejected"
+                                    ? "Vehicle Rejected"
+                                    : "Reject Vehicle"}
+                                </Button>
+                              }
+                              title={"Reject Vehicle"}
+                              description={"Enter reason for rejection"}
+                              content={
+                                <div className="flex flex-col space-y-4 lg:mb-4">
+                                  <p className="text-sm text-gray-600 mb-2">
+                                    Please provide a reason for rejecting this
+                                    vehicle. This will be shared with the driver.
+                                  </p>
+                                  <div className="space-y-4 mx-1">
+                                    <div className="space-y-2">
+                                      <Textarea
+                                        value={reason}
+                                        onChange={(e) => {
+                                          setReason(e.target.value);
+                                          validateReason(e.target.value);
+                                        }}
+                                        placeholder="Enter reason for rejection..."
+                                        className={`w-full text-sm border rounded-md h-24 ${
+                                          reasonError
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                        }`}
+                                      />
+                                      {reasonError && (
+                                        <p className="text-red-500 text-xs">
+                                          {reasonError}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="flex justify-end space-x-3 pt-5">
+                                      <Button
+                                        className="px-4 py-2 text-sm font-medium text-white bg-red-400 w-full hover:bg-red-500 rounded-md disabled:bg-red-200"
+                                        onClick={() => {
+                                          handleDisapproveDocument({
+                                            reason: reason,
+                                            doc: {
+                                              verifiable_type: "vehicle",
+                                              vehicleId: deets?.id,
+                                            },
+                                          });
+                                        }}
+                                        disabled={
+                                          rejectVehicleLoading || reason.length < 6
+                                        }
+                                      >
+                                        {rejectVehicleLoading
+                                          ? "Submitting..."
+                                          : "Submit Rejection"}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              }
+                            />
                           </div>
 
                           <Tabs defaultValue="vehiclePhotos" className="w-full">
@@ -1164,13 +1418,19 @@ const getVehicleDocuments = (vehicles: any[]) => {
                                           </p>
                                           <div className="flex justify-end space-x-3 pt-4">
                                             <Button
-                                              disabled={approveLoading}
+                                              disabled={
+                                                doc?.verifiable_type === "vehicle"
+                                                  ? approveVehicleLoading
+                                                  : approveLoading
+                                              }
                                               className="px-4 py-2 text-sm font-medium text-white w-full bg-green-600 hover:bg-green-500 rounded-md"
                                               onClick={() => {
-                                                handleApproveDocument(doc?.id);
+                                                handleApproveDocument(doc);
                                               }}
                                             >
-                                              {approveLoading
+                                              {(doc?.verifiable_type === "vehicle"
+                                                ? approveVehicleLoading
+                                                : approveLoading)
                                                 ? "Approving"
                                                 : "Yes, Approve"}
                                             </Button>
@@ -1230,14 +1490,18 @@ const getVehicleDocuments = (vehicles: any[]) => {
                                                 onClick={() => {
                                                   handleDisapproveDocument({
                                                     reason: reason,
-                                                    id: doc?.id,
+                                                    doc: doc,
                                                   });
                                                 }}
                                                 disabled={
-                                                  rejectLoading || reason.length < 6
+                                                  (doc?.verifiable_type === "vehicle"
+                                                    ? rejectVehicleLoading
+                                                    : rejectLoading) || reason.length < 6
                                                 }
                                               >
-                                                {rejectLoading
+                                                {(doc?.verifiable_type === "vehicle"
+                                                  ? rejectVehicleLoading
+                                                  : rejectLoading)
                                                   ? "Submitting..."
                                                   : "Submit Rejection"}
                                               </Button>

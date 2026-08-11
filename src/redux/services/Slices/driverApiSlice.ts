@@ -76,25 +76,32 @@ const driversApi = driversApiConfig.injectEndpoints({
       invalidatesTags: ["Drivers"],
     }),
 // Temporary debug version
+// In driverApiSlice.ts
 addDriversDocument: builder.mutation({
-  query: ({id, formData}) => {
-    // Log the raw FormData entries
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
+  query: ({ id, formData }) => {
+    // Check if formData is FormData or plain object
+    if (formData instanceof FormData) {
+      // If it's FormData, send as multipart
+      return {
+        url: `/v1/admin/drivers/add-document/${id}`,
+        method: "POST",
+        body: formData,
+        // Don't set Content-Type
+      };
+    } else {
+      // If it's a plain object, send as JSON
+      return {
+        url: `/v1/admin/drivers/add-document/${id}`,
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
     }
-    
-    return {
-      url: `/v1/admin/drivers/add-document/${id}`,
-      method: "POST",
-      body: formData,
-      // Don't set Content-Type
-    };
   },
   invalidatesTags: ["Drivers"],
+
 }),
 
 updateDriversDocument: builder.mutation({

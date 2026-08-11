@@ -42,6 +42,23 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
       invalidatesTags: ["Vehicles"],
     }),
 
+    approveVehicle: builder.mutation({
+      query: (vehicleId) => ({
+        url: `/v1/admin/vehicles/${vehicleId}/approve`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Vehicles"],
+    }),
+
+    rejectVehicle: builder.mutation({
+      query: ({ vehicleId, reason }) => ({
+        url: `/v1/admin/vehicles/${vehicleId}/reject`,
+        method: "PATCH",
+        body: { reason },
+      }),
+      invalidatesTags: ["Vehicles"],
+    }),
+
     getDriverVehicles: builder.query({
       query: (driverId) => ({
         url: `/v1/admin/drivers/vehicles/${driverId}`,
@@ -57,5 +74,7 @@ export const {
   useAddVehicleMutation,
   useUpdateVehicleMutation,
   useDeleteVehicleMutation,
+  useApproveVehicleMutation,
+  useRejectVehicleMutation,
   useGetDriverVehiclesQuery,
 } = vehicleApi;
