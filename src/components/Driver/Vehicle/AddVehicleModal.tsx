@@ -509,3 +509,5 @@ console.log("vehicle type length", vehicleTypes.length);
     />
   );
 };
+
+export default AddVehicleModal;

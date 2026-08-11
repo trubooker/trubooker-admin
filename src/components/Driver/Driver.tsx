@@ -28,7 +28,7 @@ const DriversTable = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const userData: any = [];
   const users = userData;
-  const totalPages = users?.data?.instructors?.last_page;
+  const totalPages = users?.result?.instructors?.last_page;
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
