@@ -71,12 +71,13 @@ const ReferralProgramPage = () => {
     refetch: refetchReferralData,
   } = useGetReferralProgramsQuery(null);
   const { data: systemSettingsData, refetch: refetchSettings } = useGetSystemSettingsQuery(null);
+  console.log("systemSettingsData", systemSettingsData)
 
-  const price_control = systemSettingsData?.data?.filter(
+  const price_control = systemSettingsData?.result?.filter(
     (setting: { key: string }) => setting.key === "price_control"
   )[0];
 
-  const refProgram = systemSettingsData?.data?.filter(
+  const refProgram = systemSettingsData?.result?.filter(
     (setting: { key: string }) => setting.key === "referral_program"
   )[0];
 

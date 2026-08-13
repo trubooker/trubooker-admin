@@ -113,6 +113,7 @@ const CouponList: React.FC<CouponListProps> = ({
     status: filter === "all" ? "all" : filter,
   });
 
+  console.log("cupon", data)
   const [deleteCoupon, { isLoading: isDeleting }] = useDeleteCouponMutation();
 
   // Handle both unwrapped (data.data) and raw-interceptor (data.result.data) shapes.

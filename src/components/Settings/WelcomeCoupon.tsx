@@ -62,6 +62,7 @@ const WelcomeCoupon = () => {
   } = useGetWelcomeCouponSettingsQuery(null);
   const [setWelcomeCoupon, { isLoading }] = useSetWelcomeCouponSettingsMutation();
 
+  console.log("welcome", welcomeCouponData)
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -77,18 +78,18 @@ const WelcomeCoupon = () => {
   useEffect(() => {
     // Defensive read: backend may return DTO names (type/value/expiryDays...)
     // or legacy snake_case. Handle both so the form repopulates either way.
-    const v = welcomeCouponData?.data?.value ?? welcomeCouponData?.result?.data?.value;
+    const v = welcomeCouponData?.value ?? welcomeCouponData?.value;
     if (!v) return;
 
     const type: CouponTypeT =
       v.type === "fixed" || v.coupon_type === "fixed" ? "fixed" : "percentage";
 
-    setIsEnabled(v.activate ?? v.is_enabled ?? false);
+    setIsEnabled(v.status ?? v.isActive ?? false);
     setCouponType(type);
     form.reset({
       coupon_type: type,
       coupon_value: String(v.value ?? v.coupon_value ?? "10"),
-      expiry_days: String(v.expiryDays ?? v.expiry_days ?? "30"),
+      expiry_days: String(v.expiresAt ?? v.expiry_days ?? "30"),
       usage_limit: String(v.usageLimit ?? v.usage_limit ?? "1"),
       min_order_amount:
         v.minOrderAmount ?? v.min_order_amount
