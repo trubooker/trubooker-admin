@@ -31,6 +31,8 @@ export function DriverTable({
     alert(`Trip with id # ${id} Deleted!!`);
   };
 
+  console.log("history", DriverTableData)
+
   const params = useParams();
   const driverId = params.driverId;
   return (
@@ -65,7 +67,7 @@ export function DriverTable({
                   key={data.id}
                   className="text-xs lg:text-sm w-full justify-start"
                 >
-                  {/* <TableCell># {data?.trip_id}</TableCell> */}
+                  <TableCell># {data?.id}</TableCell>
                   <TableCell className="w-1/7 py-5 text-left ">
                     <div className="flex flex-col">
                       <span> {data.departureLocation}</span>
@@ -77,18 +79,18 @@ export function DriverTable({
                   </TableCell>
                   <TableCell className="w-1/7 py-5 text-left ">
                     <div className="flex flex-col">
-                      <span> {data.arrival_location?.address}</span>
+                      <span> {data.arrivalDestination?.address}</span>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Date:</span>{" "}
                         {data.arrivalDate}, {data?.arrivalTime}
                       </small>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Latitude:</span>{" "}
-                        {data.departureLatlong[0]}
+                        {data.departureLatlong[0].latitude}
                       </small>
                       <small className="mt-1 font-light flex gap-x-2">
                         <span className="font-normal">Longitude:</span>{" "}
-                        {data.departureLatlong[1]}
+                        {data.departureLatlong[0].longitude}
                       </small>
                     </div>
                   </TableCell>
@@ -113,10 +115,10 @@ export function DriverTable({
                         <span className="w-2 h-2 bg-[#FF4500] rounded-full"></span>
                         <span className="font-semibold text-xs">Cancelled</span>
                       </div>
-                    ) : data.status === "past" ? (
+                    ) : data.status === "completed" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#1E90FF]">
                         <span className="w-2 h-2 bg-[#1E90FF] rounded-full"></span>
-                        <span className="font-semibold text-xs">Past</span>
+                        <span className="font-semibold text-xs">completed</span>
                       </div>
                     ) : data.status === "active" ? (
                       <div className="flex items-center mx-auto gap-x-2 p-1 rounded-full justify-center w-[100px] bg-[#E6F4FF] text-[#5af542]">
@@ -141,7 +143,7 @@ export function DriverTable({
                       >
                         <DropdownMenuItem
                           className="w-full text-center cursor-pointer"
-                          // onClick={() => handleDelete(data?.trip_id)}
+                          // onClick={() => handleDelete(data?.id)}
                           onClick={() =>
                             router.push(
                               `/drivers/${driverId}/trip-detail/${data?.id}`

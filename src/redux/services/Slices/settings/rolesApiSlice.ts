@@ -63,13 +63,17 @@ const passengersApi = passengersApiConfig.injectEndpoints({
       providesTags: ["Roles"],
     }),
 
-    getUsersByRole: builder.query({
-      query: ({ page, search }) => ({
-        url: `/v1/admin/user-by-role?page=${page}&search=${search}`,
-        method: "GET",
-      }),
-      providesTags: ["Roles"],
-    }),
+getUsersByRole: builder.query({
+  query: ({ page = 1, search = "" }) => ({
+    url: `/v1/admin/user-by-role`,
+    method: "GET",
+    params: {
+      page,
+      search,
+    },
+  }),
+  providesTags: ["Roles"],
+}),
 
     updateRoles: builder.mutation({
       query: ({ name, permissions, id }: any) => ({

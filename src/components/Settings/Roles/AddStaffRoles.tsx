@@ -1,8 +1,17 @@
 "use client";
 
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { debounce } from "lodash";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 import {
   Select,
   SelectContent,
@@ -20,61 +30,131 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+
 import { formatSnakeCase } from "@/lib/utils";
+
 import {
   useGetUsersByRoleQuery,
   useAssignRoleToUserMutation,
 } from "@/redux/services/Slices/settings/rolesApiSlice";
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { debounce } from "lodash";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import toast from "react-hot-toast";
+
+
+// ===============================
+// Types
+// ===============================
+
+type Role = {
+  id?: string;
+  name: string;
+};
+
+type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role?: string;
+};
+
+type AddStaffRolesProps = {
+  role: Role[];
+  onModalClose?: () => void;
+};
+
+
+// ===============================
+// Component
+// ===============================
 
 export function AddStaffRoles({
   role,
   onModalClose,
-}: {
-  role: [];
-  onModalClose?: () => void;
-}) {
+}: AddStaffRolesProps) {
+  // ===============================
+  // Form Schema
+  // ===============================
+
   const FormSchema = z.object({
-    name: z.string().min(1, { message: "Required Field" }),
-    role: z.string().min(1, { message: "Role is required" }),
+    name: z.string().min(1, {
+      message: "Please select a user",
+    }),
+
+    role: z.string().min(1, {
+      message: "Role is required",
+    }),
   });
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  type FormValues = z.infer<typeof FormSchema>;
+
+  // ===============================
+  // Form
+  // ===============================
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {},
+    defaultValues: {
+      name: "",
+      role: "",
+    },
   });
+
+  // ===============================
+  // State
+  // ===============================
 
   const [userSearch, setUserSearch] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedUser, setSelectedUser] = useState({ name: "", id: "" });
-  const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<{
+    name: string;
+    id: string;
+  }>({
+    name: "",
+    id: "",
+  });
+
+  const [page, setPage] = useState(1);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // Debounced function to update the search query
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
-      setSearchQuery(query);
-      setPage(1); // Reset to first page on new search
-    }, 500),
+
+  // ===============================
+  // Debounced Search
+  // ===============================
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        const trimmedQuery = query.trim();
+
+        console.log("SEARCH QUERY:", trimmedQuery);
+
+        setSearchQuery(trimmedQuery);
+        setPage(1);
+      }, 500),
     []
   );
 
+
   useEffect(() => {
     debouncedSearch(userSearch);
+
     return () => {
       debouncedSearch.cancel();
     };
   }, [userSearch, debouncedSearch]);
 
-  // Close dropdown on clicking outside
+
+  // ===============================
+  // Close Dropdown On Outside Click
+  // ===============================
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -85,181 +165,462 @@ export function AddStaffRoles({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
     };
   }, []);
 
-  // Fetch users based on the query and page
+
+  // ===============================
+  // Get Users
+  // ===============================
+
   const {
     data,
     isLoading: userByRoleLoading,
     isFetching: userByRoleFetching,
-  } = useGetUsersByRoleQuery({ page, search: searchQuery });
+  } = useGetUsersByRoleQuery({
+    page,
+    search: searchQuery,
+  });
 
-  const usersByRole = data?.data || [];
-  const totalPages = data?.meta?.total_pages || 1;
 
-  const handleSelectUser = (user: any) => {
-    setSelectedUser({ name: user.first_name, id: user.id });
-    form.setValue("name", user.first_name);
-    setUserSearch(`${user.first_name} ${user.last_name}`);
+  const usersByRole: User[] =
+    data?.result?.data || [];
+
+
+  // IMPORTANT:
+  // Backend returns pageCount, not totalPages.
+  const totalPages =
+    data?.result?.meta?.pageCount || 1;
+
+
+  const hasNextPage =
+    Boolean(data?.result?.meta?.nextPage);
+
+
+  console.log(
+    "ADD STAFF ROLE DATA:",
+    data
+  );
+
+
+  // ===============================
+  // Select User
+  // ===============================
+
+  const handleSelectUser = (user: User) => {
+    const fullName =
+      `${user.firstName || ""} ${user.lastName || ""}`.trim();
+
+    setSelectedUser({
+      name: fullName,
+      id: user.id,
+    });
+
+    form.setValue(
+      "name",
+      fullName,
+      {
+        shouldValidate: true,
+        shouldDirty: true,
+      }
+    );
+
+    setUserSearch(fullName);
+
     setShowDropdown(false);
   };
 
-  const handleLoadMore = () => {
-    if (page < totalPages) setPage((prev) => prev + 1);
-  };
 
-  const [assign, { isLoading }] = useAssignRoleToUserMutation();
+  // ===============================
+  // Search Input Change
+  // ===============================
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    const formData = {
-      user_id: selectedUser.id,
-      role: data.role,
-    };
-    await assign(formData)
-      .unwrap()
-      .then((res) => {
-        toast.success("Successful");
-        onModalClose?.();
-      })
-      .catch((res) => {
-        toast.error("Error occured");
+  const handleSearchChange = (
+    value: string
+  ) => {
+    setUserSearch(value);
+
+    // If the user starts typing again,
+    // remove the previous selection.
+    if (
+      selectedUser.id &&
+      value !== selectedUser.name
+    ) {
+      setSelectedUser({
+        name: "",
+        id: "",
       });
+
+      form.setValue("name", "");
+    }
+
+    setShowDropdown(true);
   };
+
+
+  // ===============================
+  // Load More
+  // ===============================
+
+  const handleLoadMore = () => {
+    if (
+      hasNextPage &&
+      page < totalPages &&
+      !userByRoleFetching
+    ) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+
+  // ===============================
+  // Assign Role Mutation
+  // ===============================
+
+  const [
+    assign,
+    { isLoading: isAssigning },
+  ] = useAssignRoleToUserMutation();
+
+
+  // ===============================
+  // Submit
+  // ===============================
+
+  const onSubmit = async (
+  values: FormValues
+) => {
+  if (!selectedUser.id) {
+    toast.error("Please select a user");
+    return;
+  }
+
+  if (!values.role) {
+    toast.error("Please select a role");
+    return;
+  }
+
+  const payload = {
+    userId: selectedUser.id,
+    roleId: values.role,
+  };
+
+  console.log("ASSIGN ROLE PAYLOAD:", payload);
+
+  try {
+    await assign(payload).unwrap();
+
+    toast.success("Role assigned successfully");
+
+    form.reset();
+
+    setSelectedUser({
+      name: "",
+      id: "",
+    });
+
+    setUserSearch("");
+    setSearchQuery("");
+    setShowDropdown(false);
+
+    onModalClose?.();
+  } catch (error: any) {
+    console.error("ASSIGN ROLE ERROR:", error);
+
+    const errors = error?.data?.errors;
+
+    if (Array.isArray(errors)) {
+      const message = errors
+        .map((err: any) => {
+          if (typeof err === "string") {
+            return err;
+          }
+
+          if (err?.constraints) {
+            return Object.values(
+              err.constraints
+            ).join(", ");
+          }
+
+          return err?.message || "Invalid field";
+        })
+        .join("\n");
+
+      toast.error(
+        message || "Invalid request"
+      );
+    } else {
+      toast.error(
+        error?.data?.message ||
+          "Error assigning role"
+      );
+    }
+  }
+};
+
+
+  // ===============================
+  // Render
+  // ===============================
 
   return (
-    <div className="h-full lg:mb-3">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 lg:space-y-6 max-w-screen h-full lg:max-w-full"
-        >
-          <div className="grid gap-2 text-gray-500">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="m-1">
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Search Staff name, or email"
-                        value={userSearch}
-                        onChange={(e) => {
-                          setUserSearch(e.target.value);
-                          setShowDropdown(true);
-                        }}
-                        className="py-6"
-                        onFocus={() => setShowDropdown(true)}
-                      />
-                    </div>
-                  </FormControl>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(
+          onSubmit
+        )}
+        className="space-y-5"
+      >
 
-                  {showDropdown && (
-                    <div
-                      className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-md max-h-32 overflow-auto mt-2 w-96"
-                      ref={dropdownRef}
-                      onMouseDown={(e) => e.stopPropagation()}
-                    >
-                      {userByRoleLoading || userByRoleFetching ? (
-                        <div className="w-full grid grid-cols-1 p-3 gap-2">
-                          {[1, 2].map((i) => (
-                            <div className="w-full rounded-md" key={i}>
-                              <Skeleton className="bg-gray-200 h-8 w-full rounded-xl" />
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        usersByRole.map((user: any) => (
-                          <>
-                            <div
-                              key={user.id}
-                              onClick={() => handleSelectUser(user)}
-                              className="p-2 cursor-pointer hover:bg-gray-200"
-                            >
-                              {user.first_name} {user.last_name}
-                            </div>
-                            <Separator />
-                          </>
-                        ))
-                      )}
+        {/* ============================
+            USER SEARCH
+        ============================ */}
 
-                      {usersByRole.length === 0 && !userByRoleFetching && (
-                        <div className="p-2 text-gray-500">No User found</div>
-                      )}
-                      {page < totalPages && (
-                        <div
-                          onClick={handleLoadMore}
-                          className="p-2 text-blue-500 cursor-pointer hover:underline"
-                        >
-                          Load More...
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </FormItem>
-              )}
-            />
-          </div>
+        <FormField
+          control={form.control}
+          name="name"
+          render={() => (
+            <FormItem className="relative">
 
-          <div className="grid gap-2">
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="m-1">
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormLabel>Role</FormLabel>
-                    <FormControl>
-                      <SelectTrigger className="py-6">
-                        <SelectValue
-                          className="text-gray-400"
-                          placeholder="Enter role"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {role
-                        ?.filter(
-                          (category: any) =>
-                            category?.name !== "driver" &&
-                            category?.name !== "agent" &&
-                            category?.name !== "passenger"
-                        )
-                        .map((category: any, i: number) => (
-                          <SelectItem
-                            key={i}
-                            value={category?.name}
-                            className="capitalize"
+              <FormLabel>
+                Name
+              </FormLabel>
+
+              <FormControl>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Search staff name or email"
+                  value={userSearch}
+                  onChange={(e) =>
+                    handleSearchChange(
+                      e.target.value
+                    )
+                  }
+                  onFocus={() =>
+                    setShowDropdown(true)
+                  }
+                  className="py-6"
+                  autoComplete="off"
+                />
+              </FormControl>
+
+
+              {/* ============================
+                  USER DROPDOWN
+              ============================ */}
+
+              {showDropdown && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute left-0 right-0 top-full z-50 mt-2 max-h-72 overflow-auto rounded-md border border-gray-300 bg-white shadow-md"
+                  onMouseDown={(e) =>
+                    e.stopPropagation()
+                  }
+                >
+
+                  {/* Loading */}
+
+                  {(
+                    userByRoleLoading ||
+                    userByRoleFetching
+                  ) ? (
+                    <div className="grid w-full gap-2 p-3">
+
+                      {[1, 2, 3].map(
+                        (item) => (
+                          <div
+                            className="w-full rounded-md"
+                            key={item}
                           >
-                            {formatSnakeCase(category?.name)}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                            <Skeleton className="h-10 w-full rounded-xl bg-gray-200" />
+                          </div>
+                        )
+                      )}
+
+                    </div>
+                  ) : usersByRole.length > 0 ? (
+
+                    <>
+
+                      {/* Users */}
+
+                      {usersByRole.map(
+                        (user) => {
+                          const fullName =
+                            `${user.firstName || ""} ${user.lastName || ""}`.trim();
+
+                          return (
+                            <React.Fragment
+                              key={user.id}
+                            >
+
+                              <div
+                                onClick={() =>
+                                  handleSelectUser(
+                                    user
+                                  )
+                                }
+                                className="cursor-pointer p-3 transition hover:bg-gray-100"
+                              >
+
+                                <p className="font-medium text-gray-900">
+                                  {fullName ||
+                                    "Unknown User"}
+                                </p>
+
+                                <p className="text-sm text-gray-500">
+                                  {user.email}
+                                </p>
+
+                              </div>
+
+                              <Separator />
+
+                            </React.Fragment>
+                          );
+                        }
+                      )}
+
+
+                      {/* Load More */}
+
+                      {hasNextPage && (
+                        <div
+                          onClick={
+                            handleLoadMore
+                          }
+                          className="cursor-pointer p-3 text-center text-sm font-medium text-blue-600 hover:bg-gray-100"
+                        >
+                          {userByRoleFetching
+                            ? "Loading..."
+                            : "Load More..."}
+                        </div>
+                      )}
+
+                    </>
+                  ) : (
+
+                    /* No User */
+
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      No user found
+                    </div>
+
+                  )}
+
+                </div>
               )}
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full text-white bg-[--primary] hover:bg-[--primary-btn] hover:text-white"
-          >
-            {isLoading ? "Sending..." : "Send"}
-          </Button>
-        </form>
-      </Form>
-    </div>
+
+              <FormMessage />
+
+            </FormItem>
+          )}
+        />
+
+
+        {/* ============================
+            ROLE
+        ============================ */}
+
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+
+              <FormLabel>
+                Role
+              </FormLabel>
+
+              <Select
+                value={field.value}
+                onValueChange={
+                  field.onChange
+                }
+              >
+
+                <FormControl>
+
+                  <SelectTrigger className="py-6">
+
+                    <SelectValue
+                      placeholder="Select role"
+                    />
+
+                  </SelectTrigger>
+
+                </FormControl>
+
+
+                <SelectContent>
+
+                  {role
+                    ?.filter(
+                      (category) =>
+                        category?.name !==
+                          "driver" &&
+                        category?.name !==
+                          "agent" &&
+                        category?.name !==
+                          "passenger"
+                    )
+                    .map(
+                      (
+                        category,
+                        index
+                      ) => (
+                       <SelectItem
+                          key={category.id || index}
+                          value={category.id!}
+                          className="capitalize"
+                        >
+                          {formatSnakeCase(category.name)}
+                        </SelectItem>
+                      )
+                    )}
+
+                </SelectContent>
+
+              </Select>
+
+              <FormMessage />
+
+            </FormItem>
+          )}
+        />
+
+
+        {/* ============================
+            SUBMIT BUTTON
+        ============================ */}
+
+        <Button
+          type="submit"
+          disabled={
+            isAssigning ||
+            !selectedUser.id
+          }
+          className="w-full bg-[--primary] text-white hover:bg-[--primary-btn] hover:text-white"
+        >
+
+          {isAssigning
+            ? "Assigning..."
+            : "Send"}
+
+        </Button>
+
+      </form>
+    </Form>
   );
 }

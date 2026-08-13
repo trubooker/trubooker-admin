@@ -16,7 +16,7 @@ const driversApi = driversApiConfig.injectEndpoints({
     approveDriversDocuments: builder.mutation({
       query: (documentVerificationId: string) => ({
         url: `/v1/admin/documents/${documentVerificationId}/approve`,
-        method: "POST",
+        method: "PATCH",
       }),
       invalidatesTags: ["Drivers"],
     }),
@@ -30,7 +30,7 @@ const driversApi = driversApiConfig.injectEndpoints({
         reason: string;
       }) => ({
         url: `/v1/admin/documents/${documentVerificationId}/reject`,
-        method: "POST",
+        method: "PATCH",
         body: { reason },
       }),
       invalidatesTags: ["Drivers"],
@@ -44,13 +44,7 @@ const driversApi = driversApiConfig.injectEndpoints({
   providesTags: ["Drivers"],
 }),
 
-    // getDrivers: builder.query({
-    //   query: ({ page, search, limit = 10 }) => ({
-    //     url: `/v1/admin/drivers?page=${page}&search=${search}&limit=${limit}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["Drivers"],
-    // }),
+
 
     getOneDriver: builder.query({
       query: (driver) => ({
@@ -75,26 +69,32 @@ const driversApi = driversApiConfig.injectEndpoints({
       }),
       invalidatesTags: ["Drivers"],
     }),
-// Temporary debug version
+
 addDriversDocument: builder.mutation({
-  query: ({id, formData}) => {
-    // Log the raw FormData entries
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
+  query: ({ id, formData }) => {
+    // Check if formData is FormData or plain object
+    if (formData instanceof FormData) {
+      // If it's FormData, send as multipart
+      return {
+        url: `/v1/admin/drivers/add-document/${id}`,
+        method: "POST",
+        body: formData,
+        // Don't set Content-Type
+      };
+    } else {
+      // If it's a plain object, send as JSON
+      return {
+        url: `/v1/admin/drivers/add-document/${id}`,
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
     }
-    
-    return {
-      url: `/v1/admin/drivers/add-document/${id}`,
-      method: "POST",
-      body: formData,
-      // Don't set Content-Type
-    };
   },
   invalidatesTags: ["Drivers"],
+
 }),
 
 updateDriversDocument: builder.mutation({
@@ -121,6 +121,15 @@ getDocumentHistory: builder.query({
   }),
   providesTags: ["Drivers"],
 }),
+
+getApprovedDriversCount: builder.query({
+  query: () => ({
+    url: `/v1/admin/drivers/approved/count`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+
   }),
 
   
@@ -138,4 +147,5 @@ export const {
   useUpdateDriversDocumentMutation,
   useDeleteDriversDocumentMutation,
   useGetDocumentHistoryQuery,
+   useGetApprovedDriversCountQuery,
 } = driversApi;

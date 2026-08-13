@@ -6,10 +6,10 @@ const tripsApiConfig = api.enhanceEndpoints({
 const tripsApi = tripsApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getAllTrips: builder.query({
-      query: ({ type, page }: any) => ({
+      query: ({ status, page }: any) => ({
         url: `/v1/admin/trips`,
         method: "GET",
-        params: { type, page },
+        params: { status, page },
       }),
       providesTags: ["Trips"],
     }),

@@ -30,7 +30,7 @@ const ViewDriver = () => {
   const id = String(params.driverId);
   const router = useRouter();
   
-  //console.log("🆔 Driver ID from params:", id);
+  console.log("🆔 Driver ID from params:", id);
   
   const {
     isLoading: loading,
@@ -39,141 +39,139 @@ const ViewDriver = () => {
     error,
   } = useGetOneDriverQuery(id);
 
+  console.log("📦 Full userData:", userData);
+  
   const [mutate, { isLoading: loadingToggle }] =
     useToggleDriverStatusMutation();
 
-    console.log('userData for [id]', userData)
   const toggleDriverStatus = async () => {
-    //console.log("🔄 Toggling driver status for ID:", id);
+    console.log("🔄 Toggling driver status for ID:", id);
     try {
       await mutate(id).unwrap();
-      //console.log("✅ Driver status toggled successfully");
+      console.log("✅ Driver status toggled successfully");
     } catch (error) {
-      //console.error("❌ Failed to toggle status:", error);
+      console.error("❌ Failed to toggle status:", error);
     }
   };
 
-  // ===== COMPREHENSIVE CONSOLE LOGS =====
-  //console.log("📥 COMPLETE API RESPONSE (userData):", userData);
-
+  // ===== COMPREHENSIVE DATA EXTRACTION =====
+  // Try different possible data structures
+  const dataSource = userData?.data || userData?.result || userData || {};
   
-  if (userData) {
-    // console.log("🔍 COMPLETE DATA STRUCTURE ANALYSIS:");
-    // console.log("1. Root level keys:", Object.keys(userData));
-    
-    if (userData.data) {
-      // console.log("2. Data property type:", typeof userData.data);
-      // console.log("3. Data object keys:", Object.keys(userData.data));
-      
-      // Log ALL properties in data object
-      for (const [key, value] of Object.entries(userData.data)) {
-        console.log(`   - "${key}":`, {
-          type: typeof value,
-          isArray: Array.isArray(value),
-          value: value
-        });
-      }
-      
-      // Detailed profile logging
-      if (userData.data.profile) {
-        // console.log("4. PROFILE DETAILS:");
-        // console.log("   Profile object:", userData.data.profile);
-        // console.log("   Profile keys:", Object.keys(userData.data.profile));
-        // console.log("   Profile ID:", userData.data.profile.id);
-        // console.log("   Profile status:", userData.data.profile.status);
-        // console.log("   Profile balance:", userData.data.profile.current_balance);
-      } else {
-        //console.log("4. PROFILE: Not found or undefined");
-      }
-      
-      // Detailed vehicles logging
-      if (userData.data.vehicles) {
-        // console.log("5. VEHICLES:");
-        // console.log("   Is vehicles array?", Array.isArray(userData.data.vehicles));
-        // console.log("   Vehicles count:", userData.data.vehicles?.length || 0);
-        if (userData.data.vehicles?.length > 0) {
-          //console.log("   First vehicle:", userData.data.vehicles[0]);
+  console.log("🔍 Data source for extraction:", dataSource);
+  console.log("🔍 Data source keys:", Object.keys(dataSource));
+
+  // Extract profile - try multiple possible paths
+  const profile = userData?.result?.user || 
+                  userData?.data?.profile || 
+                  userData?.profile || 
+                  userData?.user || 
+                  {};
+
+  console.log("👤 Profile extracted:", profile);
+  console.log("👤 Profile keys:", Object.keys(profile));
+
+  // Extract vehicles - try multiple possible paths
+  let vehicle: any[] = [];
+  
+  // Try path 1: userData.result.vehicle
+  if (userData?.result?.vehicle) {
+    vehicle = Array.isArray(userData.result.vehicle) 
+      ? userData.result.vehicle 
+      : [userData.result.vehicle];
+  }
+  // Try path 2: userData.data.vehicles
+  else if (userData?.data?.vehicles) {
+    vehicle = Array.isArray(userData.data.vehicles) 
+      ? userData.data.vehicles 
+      : [userData.data.vehicles];
+  }
+  // Try path 3: userData.vehicles
+  else if (userData?.vehicles) {
+    vehicle = Array.isArray(userData.vehicles) 
+      ? userData.vehicles 
+      : [userData.vehicles];
+  }
+  // Try path 4: userData.data.vehicle
+  else if (userData?.data?.vehicle) {
+    vehicle = Array.isArray(userData.data.vehicle) 
+      ? userData.data.vehicle 
+      : [userData.data.vehicle];
+  }
+  // Try path 5: Check if any key contains "vehicle" in its name
+  else {
+    for (const key of Object.keys(dataSource)) {
+      if (key.toLowerCase().includes('vehicle') || key.toLowerCase().includes('car')) {
+        const value = dataSource[key];
+        if (Array.isArray(value) && value.length > 0) {
+          vehicle = value;
+          break;
+        } else if (value && typeof value === 'object') {
+          vehicle = Array.isArray(value) ? value : [value];
+          break;
         }
-      } else {
-        //console.log("5. VEHICLES: Not found or undefined");
       }
-      
-      // Detailed reviews logging
-      if (userData.data.reviews) {
-        // console.log("6. REVIEWS/Feedback:");
-        // console.log("   Reviews count:", userData.data.reviews?.length || 0);
-        // console.log("   Is reviews array?", Array.isArray(userData.data.reviews));
-      } else {
-        //console.log("6. REVIEWS: Not found or undefined");
-      }
-      
-      // Detailed trip history logging
-      if (userData.data.trip_history) {
-        // console.log("7. TRIP HISTORY:");
-        // console.log("   Trip history count:", userData.data.trip_history?.length || 0);
-        // console.log("   Is trip_history array?", Array.isArray(userData.data.trip_history));
-      } else {
-        //console.log("7. TRIP HISTORY: Not found or undefined");
-      }
-      
-      // Check for any other properties
-      //console.log("8. OTHER PROPERTIES IN DATA:");
-      const knownProps = ['profile', 'vehicles', 'reviews', 'trip_history'];
-      const otherProps = Object.keys(userData.data).filter(key => !knownProps.includes(key));
-      if (otherProps.length > 0) {
-        otherProps.forEach(prop => {
-          //console.log(`   - ${prop}:`, userData.data[prop]);
-        });
-      } else {
-        //console.log("   No other properties found");
-      }
-    } else {
-      //console.log("2. Data property: undefined or null");
     }
-    
-    // Log meta and links if they exist
-    if (userData.meta) {
-      //console.log("9. META DATA:", userData.meta);
-    }
-    if (userData.links) {
-      //console.log("10. LINKS DATA:", userData.links);
-    }
-  } else {
-    //console.log("📭 No userData received from API");
   }
 
-  // Add safe access with optional chaining and fallbacks
-  const driver = userData?.result || {};
-  const profile = driver?.user || {};
-  //const vehicle = userData?.result?.vehicle || [];
-  const rawVehicle = userData?.result?.vehicle;
-const vehicle = rawVehicle ? [rawVehicle] : [];
-  const feedback = userData?.data?.reviews || [];
-  const th = userData?.result?.tripHistory || [];
+  console.log("🚗 Vehicle data extracted:", vehicle);
+  console.log("🚗 Vehicle count:", vehicle.length);
+  if (vehicle.length > 0) {
+    console.log("🚗 First vehicle:", vehicle[0]);
+    console.log("🚗 Vehicle keys:", Object.keys(vehicle[0]));
+  }
 
-  // Log extracted data
-  // console.log("📋 EXTRACTED DATA:");
-  // console.log("- Profile object:", profile);
-  // console.log("- Profile keys:", Object.keys(profile));
-  // console.log("- Vehicles array length:", vehicle.length);
-  // console.log("- Feedback array length:", feedback.length);
-   console.log("- Trip history array length:", th.length);
+  // Extract feedback/reviews - try multiple paths
+  let feedback: any[] = [];
   
+  console.log("userData/Niyu", userData)
+  if (userData?.result?.reviews && Array.isArray(userData.result.reviews)) {
+    feedback = userData?.result?.reviews;
+  } else if (userData?.reviews && Array.isArray(userData.reviews)) {
+    feedback = userData?.reviews;
+  } else if (userData?.result?.reviews && Array.isArray(userData.result.reviews)) {
+    feedback = userData?.result.reviews;
+  } else if (userData?.result?.feedback && Array.isArray(userData.result.feedback)) {
+    feedback = userData?.result.feedback;
+  }
+
+  console.log("💬 Feedback extracted:", feedback.length);
+
+  // Extract trip history - try multiple paths
+  let th: any[] = [];
+  
+  if (userData?.result?.tripHistory && Array.isArray(userData.result.tripHistory)) {
+    th = userData?.result?.tripHistory;
+  } else if (userData?.tripHistory && Array.isArray(userData.tripHistory)) {
+    th = userData.tripHistory;
+  } else if (userData?.result?.tripHistory && Array.isArray(userData.result.tripHistory)) {
+    th = userData.result.tripHistory;
+  } else if (userData?.result?.trips && Array.isArray(userData.result.trips)) {
+    th = userData.result.trips;
+  }
+
+  console.log("📋 Trip history extracted:", th.length);
+
+  // Log extracted data summary
+  console.log("📊 EXTRACTION SUMMARY:");
+  console.log(`- Profile: ${Object.keys(profile).length > 0 ? '✅ Found' : '❌ Not found'}`);
+  console.log(`- Vehicles: ${vehicle.length > 0 ? `✅ ${vehicle.length} found` : '❌ Not found'}`);
+  console.log(`- Feedback: ${feedback.length > 0 ? `✅ ${feedback.length} found` : '❌ Not found'}`);
+  console.log(`- Trip History: ${th.length > 0 ? `✅ ${th.length} found` : '❌ Not found'}`);
+
   // Safe name display
-  const driverName = `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || 'Unknown Driver';
+  const driverName = `${profile?.firstName || profile?.firstName || ''} ${profile?.lastName || profile?.lastName || ''}`.trim() || 'Unknown Driver';
   console.log("👤 Driver name:", driverName);
   
   // Safe date display
-  const joinDate = profile?.createdAt 
-    ? new Date(profile.createdAt).toLocaleDateString("en-US", {
+  const joinDate = profile?.createdAt || profile?.createdAt || profile?.joinDate
+    ? new Date(profile?.createdAt || profile?.createdAt || profile?.joinDate).toLocaleDateString("en-US", {
         day: "numeric",
         month: "short",
         year: "numeric",
       })
     : 'N/A';
-  // console.log("📅 Join date:", joinDate);
-  
-  // console.log("🔄 Loading states - isLoading:", loading, "isFetching:", isFetching);
+  console.log("📅 Join date:", joinDate);
 
   // Handle error state
   if (error) {
@@ -210,7 +208,7 @@ const vehicle = rawVehicle ? [rawVehicle] : [];
           <div className="bg-white p-5 rounded-lg my-5 flex items-center justify-between lg:flex-row flex-col gap-y-10">
             <div className="w-full flex gap-x-3 items-center">
               <Avatar className="lg:w-32 h-28 lg:h-32 w-28">
-                <AvatarImage src={profile?.profileImage} />
+                <AvatarImage src={profile?.profileImage || profile?.profileImage || profile?.avatar} />
                 <AvatarFallback>
                   <IoPersonOutline className="w-14 h-14" />
                 </AvatarFallback>
@@ -247,16 +245,16 @@ const vehicle = rawVehicle ? [rawVehicle] : [];
                   <span className="font-extrabold text-sm capitalize">
                     {profile?.role || profile?.type || 'driver'}
                   </span>
-                  <span className="text-gray-400 text-xs">#{profile?.id || 'N/A'}</span>
+                  <span className="text-gray-400 text-xs">#{profile?.id || profile?._id || 'N/A'}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col-reverse lg:flex-col gap-y-2 w-full lg:w-auto ">
               <div className="mb-5 hidden lg:flex justify-end gap-x-3 items-center text-2xl text-green-500 font-medium w-full text-end">
                 <FaMoneyBillWave />
-                {driver?.currentBalance === null || driver?.currentBalance === undefined
+                {profile?.currentBalance === null || profile?.currentBalance === undefined
                   ? "NGN 0.00"
-                  : formatCurrency(Number(driver.currentBalance), "NGN")}
+                  : formatCurrency(Number(profile.currentBalance), "NGN")}
               </div>
               {profile?.status === "active" ? (
                 <Modal
@@ -307,13 +305,13 @@ const vehicle = rawVehicle ? [rawVehicle] : [];
             </div>
             <div className="lg:hidden flex gap-x-5 items-center text-2xl text-green-500 font-medium">
               <FaMoneyBillWave />
-              {driver?.currentBalance === null || driver?.currentBalance === undefined
+              {profile?.currentBalance === null || profile?.currentBalance === undefined
                 ? "NGN 0.00"
-                : formatCurrency(Number(driver.currentBalance), "NGN")}
+                : formatCurrency(Number(profile.currentBalance), "NGN")}
             </div>
           </div>
           <ProfileVehicleDocs_Info
-            th={profile?.status === "active" ? th : []}
+            th={th}
             feedback={feedback}
             vehicle={vehicle}
             profile={profile}

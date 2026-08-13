@@ -1,5 +1,7 @@
 import { api } from "../apiSlice";
 
+
+
 const vehicleApiConfig = api.enhanceEndpoints({
   addTagTypes: ["Vehicles", "VehicleTypes"],
 });
@@ -8,7 +10,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getVehicleTypes: builder.query({
       query: () => ({
-        url: `/vehicle-types`,
+        url: `/v1/admin/vehicle-types`,
         method: "GET",
       }),
       providesTags: ["VehicleTypes"],
@@ -16,7 +18,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     addVehicle: builder.mutation({
       query: (formData) => ({
-        url: `/admin/drivers/add-vehicle`,
+        url: `/v1/admin/drivers/add-vehicle`,
         method: "POST",
         body: formData,
       }),
@@ -25,7 +27,7 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     updateVehicle: builder.mutation({
       query: (formData) => ({
-        url: `/admin/drivers/update-vehicle`,
+        url: `/v1/admin/drivers/update-vehicle`,
         method: "POST",
         body: formData,
       }),
@@ -34,8 +36,25 @@ const vehicleApi = vehicleApiConfig.injectEndpoints({
 
     deleteVehicle: builder.mutation({
       query: (vehicleId) => ({
-        url: `/admin/drivers/delete-vehicle/${vehicleId}`,
+        url: `/v1/admin/drivers/delete-vehicle/${vehicleId}`,
         method: "DELETE",
+      }),
+      invalidatesTags: ["Vehicles"],
+    }),
+
+    approveVehicle: builder.mutation({
+      query: (vehicleId) => ({
+        url: `/v1/admin/vehicles/${vehicleId}/approve`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Vehicles"],
+    }),
+
+    rejectVehicle: builder.mutation({
+      query: ({ vehicleId, reason }) => ({
+        url: `/v1/admin/vehicles/${vehicleId}/reject`,
+        method: "PATCH",
+        body: { reason },
       }),
       invalidatesTags: ["Vehicles"],
     }),
@@ -55,5 +74,7 @@ export const {
   useAddVehicleMutation,
   useUpdateVehicleMutation,
   useDeleteVehicleMutation,
+  useApproveVehicleMutation,
+  useRejectVehicleMutation,
   useGetDriverVehiclesQuery,
 } = vehicleApi;

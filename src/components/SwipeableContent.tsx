@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import clsx from "clsx";
 import { Separator } from "./ui/separator";
@@ -10,6 +10,23 @@ import { truncateText } from "@/lib/utils";
 import NotificationOpenModal from "./notificationOpenModal";
 import { FaSpinner } from "react-icons/fa6";
 
+interface NotificationRecipient {
+  id: string;
+  name: string;
+  email?: string;
+  role: string;
+}
+
+interface NotificationContent {
+  id: string;
+  title: string;
+  body: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+  recipient: NotificationRecipient | null;
+}
+
 const SwipeableNotification: React.FC<{
   index: string;
   onMarkAsRead: (id: string) => void;
@@ -17,11 +34,7 @@ const SwipeableNotification: React.FC<{
   deleteOneLoading: boolean;
   markOneLoading: boolean;
   refetch: () => void;
-  content: {
-    title: string;
-    body: string;
-    created_at: string;
-  };
+  content: NotificationContent;
 }> = ({
   index,
   onMarkAsRead,
@@ -79,7 +92,7 @@ const SwipeableNotification: React.FC<{
               id={index}
               body={content?.body}
               refetch={refetch}
-              created_at={content?.created_at}
+              created_at={content?.createdAt}
             />
           }
         />
@@ -116,15 +129,17 @@ const SwipeableNotification: React.FC<{
                   {content?.title}
                 </p>
                 <small className="my-5 text-[11px] text-gray-500">
-                  {new Date(content?.created_at).toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                  })}
+                  {content?.createdAt
+                    ? new Date(content.createdAt).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                      })
+                    : ""}
                 </small>
               </div>
               <p className="text-xs sm:text-base lg:text-xs mt-4 w-full">

@@ -17,7 +17,7 @@ const referralApi = referralApiConfig.injectEndpoints({
     setReferralProgram: builder.mutation({
       query: (body) => ({
         url: `/v1/admin/settings/referral-program`,
-        method: "POST",
+        method: "PATCH",
         body,
       }),
       invalidatesTags: ["Referral"],

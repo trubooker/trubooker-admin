@@ -7,7 +7,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getFinancialReport: builder.query({
       query: ({ filter_by }) => ({
-        url: `/admin/transactions/report`,
+        url: `/v1/admin/transactions/report`,
         method: "GET",
         params: { filter_by }, // Pass filter_by as a query parameter
       }),
@@ -16,7 +16,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getDriversEarnings: builder.query({
       query: ({ page, search }: any) => ({
-        url: `/admin/finance/drivers-earnings?page=${page}&search=${search}`,
+        url: `/v1/admin/finance/drivers-earnings?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
@@ -24,7 +24,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     getAgentsEarnings: builder.query({
       query: ({ page, search }: any) => ({
-        url: `/admin/finance/agents-earnings?page=${page}&search=${search}`,
+        url: `/v1/admin/finance/agents-earnings?page=${page}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
@@ -40,7 +40,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
         search: string;
         type: "passenger" | "driver";
       }) => ({
-        url: `/admin/transactions/refund-requests?page=${page}&search=${search}&type=${type}`,
+        url: `/v1/admin/transactions/refund-requests?page=${page}&search=${search}&type=${type}`,
         method: "GET",
       }),
       providesTags: ["Finance"],
@@ -48,7 +48,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     approveWithdrawalRequest: builder.mutation({
       query: (payout) => ({
-        url: `/admin/transactions/approve-withdrawal/${payout}`,
+        url: `/v1/admin/transactions/approve-withdrawal/${payout}`,
         method: "PATCH",
       }),
       invalidatesTags: ["Finance"],
@@ -56,7 +56,7 @@ const passengersApi = passengersApiConfig.injectEndpoints({
 
     DeclineWithdrawalRequest: builder.mutation({
       query: (payout) => ({
-        url: `/admin/transactions/decline-withdrawal/${payout}`,
+        url: `/v1/admin/transactions/decline-withdrawal/${payout}`,
         method: "PATCH",
       }),
       invalidatesTags: ["Finance"],

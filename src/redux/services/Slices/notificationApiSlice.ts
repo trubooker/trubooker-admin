@@ -11,7 +11,7 @@ const notificationApi = notificationApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     fetchNotifications: builder.query({
       query: () => ({
-        url: `/v1/notifications/all`,
+        url: `/v1/admin/notify/activity`,
         method: "GET",
       }),
       providesTags: ["Notification"],
