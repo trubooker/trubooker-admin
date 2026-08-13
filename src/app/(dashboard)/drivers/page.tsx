@@ -13,7 +13,10 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { DriverList } from "@/components/Driver/DriverList";
-import { useGetDriversQuery } from "@/redux/services/Slices/driverApiSlice";
+import {
+  useGetDriversQuery,
+  useGetApprovedDriversCountQuery, // ✅ import new hook
+} from "@/redux/services/Slices/driverApiSlice";
 import { Button } from "@/components/ui/button";
 import { FaSort, FaFilter } from "react-icons/fa";
 import {
@@ -23,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, Clock, X, FileText, Car } from "lucide-react";
+import { Check, Clock, X, FileText, Car, UserCheck } from "lucide-react"; // ✅ added UserCheck icon
 
 interface DocStatusStats {
   [key: string]: number;
@@ -50,6 +53,12 @@ const Drivers = () => {
     isFetching,
     error,
   } = useGetDriversQuery({ page, search: searchQuery, limit: limit });
+
+  // ✅ Fetch total approved drivers count
+// ✅ Fixed: pass undefined and read from result.total
+const { data: approvedCountData, isLoading: approvedCountLoading } =
+  useGetApprovedDriversCountQuery(undefined);
+const approvedCount = approvedCountData?.result?.total ?? 0;
 
   // Source of truth — read straight from the query, no mirror state
   const DriverListData = userData?.result?.data;
@@ -117,12 +126,10 @@ const Drivers = () => {
       : DriverListData?.filter((driver: any) => driver.status === statusFilter);
 
   // Resolve a single display status per driver.
-  // "no vehicle uploaded" isn't a kycStatus value — it's derived from vehicleId being null.
-  // Vehicle takes priority: no point showing "Pending" docs if there's no vehicle at all.
   const getDriverDocStatus = (driver: any): string => {
     if (!driver.vehicleId) return "no vehicle uploaded";
     if (driver.kycStatus === "not_started") return "no documents uploaded";
-    return driver.kycStatus || "pending"; // pending, approved, rejected, etc.
+    return driver.kycStatus || "pending";
   };
 
   // Apply document status filter
@@ -133,7 +140,7 @@ const Drivers = () => {
           (driver: any) => getDriverDocStatus(driver) === docStatusFilter
         );
 
-  // Function to format document status for display (handles both "snake_case" and "spaced text")
+  // Function to format document status for display
   const formatDocStatus = (status: string) => {
     return status
       .split(/[_\s]+/)
@@ -141,7 +148,7 @@ const Drivers = () => {
       .join(" ");
   };
 
-  // Get icon for document status filter (no margin — icon sits inside its own circular badge)
+  // Get icon for document status filter
   const getDocStatusIcon = (status: string) => {
     switch (status) {
       case "approved":
@@ -161,7 +168,7 @@ const Drivers = () => {
     }
   };
 
-  // Icon badge color per status — matches the small circular icon background in the UI
+  // Icon badge color per status
   const getDocStatusIconBg = (status: string) => {
     switch (status) {
       case "approved":
@@ -180,8 +187,7 @@ const Drivers = () => {
     }
   };
 
-  // Statistics for document status — derived from the query data,
-  // using the unified resolver so "no vehicle uploaded" is counted correctly
+  // Statistics for document status
   const docStatusStats: DocStatusStats =
     DriverListData?.reduce((acc: DocStatusStats, driver: any) => {
       const status = getDriverDocStatus(driver);
@@ -203,7 +209,6 @@ const Drivers = () => {
               {totalDrivers}
             </div>
           </div>
-        
         </div>
       </div>
 
@@ -329,7 +334,7 @@ const Drivers = () => {
               </div>
             </div>
 
-            {/* Document Status Summary — matches the pill design in the UI screenshot */}
+            {/* Document Status Summary — with new Approved Drivers pill */}
             {Object.keys(docStatusStats).length > 0 && (
               <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Document Status Overview</h3>
@@ -350,6 +355,19 @@ const Drivers = () => {
                       <span className="text-sm font-bold text-gray-900">{count}</span>
                     </div>
                   ))}
+
+                  {/* ✅ New pill: Approved Drivers (total active drivers) */}
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-gray-200 shadow-sm">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                      <UserCheck className="w-3.5 h-3.5" />
+                    </span>
+                    <span className="text-sm text-gray-700">Approved Drivers</span>
+                    {approvedCountLoading ? (
+                      <Skeleton className="h-4 w-6" />
+                    ) : (
+                      <span className="text-sm font-bold text-gray-900">{approvedCount}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -403,6 +421,8 @@ const Drivers = () => {
 
 export default Drivers;
 
+
+//case Alpha1
 // "use client";
 
 // import React, { useCallback, useEffect, useState } from "react";

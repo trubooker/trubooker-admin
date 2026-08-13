@@ -44,13 +44,7 @@ const driversApi = driversApiConfig.injectEndpoints({
   providesTags: ["Drivers"],
 }),
 
-    // getDrivers: builder.query({
-    //   query: ({ page, search, limit = 10 }) => ({
-    //     url: `/v1/admin/drivers?page=${page}&search=${search}&limit=${limit}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["Drivers"],
-    // }),
+
 
     getOneDriver: builder.query({
       query: (driver) => ({
@@ -75,8 +69,7 @@ const driversApi = driversApiConfig.injectEndpoints({
       }),
       invalidatesTags: ["Drivers"],
     }),
-// Temporary debug version
-// In driverApiSlice.ts
+
 addDriversDocument: builder.mutation({
   query: ({ id, formData }) => {
     // Check if formData is FormData or plain object
@@ -128,6 +121,15 @@ getDocumentHistory: builder.query({
   }),
   providesTags: ["Drivers"],
 }),
+
+getApprovedDriversCount: builder.query({
+  query: () => ({
+    url: `/v1/admin/drivers/approved/count`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+
   }),
 
   
@@ -145,4 +147,5 @@ export const {
   useUpdateDriversDocumentMutation,
   useDeleteDriversDocumentMutation,
   useGetDocumentHistoryQuery,
+   useGetApprovedDriversCountQuery,
 } = driversApi;

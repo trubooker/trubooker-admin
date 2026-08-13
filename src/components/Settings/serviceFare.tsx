@@ -25,18 +25,13 @@ import {
 } from "@/components/ui/card";
 import { useSetPriceControlMutation } from "@/redux/services/Slices/settings/referralProgramApiSlice";
 import toast from "react-hot-toast";
-// import {
-//   Select,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectContent,
-// } from "@/components/ui/select";
+
 
 const FormSchema = z.object({
-  base_trip_fare: z.string().min(1, { message: "Required" }),
-  driver_earning_percentage: z.string().min(1, { message: "Required" }),
+  minTripPrice: z.string().min(1, { message: "Required" }),
+  driverEarningRate: z.string().min(1, { message: "Required" }),
   // agent_earning: z.string().min(1, { message: "Required" }),
-  agent_earning_amount: z.string().min(1, { message: "Required" }),
+  agentEarningAmount: z.string().min(1, { message: "Required" }),
   agent_earning_percentage: z.string().min(1, { message: "Required" }),
 });
 
@@ -48,23 +43,20 @@ const PriceControl = ({ price_control }: any) => {
 
   const [setPrice, { isLoading }] = useSetPriceControlMutation();
 
-  // State for toggling between "percentage" and "amount"
-  // const [agentEarningType, setAgentEarningType] = useState<
-  //   "percentage" | "amount"
-  // >("amount");
+
 
   useEffect(() => {
     if (price_control) {
       form.reset({
-        base_trip_fare: String(price_control?.value?.base_trip_fare),
-        driver_earning_percentage: String(
-          price_control?.value?.driver_earning_percentage
+        minTripPrice: String(price_control?.value?.minTripPrice),
+        driverEarningRate: String(
+          price_control?.value?.driverEarningRate
         ),
-        agent_earning_amount: String(
-          price_control?.value?.agent_earning_amount
+        agentEarningAmount: String(
+          price_control?.value?.agentEarningAmount
         ),
         agent_earning_percentage: String(
-          price_control?.value?.agent_earning_percentage
+          price_control?.value?.agentEarningAmount
         ),
       });
     }
@@ -72,20 +64,20 @@ const PriceControl = ({ price_control }: any) => {
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const formdata = {
-      base_trip_fare: Number(
-        data.base_trip_fare || price_control?.value?.base_trip_fare
+      minTripPrice: Number(
+        data.minTripPrice || price_control?.value?.minTripPrice
       ),
-      driver_earning_percentage: Number(
-        data.driver_earning_percentage ||
-          price_control?.value?.driver_earning_percentage
+      driverEarningRate: Number(
+        data.driverEarningRate ||
+          price_control?.value?.driverEarningRate
       ),
       // ...(agentEarningType === "percentage"
       //   ? { agent_earning_percentage: Number(data.agent_earning  ||
       // price_control?.value?.agent_earning_percentage) }
       //   : { agent_earning_amount: Number(data.agent_earning || price_control?.value?.agent_earning_amount) }),
 
-      agent_earning_amount: Number(
-        data.agent_earning_amount || price_control?.value?.agent_earning_amount
+      agentEarningAmount: Number(
+        data.agentEarningAmount || price_control?.value?.agentEarningAmount
       ),
       agent_earning_percentage: Number(
         data.agent_earning_percentage ||
@@ -117,7 +109,7 @@ const PriceControl = ({ price_control }: any) => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="base_trip_fare"
+                    name="minTripPrice"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Base Trip Fare</FormLabel>
@@ -132,7 +124,7 @@ const PriceControl = ({ price_control }: any) => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="driver_earning_percentage"
+                    name="driverEarningRate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Driver Earning Percentage</FormLabel>
@@ -205,7 +197,7 @@ const PriceControl = ({ price_control }: any) => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="agent_earning_amount"
+                    name="agentEarningAmount"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Connector Earning Amount</FormLabel>
