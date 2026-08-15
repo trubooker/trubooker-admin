@@ -31,6 +31,7 @@ const Roles = () => {
     isLoading: groupUsersLoading,
     isFetching: groupUsersFetching,
   } = useGroupUserByRolesQuery(null);
+  console.log('groupUsers', groupUsers)
 
   return (
     <div>
@@ -76,7 +77,7 @@ const Roles = () => {
                   <div className="grid grid-cols-2">
                     <div className="flex flex-col items-start gap-y-3 me-auto">
                       <span className="text-sm text-black font-normal">
-                        Total {tot?.users?.length} User(s)
+                        Total {tot?.userCount } User(s)
                       </span>
                       <span className="text-lg font-bold text-black capitalize">
                         {formatSnakeCase(String(tot?.role) || "")}
