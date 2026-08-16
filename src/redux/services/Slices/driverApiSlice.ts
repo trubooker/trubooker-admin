@@ -130,6 +130,15 @@ getApprovedDriversCount: builder.query({
   providesTags: ["Drivers"],
 }),
 
+
+getVehicleUploadedCount: builder.query({
+  query: () => ({
+    url: `/v1/admin/drivers/vehicle-uploaded/count`,
+    method: "GET",
+  }),
+  providesTags: ["Drivers"],
+}),
+
   }),
 
   
@@ -143,9 +152,10 @@ export const {
   useGetDriversDocumentsQuery,
   useApproveDriversDocumentsMutation,
   useRejectDriversDocumentsMutation,
-    useAddDriversDocumentMutation,
+  useAddDriversDocumentMutation,
   useUpdateDriversDocumentMutation,
   useDeleteDriversDocumentMutation,
   useGetDocumentHistoryQuery,
-   useGetApprovedDriversCountQuery,
+  useGetApprovedDriversCountQuery,
+  useGetVehicleUploadedCountQuery
 } = driversApi;

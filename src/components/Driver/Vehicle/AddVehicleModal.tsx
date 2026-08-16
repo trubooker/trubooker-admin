@@ -76,7 +76,7 @@ export const AddVehicleModal = ({ driverId, vehicle, onSuccess, trigger }: AddVe
   // Fetch vehicle types from API
 const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = useGetVehicleTypesQuery({});
 
-
+console.log("vehicleTypesData", vehicleTypesData)
   const [addVehicle] = useAddVehicleMutation();
   const [updateVehicle] = useUpdateVehicleMutation();
 
