@@ -61,6 +61,7 @@ const Drivers = () => {
 
   // Source of truth — read straight from the query, no mirror state
   const DriverListData = userData?.result?.data;
+  console.log("DriverListData", DriverListData)
 
   // NOTE: verify these against your actual meta object.
   const totalPages = userData?.result?.meta?.pageCount ?? 1;
@@ -132,19 +133,13 @@ const Drivers = () => {
       : DriverListData?.filter((driver: any) => driver.status === statusFilter);
 
   // Resolve a single display status per driver.
-  const getDriverDocStatus = (driver: any): string => {
-    if (!driver.vehicleId) return "no vehicle uploaded";
-    if (driver.kycStatus === "not_started") return "no documents uploaded";
-    return driver.kycStatus || "pending";
-  };
+
 
   // Apply document status filter
   const docStatusFilteredData =
     docStatusFilter === "all"
       ? statusFilteredData
-      : statusFilteredData?.filter(
-          (driver: any) => getDriverDocStatus(driver) === docStatusFilter
-        );
+      : null;
 
   // Function to format document status for display
   const formatDocStatus = (status: string) => {
@@ -157,7 +152,7 @@ const Drivers = () => {
   // Get icon for document status filter
   const getDocStatusIcon = (status: string) => {
     switch (status) {
-      case "approved":
+      case "active":
         return <Check className="w-3.5 h-3.5" />;
       case "pending":
         return <Clock className="w-3.5 h-3.5" />;
@@ -193,13 +188,19 @@ const Drivers = () => {
     }
   };
 
-  // Statistics for document status
-  const docStatusStats: DocStatusStats =
-    DriverListData?.reduce((acc: DocStatusStats, driver: any) => {
-      const status = getDriverDocStatus(driver);
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {}) || {};
+const resolveDriverDocStatus = (driver: any): string => {
+  if (!driver?.vehicleId) return "no vehicle uploaded";
+  // No vehicle verificationStatus in the list payload → can't tell
+  // approved/pending/rejected here. Needs a backend change (below).
+  return "has vehicle";
+};
+
+const docStatusStats: DocStatusStats =
+  DriverListData?.reduce((acc: DocStatusStats, driver: any) => {
+    const status = resolveDriverDocStatus(driver);
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {}) || {};
 
   return (
     <div className="flex flex-col h-fit w-full">

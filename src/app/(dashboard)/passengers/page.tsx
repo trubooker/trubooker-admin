@@ -27,23 +27,45 @@ import { Passenger } from "@/types";
 import CompactNotification from "@/components/notifications/CompactNotification";
 
 const Passengers = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const urlPage = searchParams.get("page");
+  const urlSearch = searchParams.get("search") || "";
+  const urlLimit = searchParams.get("limit");
+
   const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
+  const [limit, setLimit] = useState(urlLimit ? parseInt(urlLimit) : 20);
+  
   const {
     isLoading: loading,
     data: userData,
     isFetching,
-  } = useGetPassengersQuery({ page, search: searchQuery });
+  } = useGetPassengersQuery({ page, search: searchQuery, limit: limit });
 
   const PassengerListData = userData?.result?.data;
+  console.log(userData)
+  console.log("PassengerListData", PassengerListData)
   const meta = userData?.result?.meta;
   const totalPages = meta ? Math.ceil(meta.count / meta.limit) : 1;
   
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", pageNumber.toString());
+      if (searchQuery) {
+        params.set("search", searchQuery);
+      }
+      if (limit !== 10) {
+        params.set("limit", limit.toString());
+      }
+      router.push(`/passengers?${params.toString()}`, { scroll: false });
     }
   };
+
+  
   
   const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
 

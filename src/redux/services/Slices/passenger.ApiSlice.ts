@@ -6,8 +6,8 @@ const passengersApiConfig = api.enhanceEndpoints({
 const passengersApi = passengersApiConfig.injectEndpoints({
   endpoints: (builder) => ({
     getPassengers: builder.query({
-      query: ({ page, search }) => ({
-        url: `/v1/admin/passengers?page=${page}&search=${search}`,
+      query: ({ page, search = "", limit  }) => ({
+        url: `/v1/admin/passengers?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Passengers"],
