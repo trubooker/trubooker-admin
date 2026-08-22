@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { FaSort } from "react-icons/fa";
+import CompactNotification from "@/components/notifications/CompactNotification";
 
 const Agent = () => {
   const [page, setPage] = useState(1);
@@ -30,6 +31,9 @@ const Agent = () => {
 
   // Step 1: status filter state. "all" means no filter sent to the API.
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  console.log("🤖 Agents component rendered");
+  console.log("📋 Current status filter:", statusFilter);
 
   // NOTE: status is now sent to the API so filtering works across ALL
   // records, not just the 10 currently loaded on this page. This assumes
@@ -54,8 +58,15 @@ const Agent = () => {
   // Correct field for the total record count across all pages, for the badge.
   const totalRecords = userData?.result?.meta?.totalRecords ?? 0;
 
+  console.log("📊 Agent data:", { 
+    total: totalRecords, 
+    agents: AgentListData?.length,
+    totalPages 
+  });
+
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
+      console.log(`🔄 Page change from ${page} to ${pageNumber}`);
       setPage(pageNumber);
     }
   };
@@ -63,6 +74,7 @@ const Agent = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
     debounce((query: string) => {
+      console.log(`🔍 Searching for: "${query}"`);
       setSearchQuery(query);
       setPage(1);
     }, 300),
@@ -74,6 +86,7 @@ const Agent = () => {
   };
 
   const handleStatusFilter = (status: string) => {
+    console.log(`📌 Status filter changed to: "${status}"`);
     setStatusFilter(status);
     setPage(1); // reset to page 1 whenever the filter changes
   };
@@ -86,14 +99,16 @@ const Agent = () => {
           {totalRecords}
         </div>
       </div>
-      <div className="flex flex-col xl:flex-row w-full">
-        <div className="w-full">
-          <div className="bg-white rounded-lg w-full p-5 mt-5">
+      
+      <div className="flex flex-col xl:flex-row w-full gap-6">
+        {/* Agents Table Section */}
+        <div className="w-full xl:w-2/3">
+          <div className="bg-white rounded-lg w-full p-5 mt-5 shadow-sm border border-gray-200">
             <div className="flex flex-col lg:flex-row gap-x-3 lg:justify-between text-left lg:text-center lg:items-center">
               <Search
-                placeholder={"Search..."}
+                placeholder={"Search by name, email or phone..."}
                 onSearch={handleSearch}
-                classname="mb-5 max-w-[300px] "
+                classname="mb-5 max-w-[300px]"
               />
               <div className="mb-4">
                 <DropdownMenu>
@@ -131,6 +146,7 @@ const Agent = () => {
                 </DropdownMenu>
               </div>
             </div>
+            
             {isFetching || loading ? (
               <Table>
                 <TableHeader>
@@ -175,6 +191,7 @@ const Agent = () => {
                 loading={loading}
               />
             )}
+            
             {totalPages > 1 && (
               <div className="pt-10">
                 <Pagination
@@ -184,6 +201,13 @@ const Agent = () => {
                 />
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Notifications Sidebar - Agent Notifications */}
+        <div className="w-full xl:w-1/3">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 sticky top-4 mt-5">
+            <CompactNotification role="agent" maxDisplay={100} />
           </div>
         </div>
       </div>

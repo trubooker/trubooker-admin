@@ -15,8 +15,7 @@ import {
 import { DriverList } from "@/components/Driver/DriverList";
 import {
   useGetDriversQuery,
-  useGetApprovedDriversCountQuery, // ✅ import new hook
-  useGetVehicleUploadedCountQuery
+  useGetApprovedDriversCountQuery,
 } from "@/redux/services/Slices/driverApiSlice";
 import { Button } from "@/components/ui/button";
 import { FaSort, FaFilter } from "react-icons/fa";
@@ -27,7 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, Clock, X, FileText, Car, UserCheck,  } from "lucide-react"; // ✅ added UserCheck icon
+import { Check, Clock, X, FileText, Car, UserCheck } from "lucide-react";
+import CompactNotification from "@/components/notifications/CompactNotification";
 
 interface DocStatusStats {
   [key: string]: number;
@@ -55,15 +55,9 @@ const Drivers = () => {
     error,
   } = useGetDriversQuery({ page, search: searchQuery, limit: limit });
 
-// ✅ Fetch total approved drivers count
-// ✅ Fixed: pass undefined and read from result.total
-const { data: approvedCountData, isLoading: approvedCountLoading } =
-  useGetApprovedDriversCountQuery(undefined);
-
-const {data: noVehicleUploadedCount, isLoading: noVehicleLoading} = useGetVehicleUploadedCountQuery(undefined);
-
-const noVehicleUploaded = noVehicleUploadedCount?.result?.total ?? 0;
-const approvedCount = approvedCountData?.result?.total ?? 0;
+  const { data: approvedCountData, isLoading: approvedCountLoading } =
+    useGetApprovedDriversCountQuery(undefined);
+  const approvedCount = approvedCountData?.result?.total ?? 0;
 
   // Source of truth — read straight from the query, no mirror state
   const DriverListData = userData?.result?.data;
@@ -72,6 +66,13 @@ const approvedCount = approvedCountData?.result?.total ?? 0;
   // NOTE: verify these against your actual meta object.
   const totalPages = userData?.result?.meta?.pageCount ?? 1;
   const totalDrivers = userData?.result?.meta?.totalRecords ?? 0;
+
+  console.log("🚀 Drivers component rendered");
+  console.log("📊 Driver data:", { 
+    total: totalDrivers, 
+    approvedCount,
+    drivers: DriverListData?.length 
+  });
 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
@@ -218,8 +219,9 @@ const docStatusStats: DocStatusStats =
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row w-full">
-        <div className="w-full">
+      <div className="flex flex-col xl:flex-row w-full gap-6">
+        {/* Drivers Table Section */}
+        <div className="w-full xl:w-2/3">
           <div className="bg-white rounded-lg w-full p-5 mt-2 shadow-sm border border-gray-200">
             {/* Filters Section */}
             <div className="flex flex-col lg:flex-row gap-4 lg:justify-between mb-6">
@@ -362,19 +364,7 @@ const docStatusStats: DocStatusStats =
                     </div>
                   ))}
 
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-gray-200 shadow-sm">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
-                      <Car className="w-3.5 h-3.5" />
-                    </span>
-                    <span className="text-sm text-gray-700">No Vehicle Uploaded</span>
-                    {noVehicleLoading ? (
-                      <Skeleton className="h-4 w-6" />
-                    ) : (
-                      <span className="text-sm font-bold text-gray-900">{noVehicleUploaded}</span>
-                    )}
-                  </div>
-
-                  {/* ✅ New pill: Approved Drivers (total active drivers) */}
+                  {/* Approved Drivers pill */}
                   <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-gray-200 shadow-sm">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
                       <UserCheck className="w-3.5 h-3.5" />
@@ -432,11 +422,16 @@ const docStatusStats: DocStatusStats =
             )}
           </div>
         </div>
+
+        {/* Notifications Sidebar - Driver Notifications */}
+        <div className="w-full xl:w-1/3">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 sticky top-4 mt-2">
+            <CompactNotification role="driver" maxDisplay={500} />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Drivers;
-
-
