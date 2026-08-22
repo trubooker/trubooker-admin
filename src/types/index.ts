@@ -13,6 +13,13 @@ export interface NiyuItem {
   icon: any;
   sublinks?: any[];
 }
+export interface JohnItem {
+  id: number;
+  title: string;
+  link?: string;
+  icon: any;
+  sublinks?: any[];
+}
 
 export interface ModalProps {
   data: any;
