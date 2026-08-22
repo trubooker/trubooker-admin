@@ -234,18 +234,31 @@ const ProfileVehicleDocs_Info = ({
       
       // This is the main document object from the API
       return {
-        id: doc.id || doc.document_id || doc._id,
-        verification_type: doc.document_type || "other",
-        document_type_label: doc.document_name || "Document",
-        status: status,
-        link: doc.driverLicense || doc.image_url || doc.images_front_side_url,
-        created_at: doc.submittedAt || doc.verifiedAt || doc.created_at || new Date().toISOString(),
-        reason: doc.rejectionReason || doc.reason,
-        name: doc.document_name || "Document",
-        verifiable_type: doc.verifiable_type || "driver",
-        // Store the full document for later use
-        _raw: doc
-      };
+  id: doc.id || doc.document_id || doc._id,
+  verification_type: doc.verification_type || doc.documentType || doc.document_type || "other",
+  document_type_label:
+    doc.document_type_label || doc.document_name || DOCUMENT_TYPE_LABELS[doc.documentType] || "Document",
+  status: status,
+  link: doc.link || doc.documentUrl || doc.driverLicense || doc.image_url || doc.images_front_side_url,
+  created_at: doc.created_at || doc.createdAt || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
+  reason: doc.reason || doc.rejectionReason,
+  name: doc.name || doc.document_name || "Document",
+  verifiable_type: doc.verifiable_type || "driver",
+  _raw: doc,
+};
+      // return {
+      //   id: doc.id || doc.document_id || doc._id,
+      //   verification_type: doc.document_type || "other",
+      //   document_type_label: doc.document_name || "Document",
+      //   status: status,
+      //   link: doc.driverLicense || doc.image_url || doc.images_front_side_url,
+      //   created_at: doc.submittedAt || doc.verifiedAt || doc.created_at || new Date().toISOString(),
+      //   reason: doc.rejectionReason || doc.reason,
+      //   name: doc.document_name || "Document",
+      //   verifiable_type: doc.verifiable_type || "driver",
+      //   // Store the full document for later use
+      //   _raw: doc
+      // };
     }
     
     // If it's a regular document object
@@ -260,19 +273,33 @@ const ProfileVehicleDocs_Info = ({
     if (doc.rejectedAt && !doc.verifiedAt) {
       status = "rejected";
     }
-    
+
     return {
-      id: doc.id || doc.document_id || doc._id,
-      verification_type: doc.verification_type || doc.document_type || "other",
-      document_type_label: doc.document_type_label || doc.document_name || "Document",
-      status: status,
-      link: doc.link || doc.driverLicense || doc.image_url || doc.images_front_side_url,
-      created_at: doc.created_at || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
-      reason: doc.reason || doc.rejectionReason,
-      name: doc.name || doc.document_name || "Document",
-      verifiable_type: doc.verifiable_type || "driver",
-      _raw: doc
-    };
+  id: doc.id || doc.document_id || doc._id,
+  verification_type: doc.verification_type || doc.documentType || doc.document_type || "other",
+  document_type_label:
+    doc.document_type_label || doc.document_name || DOCUMENT_TYPE_LABELS[doc.documentType] || "Document",
+  status: status,
+  link: doc.link || doc.documentUrl || doc.driverLicense || doc.image_url || doc.images_front_side_url,
+  created_at: doc.created_at || doc.createdAt || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
+  reason: doc.reason || doc.rejectionReason,
+  name: doc.name || doc.document_name || "Document",
+  verifiable_type: doc.verifiable_type || "driver",
+  _raw: doc,
+};
+    
+    // return {
+    //   id: doc.id || doc.document_id || doc._id,
+    //   verification_type: doc.verification_type || doc.document_type || "other",
+    //   document_type_label: doc.document_type_label || doc.document_name || "Document",
+    //   status: status,
+    //   link: doc.link || doc.driverLicense || doc.image_url || doc.images_front_side_url,
+    //   created_at: doc.created_at || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
+    //   reason: doc.reason || doc.rejectionReason,
+    //   name: doc.name || doc.document_name || "Document",
+    //   verifiable_type: doc.verifiable_type || "driver",
+    //   _raw: doc
+    // };
   };
 
   // Function to extract vehicle documents and add them to the documents list.
@@ -363,6 +390,7 @@ const ProfileVehicleDocs_Info = ({
     onModalClose?: () => void
   ) => {
     try {
+      
       if (doc?.verifiable_type === "vehicle" && doc?.vehicleId) {
         await approveVehicle(doc.vehicleId)
           .unwrap()
@@ -669,23 +697,16 @@ const handleAddDocument = async (onModalClose?: () => void) => {
   };
 
   // Extract documents from the API response
-  let docs: any[] = [];
-  
-  // Check if driverDocs has the expected structure
-  if (driverDocs?.result) {
-    // If result is an array, use it directly
-    if (Array.isArray(driverDocs.result)) {
-      docs = driverDocs.result.map(mapDocumentData);
-    } 
-    // If result is a single object (like in your API response)
-    else if (typeof driverDocs.result === 'object') {
-      docs = [mapDocumentData(driverDocs.result)];
-    }
-  } 
-  // If driverDocs is an array directly
-  else if (Array.isArray(driverDocs)) {
-    docs = driverDocs.map(mapDocumentData);
-  }
+  // Driver documents come from the document_verifications rows (real UUID id), via the history endpoint.
+  const driverRows: any[] = Array.isArray(documentHistory?.result)
+    ? documentHistory.result
+    : Array.isArray(documentHistory?.data)
+      ? documentHistory.data
+      : Array.isArray(documentHistory)
+        ? documentHistory
+        : [];
+
+  const docs: any[] = driverRows.map(mapDocumentData);
   
   // Merge vehicle documents with driver documents
   const vehicleDocs = getVehicleDocuments(safeVehicle);
@@ -695,7 +716,8 @@ const handleAddDocument = async (onModalClose?: () => void) => {
   console.log("🚗 Vehicle documents:", vehicleDocs);
   console.log("📄 All documents combined:", allDocs);
 
-  const history: any[] = documentHistory?.data || [];
+  const history: any[] = documentHistory?.result || [];
+  console.log("new history", history)
 
   return (
     <div className="w-full">
