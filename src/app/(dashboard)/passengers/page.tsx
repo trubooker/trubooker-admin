@@ -25,6 +25,8 @@ import { FaSort } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Passenger } from "@/types";
 import CompactNotification from "@/components/notifications/CompactNotification";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 const Passengers = () => {
   const router = useRouter();
