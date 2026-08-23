@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Passenger } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
 
+
 const Passengers = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
