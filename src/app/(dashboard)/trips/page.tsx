@@ -27,7 +27,7 @@ import { Modal } from "@/components/DualModal";
 import { TransactionDetails } from "@/components/finance/transactionDetails";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import { useGetAllTripsQuery } from "@/redux/services/Slices/tripsApiSlice";
+import { useGetAllTripsQuery, useGetTripRequestQuery } from "@/redux/services/Slices/tripsApiSlice";
 import { debounce } from "lodash";
 import { formatDistanceStrict } from "date-fns";
 import Search from "@/components/SearchBar";
@@ -95,7 +95,7 @@ const Trips = () => {
   const router = useRouter();
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [upcomingSearchQuery, setUpcomingSearchQuery] = useState("");
-
+const [requestPage, setRequestPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
   const [pastSearchQuery, setPastSearchQuery] = useState("");
 
@@ -128,6 +128,15 @@ const Trips = () => {
   });
 
   
+const {
+  data: requests,
+  isLoading: requestsLoading,
+  isFetching: requestsFetching,
+} = useGetTripRequestQuery({
+  status: "pending",
+  page: requestPage,
+  limit: 20,
+});
 
   console.log("upcoming", upcoming);
   console.log("completed", completed);
@@ -140,6 +149,18 @@ const Trips = () => {
       setUpcomingPage(pageNumber);
     }
   };
+
+  // Trip Requests --------------------------------------------------
+const requestData = requests?.result?.data;
+// NOTE: use `pageCount` (real total). Your other tabs read `previousPage`,
+// which is only `false`/`page-1` — that's why their pagination doesn't work.
+const totalRequestPages = requests?.result?.meta?.pageCount;
+const onRequestPageChange = (pageNumber: number) => {
+  if (!requestsLoading && pageNumber !== requestPage) {
+    setRequestPage(pageNumber);
+  }
+};
+
   const [upcomingfiltered, setUpcomingFiltered] = useState(upcomingData);
   useEffect(() => {
     if (upcomingData) {
@@ -224,6 +245,10 @@ const Trips = () => {
           </TabsTrigger>
           <TabsTrigger className="me-auto lg:w-full" value="completed">
             Completed Trips
+          </TabsTrigger>
+
+          <TabsTrigger className="me-auto lg:w-full" value="requests">
+            Trip Requests
           </TabsTrigger>
         </TabsList>
 
@@ -819,6 +844,188 @@ const Trips = () => {
             )}
           </div>
         </TabsContent>
+
+        <TabsContent value="requests">
+  <div className="bg-white rounded-xl p-5">
+    <ScrollArea className="w-full">
+      {requestsFetching || requestsLoading ? (
+        <Table className="min-w-[700px] py-2">
+          <TableHeader>
+            <TableRow className="text-[10px] lg:text-sm text-center">
+              <TableHead className="text-xs font-bold w-1/5 text-left">
+                Requester
+              </TableHead>
+              <TableHead className="text-xs font-bold w-1/5 text-left">
+                Route
+              </TableHead>
+              <TableHead className="text-xs font-bold w-1/6 text-center">
+                Requested date
+              </TableHead>
+              <TableHead className="text-xs font-bold w-1/6 text-center">
+                Note
+              </TableHead>
+              <TableHead className="text-xs font-bold w-1/6 text-center">
+                Status
+              </TableHead>
+              <TableHead className="text-xs font-bold w-1/6 text-center">
+                Action
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <TableRow key={i}>
+                {[1, 2, 3, 4, 5, 6].map((j) => (
+                  <TableCell key={j}>
+                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <>
+          {requestData?.length > 0 ? (
+            <ScrollArea>
+              <Table className="min-w-[900px] py-2">
+                <TableHeader>
+                  <TableRow className="text-[10px] lg:text-sm text-center">
+                    <TableHead className="text-xs font-bold w-1/5 text-left">
+                      Requester
+                    </TableHead>
+                    <TableHead className="text-xs font-bold w-1/5 text-left">
+                      Route
+                    </TableHead>
+                    <TableHead className="text-xs font-bold w-1/6 text-center">
+                      Requested date
+                    </TableHead>
+                    <TableHead className="text-xs font-bold w-1/6 text-center">
+                      Note
+                    </TableHead>
+                    <TableHead className="text-xs font-bold w-1/6 text-center">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-xs font-bold w-1/6 text-center">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {requestData?.map((data: any) => (
+                    <TableRow
+                      key={data.id}
+                      className="text-xs text-center lg:text-sm"
+                    >
+                      <TableCell className="w-1/5 py-5 text-left">
+                        <div className="flex items-center gap-x-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={data.requester?.profileImage} />
+                            <AvatarFallback>
+                              <IoPersonOutline />
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {data.requester?.firstName}{" "}
+                              {data.requester?.lastName}
+                            </span>
+                            <small className="font-light">
+                              {data.requester?.email}
+                            </small>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="w-1/5 py-5 text-left">
+                        <div className="flex flex-col">
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">From:</span>{" "}
+                            {data.origin}
+                          </small>
+                          <small className="mt-1 font-light flex gap-x-2">
+                            <span className="font-normal">To:</span>{" "}
+                            {data.destination}
+                          </small>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="w-1/6 py-5">
+                        <div className="flex flex-col">
+                          <span>{data.requestedDate}</span>
+                          <small className="mt-1 font-light">
+                            {data.seats}{" "}
+                            {data.seats === 1 ? "seat" : "seats"}
+                          </small>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="w-1/6 py-5 max-w-[160px] truncate">
+                        {data.note || "—"}
+                      </TableCell>
+
+                      <TableCell className="w-1/6 py-5">
+                        <StatusBadge status={data?.status} />
+                      </TableCell>
+
+                      <TableCell className="py-5 text-center w-[100px]">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="center"
+                            className="cursor-pointer"
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`/trips/trip-requests/${data?.id}`)
+                              }
+                              className="w-full text-center cursor-pointer"
+                            >
+                              View
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          ) : (
+            <div className="flex items-center w-full h-[357px] flex-col justify-center">
+              <Image
+                src={"/nodata.svg"}
+                alt=""
+                width={200}
+                height={200}
+                className="object-cover me-5"
+              />
+              <h1 className="mt-8 text-lg text-center font-semibold">
+                No Data
+              </h1>
+            </div>
+          )}
+        </>
+      )}
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+    {totalRequestPages > 1 && (
+      <div className="pt-10">
+        <Pagination
+          currentPage={requestPage}
+          totalPages={totalRequestPages}
+          onPageChange={onRequestPageChange}
+        />
+      </div>
+    )}
+  </div>
+</TabsContent>
       </Tabs>
     </div>
   );
