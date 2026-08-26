@@ -27,7 +27,10 @@ import { Modal } from "@/components/DualModal";
 import { TransactionDetails } from "@/components/finance/transactionDetails";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import { useGetAllTripsQuery, useGetTripRequestQuery } from "@/redux/services/Slices/tripsApiSlice";
+import {
+  useGetAllTripsQuery,
+  useGetTripRequestQuery,
+} from "@/redux/services/Slices/tripsApiSlice";
 import { debounce } from "lodash";
 import { formatDistanceStrict } from "date-fns";
 import Search from "@/components/SearchBar";
@@ -57,14 +60,14 @@ const getTripDuration = (data: any) => {
 
 // Single source of truth for status colors, driven by the actual status value
 // so the same status always looks identical across every tab.
-const STATUS_STYLES: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
+const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   active: { bg: "#CCFFCD", text: "#00B771", label: "Active" },
   completed: { bg: "#E6F4FF", text: "#1E90FF", label: "Completed" },
   upcoming: { bg: "#FFF4E6", text: "#FFA500", label: "Upcoming" },
   pending: { bg: "#FFF4E6", text: "#FFA500", label: "Pending" },
+  approved: { bg: "#CCFFCD", text: "#00B771", label: "Approved" },
+  fulfilled: { bg: "#E6F0FF", text: "#0077FF", label: "Fulfilled" },
+  declined: { bg: "#FFE6E6", text: "#FF4500", label: "Declined" },
   cancelled: { bg: "#FFE6E6", text: "#FF4500", label: "Cancelled" },
   past: { bg: "#F1F1F1", text: "#6B7280", label: "Past" },
 };
@@ -91,11 +94,25 @@ const StatusBadge = ({ status }: { status?: string }) => {
   );
 };
 
+// Filter options for the Trip Requests tab. `undefined` = all statuses.
+const REQUEST_STATUS_FILTERS: { label: string; value?: string }[] = [
+  { label: "All", value: undefined },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Fulfilled", value: "fulfilled" },
+  { label: "Declined", value: "declined" },
+];
+
 const Trips = () => {
   const router = useRouter();
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [upcomingSearchQuery, setUpcomingSearchQuery] = useState("");
-const [requestPage, setRequestPage] = useState(1);
+
+  const [requestPage, setRequestPage] = useState(1);
+  const [requestStatus, setRequestStatus] = useState<string | undefined>(
+    undefined
+  );
+
   const [pastPage, setPastPage] = useState(1);
   const [pastSearchQuery, setPastSearchQuery] = useState("");
 
@@ -127,23 +144,21 @@ const [requestPage, setRequestPage] = useState(1);
     page: completedPage,
   });
 
-  
-const {
-  data: requests,
-  isLoading: requestsLoading,
-  isFetching: requestsFetching,
-} = useGetTripRequestQuery({
-  status: "pending",
-  page: requestPage,
-  limit: 20,
-});
+  const {
+    data: requests,
+    isLoading: requestsLoading,
+    isFetching: requestsFetching,
+  } = useGetTripRequestQuery({
+    status: requestStatus, // undefined => all: pending, approved, fulfilled, declined
+    page: requestPage,
+    limit: 20,
+  });
 
-  console.log("upcoming", upcoming);
-  console.log("completed", completed);
-  console.log("past", past);
   // Upcoming ----------------------------------------------------------
-  const totalUpcomingPage = upcoming?.result.meta?.previousPage;
-  const upcomingData = upcoming?.result.data;
+  // FIX: totalPages must read `pageCount`, not `previousPage`
+  // (previousPage is only false / page-1, which broke pagination).
+  const totalUpcomingPage = upcoming?.result?.meta?.pageCount;
+  const upcomingData = upcoming?.result?.data;
   const onUpcomingChange = (pageNumber: number) => {
     if (!upcomingLoading && pageNumber !== upcomingPage) {
       setUpcomingPage(pageNumber);
@@ -151,15 +166,17 @@ const {
   };
 
   // Trip Requests --------------------------------------------------
-const requestData = requests?.result?.data;
-// NOTE: use `pageCount` (real total). Your other tabs read `previousPage`,
-// which is only `false`/`page-1` — that's why their pagination doesn't work.
-const totalRequestPages = requests?.result?.meta?.pageCount;
-const onRequestPageChange = (pageNumber: number) => {
-  if (!requestsLoading && pageNumber !== requestPage) {
-    setRequestPage(pageNumber);
-  }
-};
+  const requestData = requests?.result?.data;
+  const totalRequestPages = requests?.result?.meta?.pageCount;
+  const onRequestPageChange = (pageNumber: number) => {
+    if (!requestsLoading && pageNumber !== requestPage) {
+      setRequestPage(pageNumber);
+    }
+  };
+  const onRequestStatusChange = (value?: string) => {
+    setRequestStatus(value);
+    setRequestPage(1); // reset to first page when the filter changes
+  };
 
   const [upcomingfiltered, setUpcomingFiltered] = useState(upcomingData);
   useEffect(() => {
@@ -181,8 +198,9 @@ const onRequestPageChange = (pageNumber: number) => {
   };
 
   // Past --------------------------------------------------
-  const totalPastPages = past?.result.meta?.previousPage;
-  const pastData = past?.result.data;
+  // FIX: pageCount instead of previousPage
+  const totalPastPages = past?.result?.meta?.pageCount;
+  const pastData = past?.result?.data;
   const onPastPageChange = (pageNumber: number) => {
     if (!pastLoading && pageNumber !== pastPage) {
       setPastPage(pageNumber);
@@ -208,8 +226,9 @@ const onRequestPageChange = (pageNumber: number) => {
   };
 
   // Completed --------------------------------------------------
-  const totalCompletedPages = completed?.result.meta?.previousPage;
-  const completedData = completed?.result.data;
+  // FIX: pageCount instead of previousPage
+  const totalCompletedPages = completed?.result?.meta?.pageCount;
+  const completedData = completed?.result?.data;
   const onCompletedPageChange = (pageNumber: number) => {
     if (!completedLoading && pageNumber !== completedPage) {
       setCompletedPage(pageNumber);
@@ -233,6 +252,7 @@ const onRequestPageChange = (pageNumber: number) => {
   const handleCompletedSearch = (query: string) => {
     debounceCompletedSearch(query);
   };
+
   return (
     <div>
       <Tabs defaultValue="upcoming" className="w-full">
@@ -449,6 +469,7 @@ const onRequestPageChange = (pageNumber: number) => {
             )}
           </div>
         </TabsContent>
+
         <TabsContent value="past">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
@@ -646,6 +667,7 @@ const onRequestPageChange = (pageNumber: number) => {
             )}
           </div>
         </TabsContent>
+
         <TabsContent value="completed">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
@@ -846,186 +868,213 @@ const onRequestPageChange = (pageNumber: number) => {
         </TabsContent>
 
         <TabsContent value="requests">
-  <div className="bg-white rounded-xl p-5">
-    <ScrollArea className="w-full">
-      {requestsFetching || requestsLoading ? (
-        <Table className="min-w-[700px] py-2">
-          <TableHeader>
-            <TableRow className="text-[10px] lg:text-sm text-center">
-              <TableHead className="text-xs font-bold w-1/5 text-left">
-                Requester
-              </TableHead>
-              <TableHead className="text-xs font-bold w-1/5 text-left">
-                Route
-              </TableHead>
-              <TableHead className="text-xs font-bold w-1/6 text-center">
-                Requested date
-              </TableHead>
-              <TableHead className="text-xs font-bold w-1/6 text-center">
-                Note
-              </TableHead>
-              <TableHead className="text-xs font-bold w-1/6 text-center">
-                Status
-              </TableHead>
-              <TableHead className="text-xs font-bold w-1/6 text-center">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <TableRow key={i}>
-                {[1, 2, 3, 4, 5, 6].map((j) => (
-                  <TableCell key={j}>
-                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <>
-          {requestData?.length > 0 ? (
-            <ScrollArea>
-              <Table className="min-w-[900px] py-2">
-                <TableHeader>
-                  <TableRow className="text-[10px] lg:text-sm text-center">
-                    <TableHead className="text-xs font-bold w-1/5 text-left">
-                      Requester
-                    </TableHead>
-                    <TableHead className="text-xs font-bold w-1/5 text-left">
-                      Route
-                    </TableHead>
-                    <TableHead className="text-xs font-bold w-1/6 text-center">
-                      Requested date
-                    </TableHead>
-                    <TableHead className="text-xs font-bold w-1/6 text-center">
-                      Note
-                    </TableHead>
-                    <TableHead className="text-xs font-bold w-1/6 text-center">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-xs font-bold w-1/6 text-center">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {requestData?.map((data: any) => (
-                    <TableRow
-                      key={data.id}
-                      className="text-xs text-center lg:text-sm"
-                    >
-                      <TableCell className="w-1/5 py-5 text-left">
-                        <div className="flex items-center gap-x-3">
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={data.requester?.profileImage} />
-                            <AvatarFallback>
-                              <IoPersonOutline />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="font-medium">
-                              {data.requester?.firstName}{" "}
-                              {data.requester?.lastName}
-                            </span>
-                            <small className="font-light">
-                              {data.requester?.email}
-                            </small>
-                          </div>
-                        </div>
-                      </TableCell>
+          <div className="bg-white rounded-xl p-5">
+            {/* Status filter — undefined = all statuses */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {REQUEST_STATUS_FILTERS.map((f) => {
+                const active = requestStatus === f.value;
+                return (
+                  <button
+                    key={f.label}
+                    onClick={() => onRequestStatusChange(f.value)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
+                      active
+                        ? "bg-[#00B771] text-white border-[#00B771]"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
 
-                      <TableCell className="w-1/5 py-5 text-left">
-                        <div className="flex flex-col">
-                          <small className="mt-1 font-light flex gap-x-2">
-                            <span className="font-normal">From:</span>{" "}
-                            {data.origin}
-                          </small>
-                          <small className="mt-1 font-light flex gap-x-2">
-                            <span className="font-normal">To:</span>{" "}
-                            {data.destination}
-                          </small>
-                        </div>
-                      </TableCell>
-
-                      <TableCell className="w-1/6 py-5">
-                        <div className="flex flex-col">
-                          <span>{data.requestedDate}</span>
-                          <small className="mt-1 font-light">
-                            {data.seats}{" "}
-                            {data.seats === 1 ? "seat" : "seats"}
-                          </small>
-                        </div>
-                      </TableCell>
-
-                      <TableCell className="w-1/6 py-5 max-w-[160px] truncate">
-                        {data.note || "—"}
-                      </TableCell>
-
-                      <TableCell className="w-1/6 py-5">
-                        <StatusBadge status={data?.status} />
-                      </TableCell>
-
-                      <TableCell className="py-5 text-center w-[100px]">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="center"
-                            className="cursor-pointer"
-                          >
-                            <DropdownMenuItem
-                              onClick={() =>
-                                router.push(`/trips/trip-requests/${data?.id}`)
-                              }
-                              className="w-full text-center cursor-pointer"
-                            >
-                              View
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            <ScrollArea className="w-full">
+              {requestsFetching || requestsLoading ? (
+                <Table className="min-w-[700px] py-2">
+                  <TableHeader>
+                    <TableRow className="text-[10px] lg:text-sm text-center">
+                      <TableHead className="text-xs font-bold w-1/5 text-left">
+                        Requester
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/5 text-left">
+                        Route
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Requested date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Note
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Action
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      <TableRow key={i}>
+                        {[1, 2, 3, 4, 5, 6].map((j) => (
+                          <TableCell key={j}>
+                            <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <>
+                  {requestData?.length > 0 ? (
+                    <ScrollArea>
+                      <Table className="min-w-[900px] py-2">
+                        <TableHeader>
+                          <TableRow className="text-[10px] lg:text-sm text-center">
+                            <TableHead className="text-xs font-bold w-1/5 text-left">
+                              Requester
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/5 text-left">
+                              Route
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Requested date
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Note
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Status
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Action
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {requestData?.map((data: any) => (
+                            <TableRow
+                              key={data.id}
+                              className="text-xs text-center lg:text-sm"
+                            >
+                              <TableCell className="w-1/5 py-5 text-left">
+                                <div className="flex items-center gap-x-3">
+                                  <Avatar className="h-9 w-9">
+                                    <AvatarImage
+                                      src={data.requester?.profileImage}
+                                    />
+                                    <AvatarFallback>
+                                      <IoPersonOutline />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {data.requester?.firstName}{" "}
+                                      {data.requester?.lastName}
+                                    </span>
+                                    <small className="font-light">
+                                      {data.requester?.email}
+                                    </small>
+                                  </div>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="w-1/5 py-5 text-left">
+                                <div className="flex flex-col">
+                                  <small className="mt-1 font-light flex gap-x-2">
+                                    <span className="font-normal">From:</span>{" "}
+                                    {data.origin}
+                                  </small>
+                                  <small className="mt-1 font-light flex gap-x-2">
+                                    <span className="font-normal">To:</span>{" "}
+                                    {data.destination}
+                                  </small>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="w-1/6 py-5">
+                                <div className="flex flex-col">
+                                  <span>{data.requestedDate}</span>
+                                  <small className="mt-1 font-light">
+                                    {data.seats}{" "}
+                                    {data.seats === 1 ? "seat" : "seats"}
+                                  </small>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="w-1/6 py-5 max-w-[160px] truncate">
+                                {data.note || "—"}
+                              </TableCell>
+
+                              <TableCell className="w-1/6 py-5">
+                                <StatusBadge status={data?.status} />
+                              </TableCell>
+
+                              <TableCell className="py-5 text-center w-[100px]">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <span className="sr-only">Open menu</span>
+                                      <MoreHorizontal />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="center"
+                                    className="cursor-pointer"
+                                  >
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        router.push(
+                                          `/trips/trip-requests/${data?.id}`
+                                        )
+                                      }
+                                      className="w-full text-center cursor-pointer"
+                                    >
+                                      View
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
+                  ) : (
+                    <div className="flex items-center w-full h-[357px] flex-col justify-center">
+                      <Image
+                        src={"/nodata.svg"}
+                        alt=""
+                        width={200}
+                        height={200}
+                        className="object-cover me-5"
+                      />
+                      <h1 className="mt-8 text-lg text-center font-semibold">
+                        No Data
+                      </h1>
+                    </div>
+                  )}
+                </>
+              )}
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
-          ) : (
-            <div className="flex items-center w-full h-[357px] flex-col justify-center">
-              <Image
-                src={"/nodata.svg"}
-                alt=""
-                width={200}
-                height={200}
-                className="object-cover me-5"
-              />
-              <h1 className="mt-8 text-lg text-center font-semibold">
-                No Data
-              </h1>
-            </div>
-          )}
-        </>
-      )}
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
-    {totalRequestPages > 1 && (
-      <div className="pt-10">
-        <Pagination
-          currentPage={requestPage}
-          totalPages={totalRequestPages}
-          onPageChange={onRequestPageChange}
-        />
-      </div>
-    )}
-  </div>
-</TabsContent>
+            {totalRequestPages > 1 && (
+              <div className="pt-10">
+                <Pagination
+                  currentPage={requestPage}
+                  totalPages={totalRequestPages}
+                  onPageChange={onRequestPageChange}
+                />
+              </div>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
