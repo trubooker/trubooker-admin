@@ -16,9 +16,11 @@ const tripsApi = tripsApiConfig.injectEndpoints({
     }),
 
     getTripRequest: builder.query({
-      query: ({ status = "pending", page = 1, limit = 20 }: any = {}) => ({
+      query: ({ status, page = 1, limit = 20 }: any = {}) => ({
         url: `/v1/trip-requests`,
         method: "GET",
+        // undefined `status` is stripped by fetchBaseQuery => returns ALL statuses.
+        // an array serializes as ?status=approved&status=fulfilled (DTO now accepts it).
         params: { status, page, limit },
       }),
       providesTags: ["TripRequests"],
@@ -42,24 +44,44 @@ const tripsApi = tripsApiConfig.injectEndpoints({
       ],
     }),
 
-    // ✅ Approve a trip request
+    // ✅ Approve a trip request.
+    // Called as approveTripRequest(id) OR approveTripRequest({ tripid, tripId, adminNote }).
     approveTripRequest: builder.mutation({
-      query: (tripid: string) => ({
-        url: `/v1/trip-requests/${tripid}/approve`,
-        method: "PATCH",
-      }),
-      invalidatesTags: (result, error, tripid) => [
-        "TripRequests",
-        { type: "TripRequests", id: tripid },
-      ],
+      query: (
+        arg:
+          | string
+          | { tripid: string; tripId?: string; adminNote?: string },
+      ) => {
+        const { tripid, ...body } =
+          typeof arg === "string" ? { tripid: arg } : arg;
+        return {
+          url: `/v1/trip-requests/${tripid}/approve`,
+          method: "PATCH",
+          // {} when called with just an id; { tripId, adminNote } otherwise
+          body,
+        };
+      },
+      invalidatesTags: (result, error, arg) => {
+        const tripid = typeof arg === "string" ? arg : arg.tripid;
+        return ["TripRequests", { type: "TripRequests", id: tripid }];
+      },
     }),
 
-    // ✅ Decline a trip request (optionally send a reason)
+    // ✅ Decline a trip request. Backend requires a non-empty `reason`.
+    // Accepts either `reason` or your existing `adminNote` and sends `reason`.
     declineTripRequest: builder.mutation({
-      query: ({ tripid, adminNote }: { tripid: string; adminNote?: string }) => ({
+      query: ({
+        tripid,
+        reason,
+        adminNote,
+      }: {
+        tripid: string;
+        reason?: string;
+        adminNote?: string;
+      }) => ({
         url: `/v1/trip-requests/${tripid}/decline`,
         method: "PATCH",
-        body: adminNote ? { adminNote } : undefined,
+        body: { reason: reason ?? adminNote ?? "" },
       }),
       invalidatesTags: (result, error, { tripid }) => [
         "TripRequests",
