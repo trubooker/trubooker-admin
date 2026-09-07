@@ -126,6 +126,27 @@ const Drivers = () => {
     debounceSearch(query);
   };
 
+  // Resolve a single document/verification status per driver row.
+  // Defined before the filters below because those .filter() callbacks run
+  // immediately during render (a const arrow can't be used before this point).
+  const resolveDriverDocStatus = (driver: any): string => {
+    // No vehicle attached at all
+    if (!driver?.vehicleId && !driver?.vehicle) return "no vehicle uploaded";
+
+    // Use the verification status the backend now sends on the joined vehicle
+    // (falls back to a top-level docStatus if you ever compute one server-side).
+    const raw =
+      driver?.docStatus ??
+      driver?.vehicle?.verificationStatus ??
+      driver?.vehicles?.[0]?.verificationStatus ??
+      null;
+
+    // Vehicle exists but hasn't been reviewed yet → treat as pending
+    if (!raw) return "pending";
+
+    return String(raw).toLowerCase(); // "approved" | "pending" | "rejected"
+  };
+
   // Apply status filter — derived directly from DriverListData (recomputes every render)
   const statusFilteredData =
     statusFilter === "all"
@@ -139,7 +160,9 @@ const Drivers = () => {
   const docStatusFilteredData =
     docStatusFilter === "all"
       ? statusFilteredData
-      : null;
+      : statusFilteredData?.filter(
+          (driver: any) => resolveDriverDocStatus(driver) === docStatusFilter
+        );
 
   // Function to format document status for display
   const formatDocStatus = (status: string) => {
@@ -187,13 +210,6 @@ const Drivers = () => {
         return "bg-gray-100 text-gray-600";
     }
   };
-
-const resolveDriverDocStatus = (driver: any): string => {
-  if (!driver?.vehicleId) return "no vehicle uploaded";
-  // No vehicle verificationStatus in the list payload → can't tell
-  // approved/pending/rejected here. Needs a backend change (below).
-  return "has vehicle";
-};
 
 const docStatusStats: DocStatusStats =
   DriverListData?.reduce((acc: DocStatusStats, driver: any) => {
