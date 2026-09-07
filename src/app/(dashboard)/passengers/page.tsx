@@ -24,6 +24,7 @@ import { useGetPassengersQuery } from "@/redux/services/Slices/passenger.ApiSlic
 import { FaSort } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Passenger } from "@/types";
+import CompactNotification from "@/components/notifications/CompactNotification";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
@@ -49,8 +50,8 @@ const Passengers = () => {
   console.log(userData)
   console.log("PassengerListData", PassengerListData)
   const meta = userData?.result?.meta;
-  const totalPages = meta?.pageCount ?? 1;
-
+  const totalPages = meta ? Math.ceil(meta.count / meta.limit) : 1;
+  
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -98,13 +99,19 @@ const Passengers = () => {
         );
 
   // Helper to count verified users
-const verifiedCount = {
-  emailVerified:
-    filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified).length || 0,
-  phoneVerified:
-    filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified).length || 0,
-};
+  const verifiedCount = {
+    emailVerified:
+      filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified).length || 0,
+    phoneVerified:
+      filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified).length || 0,
+  };
 
+  console.log("🚀 Passengers component rendered");
+  console.log("📊 Passenger data:", { 
+    total: PassengerListData?.length, 
+    filtered: statusFilteredData?.length,
+    statusFilter 
+  });
 
   return (
     <div className="flex flex-col h-fit w-full">
@@ -116,7 +123,7 @@ const verifiedCount = {
       </div>
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="text-sm text-gray-500">Total Passengers</h3>
           <p className="text-2xl font-bold">{PassengerListData?.length || 0}</p>
@@ -129,11 +136,25 @@ const verifiedCount = {
           <h3 className="text-sm text-gray-500">Phone Verified</h3>
           <p className="text-2xl font-bold text-blue-600">{verifiedCount.phoneVerified}</p>
         </div>
+        <div className="bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="text-sm text-gray-500">Notifications</h3>
+          <div className="flex items-center justify-between">
+            <p className="text-2xl font-bold text-purple-600">3</p>
+            <Button 
+              variant="link" 
+              className="text-xs text-[--primary] p-0"
+              onClick={() => window.location.href = "/notification"}
+            >
+              View all
+            </Button>
+          </div>
+        </div>
       </div>
       
-      <div className="flex flex-col xl:flex-row w-full">
-        <div className="w-full">
-          <div className="bg-white rounded-lg w-full p-5 mt-5">
+      <div className="flex flex-col xl:flex-row w-full gap-6">
+        {/* Passengers Table Section */}
+        <div className="w-full xl:w-2/3">
+          <div className="bg-white rounded-lg w-full p-5">
             <div className="flex flex-col lg:flex-row gap-x-3 lg:justify-between text-left lg:text-center lg:items-center">
               <Search
                 placeholder={"Search by name, email or phone..."}
@@ -218,6 +239,13 @@ const verifiedCount = {
                 />
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Notifications Sidebar */}
+        <div className="w-full xl:w-1/3">
+          <div className="bg-white rounded-lg p-4 shadow-sm sticky top-4">
+            <CompactNotification role="passenger" maxDisplay={500} />
           </div>
         </div>
       </div>
