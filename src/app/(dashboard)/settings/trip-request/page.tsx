@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
 import {
-  useSetPricePerKmMutation,
+  useSetPerKmRateMutation,
   useUpdateDispatchWindowMutation,
 } from "@/redux/services/Slices/settings/appSettingsApiSlice";
 import { useGetSystemSettingsQuery } from "@/redux/services/Slices/settings/referralProgramApiSlice";
@@ -34,14 +34,26 @@ import {
   DollarSign,
   Timer,
   Car,
+  MapPin,
+  Route,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+interface PerKmRateForm {
+  intraStatePerKmRate: string;
+  interStatePerKmRate: string;
+}
 
 interface DispatchWindowForm {
   intraStateDispatchWindowHours: string;
   interStateDispatchWindowHours: string;
 }
+
+const DEFAULT_PER_KM: PerKmRateForm = {
+  intraStatePerKmRate: "",
+  interStatePerKmRate: "",
+};
 
 const DEFAULT_DISPATCH: DispatchWindowForm = {
   intraStateDispatchWindowHours: "",
@@ -58,7 +70,6 @@ const MAX_DISPATCH_HOURS = 168;
 const extractErrorMessage = (err: any, fallback: string): string => {
   const data = err?.data;
 
-  // NestJS field-level: { errors: [{ field, errors: [msg] }] }
   if (Array.isArray(data?.errors)) {
     const fieldMsgs = data.errors
       .flatMap((e: any) =>
@@ -72,23 +83,32 @@ const extractErrorMessage = (err: any, fallback: string): string => {
     if (fieldMsgs.length) return fieldMsgs.join("; ");
   }
 
-  // NestJS top-level: { message: "..." } or { message: ["...", "..."] }
   if (Array.isArray(data?.message)) return data.message.join("; ");
   if (typeof data?.message === "string") return data.message;
 
-  // Plain error string
   if (typeof err?.error === "string") return err.error;
 
   return fallback;
 };
 
+// Convert any value to a form-friendly string; "" when absent
+const toInputString = (val: unknown): string =>
+  val !== undefined && val !== null && val !== "" ? String(val) : "";
+
+// Format currency for display
+const formatNaira = (val: string | number): string =>
+  Number(val || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const TripRequestSettings = () => {
-  // ── Price per km state ───────────────────────────────────────────────────
-  const [pricePerKm, setPriceInput] = useState<string>("");
-  const [showPriceConfirm, setShowPriceConfirm] = useState(false);
-  const [isConfirmingPrice, setIsConfirmingPrice] = useState(false);
+  // ── Per km rate state ────────────────────────────────────────────────────
+  const [perKm, setPerKm] = useState<PerKmRateForm>(DEFAULT_PER_KM);
+  const [showRateConfirm, setShowRateConfirm] = useState(false);
+  const [isConfirmingRate, setIsConfirmingRate] = useState(false);
 
   // ── Dispatch window state ────────────────────────────────────────────────
   const [dispatch, setDispatch] = useState<DispatchWindowForm>(DEFAULT_DISPATCH);
@@ -103,13 +123,13 @@ const TripRequestSettings = () => {
     refetch,
   } = useGetSystemSettingsQuery(null);
 
-  const [setPricePerKm, { isLoading: isSettingPrice }] =
-    useSetPricePerKmMutation();
+  const [setPerKmRate, { isLoading: isSettingRate }] =
+    useSetPerKmRateMutation();
 
   const [updateDispatchWindow, { isLoading: isUpdatingDispatch }] =
     useUpdateDispatchWindowMutation();
 
-  // ── Extract price_control entry from response ────────────────────────────
+  // ── Extract price_control entry ──────────────────────────────────────────
 
   const priceControl = systemSettingsData?.result?.find(
     (entry: { key: string }) => entry.key === "price_control"
@@ -121,62 +141,101 @@ const TripRequestSettings = () => {
     if (!priceControl?.value) return;
     const v = priceControl.value;
 
-    const price = v.perKmRate ?? v.pricePerKm ?? "";
-    setPriceInput(price !== "" && price !== null ? String(price) : "");
+    // Legacy single fallback (in case backend hasn't migrated yet)
+    const fallbackRate = v.perKmRate ?? v.pricePerKm ?? "";
 
-    const intra = v.intraStateDispatchWindowHours ?? "";
-    const inter = v.interStateDispatchWindowHours ?? "";
+    setPerKm({
+      intraStatePerKmRate: toInputString(
+        v.intraStatePerKmRate ?? fallbackRate
+      ),
+      interStatePerKmRate: toInputString(
+        v.interStatePerKmRate ?? fallbackRate
+      ),
+    });
 
     setDispatch({
-      intraStateDispatchWindowHours:
-        intra !== "" && intra !== null ? String(intra) : "",
-      interStateDispatchWindowHours:
-        inter !== "" && inter !== null ? String(inter) : "",
+      intraStateDispatchWindowHours: toInputString(
+        v.intraStateDispatchWindowHours
+      ),
+      interStateDispatchWindowHours: toInputString(
+        v.interStateDispatchWindowHours
+      ),
     });
   }, [priceControl]);
 
-  const priceBusy = isSettingPrice || isConfirmingPrice;
+  const rateBusy = isSettingRate || isConfirmingRate;
   const dispatchBusy = isUpdatingDispatch || isConfirmingDispatch;
+
+  const patchPerKm = (field: keyof PerKmRateForm, value: string) =>
+    setPerKm((prev) => ({ ...prev, [field]: value }));
 
   const patchDispatch = (field: keyof DispatchWindowForm, value: string) =>
     setDispatch((prev) => ({ ...prev, [field]: value }));
 
-  // ── Price handlers ───────────────────────────────────────────────────────
+  // ── Per km rate handlers ─────────────────────────────────────────────────
 
-  const handlePriceSaveClick = () => {
-    const num = Number(pricePerKm);
+  const handleRateSaveClick = () => {
+    const intraRaw = perKm.intraStatePerKmRate.trim();
+    const interRaw = perKm.interStatePerKmRate.trim();
 
-    if (!pricePerKm.trim() || isNaN(num) || num <= 0) {
-      toast.error("Price per km must be a positive number", {
+    if (!intraRaw) {
+      toast.error("Intra-state rate is required", {
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+    const intra = Number(intraRaw);
+    if (isNaN(intra) || intra <= 0) {
+      toast.error("Intra-state rate must be greater than 0", {
         position: "top-right",
         duration: 4000,
       });
       return;
     }
 
-    setShowPriceConfirm(true);
+    if (!interRaw) {
+      toast.error("Inter-state rate is required", {
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+    const inter = Number(interRaw);
+    if (isNaN(inter) || inter <= 0) {
+      toast.error("Inter-state rate must be greater than 0", {
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+
+    setShowRateConfirm(true);
   };
 
-  const confirmPriceSave = async () => {
-    if (isConfirmingPrice) return;
-    setIsConfirmingPrice(true);
+  const confirmRateSave = async () => {
+    if (isConfirmingRate) return;
+    setIsConfirmingRate(true);
 
-    const num = Number(pricePerKm);
+    const payload = {
+      intraStatePerKmRate: Number(perKm.intraStatePerKmRate),
+      interStatePerKmRate: Number(perKm.interStatePerKmRate),
+    };
 
     try {
-      await setPricePerKm({ pricePerKm: num }).unwrap();
-      setIsConfirmingPrice(false);
-      setShowPriceConfirm(false);
-      toast.success(`Price set to ₦${num.toLocaleString()} per km ✅`, {
+      await setPerKmRate(payload).unwrap();
+      setIsConfirmingRate(false);
+      setShowRateConfirm(false);
+      toast.success("Per-km rates updated ✅", {
         position: "top-right",
         duration: 4000,
         icon: "💰",
       });
     } catch (e: any) {
-      setIsConfirmingPrice(false);
-      setShowPriceConfirm(false);
+      setIsConfirmingRate(false);
+      setShowRateConfirm(false);
       toast.error(
-        extractErrorMessage(e, "Failed to set price per km"),
+        extractErrorMessage(e, "Failed to update per-km rates"),
         { position: "top-right", duration: 8000 }
       );
     }
@@ -188,7 +247,6 @@ const TripRequestSettings = () => {
     const intraRaw = dispatch.intraStateDispatchWindowHours.trim();
     const interRaw = dispatch.interStateDispatchWindowHours.trim();
 
-    // Intra-state
     if (!intraRaw) {
       toast.error("Intra-state window is required", {
         position: "top-right",
@@ -212,7 +270,6 @@ const TripRequestSettings = () => {
       return;
     }
 
-    // Inter-state
     if (!interRaw) {
       toast.error("Inter-state window is required", {
         position: "top-right",
@@ -301,7 +358,7 @@ const TripRequestSettings = () => {
         </Button>
       </div>
 
-      {/* ── Price Per Km Card ───────────────────────────────────────────── */}
+      {/* ── Per Km Rate Card ────────────────────────────────────────────── */}
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -311,16 +368,17 @@ const TripRequestSettings = () => {
                 Price Per Kilometer
               </CardTitle>
               <CardDescription>
-                Set the per-kilometer rate for rides
+                Set the per-kilometer rate for intra-state and inter-state
+                trips
               </CardDescription>
             </div>
             <Button
               size="sm"
-              onClick={handlePriceSaveClick}
-              disabled={priceBusy || isLoading}
+              onClick={handleRateSaveClick}
+              disabled={rateBusy || isLoading}
               className="bg-[--primary] hover:bg-[--primary-btn]"
             >
-              {priceBusy ? (
+              {rateBusy ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   Saving…
@@ -328,7 +386,7 @@ const TripRequestSettings = () => {
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Save Price
+                  Save Rates
                 </>
               )}
             </Button>
@@ -336,49 +394,77 @@ const TripRequestSettings = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
-            <Skeleton className="h-10 w-full" />
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
           ) : (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="price-per-km">Price Per Kilometer</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
-                    ₦
-                  </span>
-                  <Input
-                    id="price-per-km"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="e.g., 150.00"
-                    value={pricePerKm}
-                    onChange={(e) => setPriceInput(e.target.value)}
-                    className="pl-8"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="intra-rate">Intra-State Rate (per km)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
+                      ₦
+                    </span>
+                    <Input
+                      id="intra-rate"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g., 315"
+                      value={perKm.intraStatePerKmRate}
+                      onChange={(e) =>
+                        patchPerKm("intraStatePerKmRate", e.target.value)
+                      }
+                      className="pl-8"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    Rate for trips within the same state
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  Amount charged per kilometer traveled
-                </p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="inter-rate">Inter-State Rate (per km)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
+                      ₦
+                    </span>
+                    <Input
+                      id="inter-rate"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g., 200"
+                      value={perKm.interStatePerKmRate}
+                      onChange={(e) =>
+                        patchPerKm("interStatePerKmRate", e.target.value)
+                      }
+                      className="pl-8"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <Route className="h-3 w-3" />
+                    Rate for trips between states
+                  </p>
+                </div>
               </div>
 
-              {pricePerKm && Number(pricePerKm) > 0 && (
+              {perKm.intraStatePerKmRate && perKm.interStatePerKmRate && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <DollarSign className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
                     <div>
                       <h4 className="font-medium text-blue-800">
-                        Current Rate
+                        Current Rates
                       </h4>
                       <p className="text-sm text-blue-700 mt-1">
-                        Riders are currently charged{" "}
-                        <strong>
-                          ₦
-                          {Number(pricePerKm).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </strong>{" "}
-                        per kilometer.
+                        <strong>Same-state:</strong> ₦
+                        {formatNaira(perKm.intraStatePerKmRate)} / km ·{" "}
+                        <strong>Cross-state:</strong> ₦
+                        {formatNaira(perKm.interStatePerKmRate)} / km
                       </p>
                     </div>
                   </div>
@@ -529,33 +615,47 @@ const TripRequestSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Price Confirm */}
-      <AlertDialog open={showPriceConfirm} onOpenChange={setShowPriceConfirm}>
+      {/* Rate Confirm */}
+      <AlertDialog open={showRateConfirm} onOpenChange={setShowRateConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Save Price Per Km?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will immediately set the rate to{" "}
-              <strong>
-                ₦
-                {Number(pricePerKm || 0).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </strong>{" "}
-              per kilometer for all new rides.
+            <AlertDialogTitle>Save Per-Km Rates?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <p>This will update the per-kilometer rates:</p>
+                <ul className="mt-3 space-y-1 text-sm">
+                  <li>
+                    • Intra-state:{" "}
+                    <strong>
+                      ₦{formatNaira(perKm.intraStatePerKmRate)}
+                    </strong>{" "}
+                    per km
+                  </li>
+                  <li>
+                    • Inter-state:{" "}
+                    <strong>
+                      ₦{formatNaira(perKm.interStatePerKmRate)}
+                    </strong>{" "}
+                    per km
+                  </li>
+                </ul>
+                <p className="mt-3 text-sm text-amber-600 font-medium flex items-start gap-1.5">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                  New rates apply immediately to all new trips.
+                </p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isConfirmingPrice}>
+            <AlertDialogCancel disabled={isConfirmingRate}>
               Cancel
             </AlertDialogCancel>
             <Button
-              onClick={confirmPriceSave}
-              disabled={isConfirmingPrice}
+              onClick={confirmRateSave}
+              disabled={isConfirmingRate}
               className="bg-[--primary] hover:bg-[--primary-btn]"
             >
-              {isConfirmingPrice ? (
+              {isConfirmingRate ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                   Saving…
