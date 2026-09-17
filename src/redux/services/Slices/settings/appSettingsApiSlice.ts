@@ -11,10 +11,11 @@ export interface UpdateAppVersionDto {
   updateMessage: string | null;
 }
 
-// ── Price per km types ─────────────────────────────────────────────────────
+// ── Per km rate types ──────────────────────────────────────────────────────
 
-export interface SetPricePerKmDto {
-  pricePerKm: number;
+export interface SetPerKmRateDto {
+  intraStatePerKmRate: number;
+  interStatePerKmRate: number;
 }
 
 // ── Dispatch window types ──────────────────────────────────────────────────
@@ -37,6 +38,10 @@ export interface SettingValue {
   maxTripPrice?: number;
   intraStateDispatchWindowHours?: number;
   interStateDispatchWindowHours?: number;
+  // per-km rates (preferred)
+  intraStatePerKmRate?: number;
+  interStatePerKmRate?: number;
+  // legacy single field (fallback)
   perKmRate?: number;
   pricePerKm?: number;
   // allow other shapes without type errors
@@ -87,11 +92,11 @@ export const appSettingsApiSlice = api.injectEndpoints({
       providesTags: ["Settings"],
     }),
 
-    // ── Price per km (write) ──────────────────────────────────────────────
-    setPricePerKm: builder.mutation<void, SetPricePerKmDto>({
+    // ── Per km rate (write) ───────────────────────────────────────────────
+    setPerKmRate: builder.mutation<void, SetPerKmRateDto>({
       query: (dto) => ({
-        url: "/v1/admin/settings/price-per-km",
-        method: "POST",
+        url: "/v1/admin/settings/per-km-rate",
+        method: "PATCH",
         body: dto,
       }),
       invalidatesTags: ["Settings"],
@@ -114,6 +119,6 @@ export const {
   useUpdateAppSettingsMutation,
   useGetVersionHistoryQuery,
   useGetAllSettingsQuery,
-  useSetPricePerKmMutation,
+  useSetPerKmRateMutation,
   useUpdateDispatchWindowMutation,
 } = appSettingsApiSlice;
