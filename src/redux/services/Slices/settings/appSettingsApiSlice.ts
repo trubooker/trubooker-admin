@@ -11,22 +11,65 @@ export interface UpdateAppVersionDto {
   updateMessage: string | null;
 }
 
+// ── Price per km types ─────────────────────────────────────────────────────
+
+export interface SetPricePerKmDto {
+  pricePerKm: number;
+}
+
+// ── Dispatch window types ──────────────────────────────────────────────────
+
+export interface DispatchWindowSettings {
+  intraStateDispatchWindowHours: number;
+  interStateDispatchWindowHours: number;
+}
+
+export type UpdateDispatchWindowDto = DispatchWindowSettings;
+
+// ── Settings get-all types ─────────────────────────────────────────────────
+
+export interface SettingValue {
+  // price_control fields
+  agentEarningAmount?: number;
+  platformCommissionRate?: number;
+  driverEarningRate?: number;
+  minTripPrice?: number;
+  maxTripPrice?: number;
+  intraStateDispatchWindowHours?: number;
+  interStateDispatchWindowHours?: number;
+  perKmRate?: number;
+  pricePerKm?: number;
+  // allow other shapes without type errors
+  [key: string]: unknown;
+}
+
+export interface SettingEntry {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string | null;
+  createdBy: string | null;
+  key: string;
+  description: string;
+  value: SettingValue;
+}
+
+export type GetAllSettingsResponse = SettingEntry[];
+
 export const appSettingsApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
+    // ── App Version endpoints ─────────────────────────────────────────────
     getAppSettings: builder.query({
       query: () => "/v1/admin/app-versions",
       providesTags: ["AppSettings"],
     }),
 
-    // Backend takes ONE flat DTO per call — the frontend fires 4 times (one per combo)
     updateAppSettings: builder.mutation<void, UpdateAppVersionDto>({
       query: (dto) => ({
         url: "/v1/admin/app-versions/update",
         method: "POST",
         body: dto,
       }),
-      // Don't auto-invalidate here — AppSettings.tsx calls refetch() manually
-      // after all 4 requests complete so we get one clean refresh.
       invalidatesTags: ["VersionHistory"],
     }),
 
@@ -37,6 +80,32 @@ export const appSettingsApiSlice = api.injectEndpoints({
       }),
       providesTags: ["VersionHistory"],
     }),
+
+    // ── Settings get-all (read) ───────────────────────────────────────────
+    getAllSettings: builder.query<GetAllSettingsResponse, void>({
+      query: () => "/v1/admin/settings/get-all",
+      providesTags: ["Settings"],
+    }),
+
+    // ── Price per km (write) ──────────────────────────────────────────────
+    setPricePerKm: builder.mutation<void, SetPricePerKmDto>({
+      query: (dto) => ({
+        url: "/v1/admin/settings/price-per-km",
+        method: "POST",
+        body: dto,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
+
+    // ── Dispatch window (write) ───────────────────────────────────────────
+    updateDispatchWindow: builder.mutation<void, UpdateDispatchWindowDto>({
+      query: (dto) => ({
+        url: "/v1/admin/settings/dispatch-window",
+        method: "PATCH",
+        body: dto,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
   }),
 });
 
@@ -44,36 +113,7 @@ export const {
   useGetAppSettingsQuery,
   useUpdateAppSettingsMutation,
   useGetVersionHistoryQuery,
+  useGetAllSettingsQuery,
+  useSetPricePerKmMutation,
+  useUpdateDispatchWindowMutation,
 } = appSettingsApiSlice;
-
-// import { api } from "../../apiSlice";
-
-// export const appSettingsApiSlice = api.injectEndpoints({
-//   endpoints: (builder) => ({
-//     getAppSettings: builder.query({
-//       query: () => "/v1/admin/app-versions",
-//       providesTags: ["AppSettings"],
-//     }),
-//     updateAppSettings: builder.mutation({
-//       query: (data) => ({
-//         url: "/v1/admin/app-versions/update",
-//         method: "POST",
-//         body: data,
-//       }),
-//       invalidatesTags: ["AppSettings", "VersionHistory"],
-//     }),
-//     getVersionHistory: builder.query({
-//       query: (params) => ({
-//         url: "/v1/admin/history",
-//         params,
-//       }),
-//       providesTags: ["VersionHistory"],
-//     }),
-//   }),
-// });
-
-// export const {
-//   useGetAppSettingsQuery,
-//   useUpdateAppSettingsMutation,
-//   useGetVersionHistoryQuery,
-// } = appSettingsApiSlice;

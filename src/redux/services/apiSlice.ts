@@ -117,7 +117,10 @@ export const api = createApi({
     "VersionHistory",
     "Drivers",
     "Vehicles",
-    "VehicleTypes"
+    "VehicleTypes",
+    "DispatchWindow",
+    "PricePerKm",
+    "Settings",
   ],
   keepUnusedDataFor: 30,
   endpoints: () => ({}),
