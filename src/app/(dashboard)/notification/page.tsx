@@ -52,16 +52,12 @@ const Notification = ({ role = "all" }: NotificationProps) => {
   const [page, setPage] = useState(1);
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
   
-  console.log(`📢 Notification component rendered with role: ${role}`);
-  console.log(`📋 Current viewType: ${viewType}`);
-  
+
   const { data, isLoading, isFetching, refetch } = useFetchNotificationsQuery({
     type: viewType,
     // Pass role to the query if your API supports it
     ...(role !== "all" && { role }),
   });
-
-  console.log("📡 Fetch query state:", { data, isLoading, isFetching });
 
   // data.result = { data: NotificationItem[], meta: NotificationsMeta }
   let notifications: NotificationItem[] = data?.result?.data ?? [];
@@ -70,31 +66,29 @@ const Notification = ({ role = "all" }: NotificationProps) => {
 
   // Filter notifications by role if API doesn't support role filtering
   if (role !== "all" && notifications.length > 0) {
-    console.log(`🔍 Filtering notifications for role: ${role}`);
+   
     notifications = notifications.filter(
       (notification) => notification.recipient?.role === role
     );
-    console.log(`📨 Filtered notifications count: ${notifications.length}`);
+   
   }
 
-  console.log(`📨 Total notifications after filtering: ${notifications.length}`);
-  console.log(`📄 Total pages: ${totalPages}`);
 
   const onPageChange = (pageNumber: number) => {
-    console.log(`🔄 Page change requested: ${pageNumber}`);
+  
     if (
       !isFetching &&
       pageNumber !== page &&
       pageNumber >= 1 &&
       pageNumber <= totalPages
     ) {
-      console.log(`✅ Changing page from ${page} to ${pageNumber}`);
+     
       setPage(pageNumber);
     }
   };
 
   const handleViewToggle = (newViewType: "unread" | "read") => {
-    console.log(`🔄 Toggling view from "${viewType}" to "${newViewType}"`);
+    
     setViewType(newViewType);
   };
 
@@ -155,12 +149,7 @@ const Notification = ({ role = "all" }: NotificationProps) => {
                 <Spinner />
               ) : notifications.length > 0 ? (
                 notifications.map((notification, index) => {
-                  console.log(`📋 Rendering notification ${index + 1}:`, {
-                    id: notification.id,
-                    title: notification.title,
-                    recipientRole: notification.recipient?.role,
-                    isRead: notification.isRead
-                  });
+                
                   return (
                     <div key={notification.id}>
                       <div className="flex items-center">

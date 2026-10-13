@@ -27,7 +27,6 @@ import { Passenger } from "@/types";
 import CompactNotification from "@/components/notifications/CompactNotification";
 import { useRouter, useSearchParams } from "next/navigation";
 
-
 const Passengers = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,7 +38,7 @@ const Passengers = () => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [limit, setLimit] = useState(urlLimit ? parseInt(urlLimit) : 20);
-  
+
   const {
     isLoading: loading,
     data: userData,
@@ -47,11 +46,43 @@ const Passengers = () => {
   } = useGetPassengersQuery({ page, search: searchQuery, limit: limit });
 
   const PassengerListData = userData?.result?.data;
-  console.log(userData)
-  console.log("PassengerListData", PassengerListData)
-  const meta = userData?.result?.meta;
-  const totalPages = meta ? Math.ceil(meta.count / meta.limit) : 1;
-  
+
+  // ============================================================
+  // PAGINATION — handle multiple meta shapes from the backend
+  // ============================================================
+  const meta =
+    userData?.result?.meta ??
+    (userData as any)?.meta ??
+    undefined;
+
+  // ✅ "count" in this API = items on the current page, NOT total.
+  //    Prefer totalRecords / totalCount first.
+  const totalRecords =
+    meta?.totalRecords ??
+    meta?.total_records ??
+    meta?.totalCount ??
+    meta?.total ??
+    (userData as any)?.result?.totalRecords ??
+    (userData as any)?.result?.total ??
+    (userData as any)?.totalRecords ??
+    (userData as any)?.total ??
+    // last resort only — count is items on this page
+    meta?.count ??
+    0;
+
+  const perPage =
+    meta?.limit ??
+    meta?.perPage ??
+    meta?.per_page ??
+    (userData as any)?.result?.limit ??
+    limit;
+
+  const totalPages =
+    meta?.pageCount ??
+    meta?.totalPages ??
+    meta?.total_pages ??
+    (totalRecords > 0 ? Math.ceil(totalRecords / perPage) : 1);
+
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
@@ -67,8 +98,6 @@ const Passengers = () => {
     }
   };
 
-  
-  
   const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
 
   useEffect(() => {
@@ -98,61 +127,59 @@ const Passengers = () => {
           (passenger: any) => passenger.user.status === statusFilter
         );
 
-  // Helper to count verified users
   const verifiedCount = {
     emailVerified:
-      filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified).length || 0,
+      filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified)
+        .length || 0,
     phoneVerified:
-      filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified).length || 0,
+      filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified)
+        .length || 0,
   };
-
-  console.log("🚀 Passengers component rendered");
-  console.log("📊 Passenger data:", { 
-    total: PassengerListData?.length, 
-    filtered: statusFilteredData?.length,
-    statusFilter 
-  });
 
   return (
     <div className="flex flex-col h-fit w-full">
       <div className="flex gap-x-3 items-center ps-3 mb-5">
         <h2 className="text-2xl font-bold">Passengers</h2>
         <div className="flex items-center justify-center rounded-full px-2 bg-orange-500 text-white">
-          {PassengerListData?.length}
+          {totalRecords || PassengerListData?.length || 0}
         </div>
       </div>
-      
-      {/* Stats Cards */}
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="text-sm text-gray-500">Total Passengers</h3>
-          <p className="text-2xl font-bold">{PassengerListData?.length || 0}</p>
+          <p className="text-2xl font-bold">
+            {totalRecords || PassengerListData?.length || 0}
+          </p>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="text-sm text-gray-500">Email Verified</h3>
-          <p className="text-2xl font-bold text-green-600">{verifiedCount.emailVerified}</p>
+          <p className="text-2xl font-bold text-green-600">
+            {verifiedCount.emailVerified}
+          </p>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="text-sm text-gray-500">Phone Verified</h3>
-          <p className="text-2xl font-bold text-blue-600">{verifiedCount.phoneVerified}</p>
+          <p className="text-2xl font-bold text-blue-600">
+            {verifiedCount.phoneVerified}
+          </p>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="text-sm text-gray-500">Notifications</h3>
           <div className="flex items-center justify-between">
             <p className="text-2xl font-bold text-purple-600">3</p>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="text-xs text-[--primary] p-0"
-              onClick={() => window.location.href = "/notification"}
+              onClick={() => (window.location.href = "/notification")}
             >
               View all
             </Button>
           </div>
         </div>
       </div>
-      
+
       <div className="flex flex-col xl:flex-row w-full gap-6">
-        {/* Passengers Table Section */}
         <div className="w-full xl:w-2/3">
           <div className="bg-white rounded-lg w-full p-5">
             <div className="flex flex-col lg:flex-row gap-x-3 lg:justify-between text-left lg:text-center lg:items-center">
@@ -194,7 +221,7 @@ const Passengers = () => {
                 </DropdownMenu>
               </div>
             </div>
-            
+
             {isFetching || loading ? (
               <Table>
                 <TableHeader>
@@ -229,7 +256,7 @@ const Passengers = () => {
                 loading={loading}
               />
             )}
-            
+
             {totalPages > 1 && (
               <div className="pt-10">
                 <Pagination
@@ -242,7 +269,6 @@ const Passengers = () => {
           </div>
         </div>
 
-        {/* Notifications Sidebar */}
         <div className="w-full xl:w-1/3">
           <div className="bg-white rounded-lg p-4 shadow-sm sticky top-4">
             <CompactNotification role="passenger" maxDisplay={500} />

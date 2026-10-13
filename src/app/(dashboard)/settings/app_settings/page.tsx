@@ -137,7 +137,6 @@ const AppSettings = () => {
     limit: 10,
   });
 
-  console.log('history data', historyData)
 
   // ── Seed form from API ───────────────────────────────────────────────────────
 
@@ -182,7 +181,7 @@ const AppSettings = () => {
     }
 
     const dto = toDto(activeApp, activePlatform, s);
-    console.log("[AppSettings] staged DTO:", dto);
+  
     setPendingDtos([dto]);
     setShowConfirmDialog(true);
   };
@@ -194,7 +193,6 @@ const AppSettings = () => {
     setIsConfirming(true);
 
     const dto = pendingDtos[0];
-    console.log("[AppSettings] posting DTO:", dto);
 
     try {
       await updateSettings(dto).unwrap();

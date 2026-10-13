@@ -133,8 +133,6 @@ export function AddStaffRoles({
       debounce((query: string) => {
         const trimmedQuery = query.trim();
 
-        console.log("SEARCH QUERY:", trimmedQuery);
-
         setSearchQuery(trimmedQuery);
         setPage(1);
       }, 500),
@@ -206,11 +204,6 @@ export function AddStaffRoles({
   const hasNextPage =
     Boolean(data?.result?.meta?.nextPage);
 
-
-  console.log(
-    "ADD STAFF ROLE DATA:",
-    data
-  );
 
 
   // ===============================
@@ -315,7 +308,6 @@ export function AddStaffRoles({
     roleId: values.role,
   };
 
-  console.log("ASSIGN ROLE PAYLOAD:", payload);
 
   try {
     await assign(payload).unwrap();

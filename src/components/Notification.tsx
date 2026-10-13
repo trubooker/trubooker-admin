@@ -38,26 +38,16 @@ interface NotificationItem {
 
 const Notifications = () => {
   const [viewType, setViewType] = useState<"unread" | "read">("unread");
-  
-  console.log("🔔 Notifications component rendered");
-  console.log("📋 Current viewType:", viewType);
-  
+
   const { data, isLoading, isFetching, refetch } = useFetchNotificationsQuery({
     type: viewType,
   });
-  
-  console.log("📡 Fetch query state:", { data, isLoading, isFetching });
-  console.log("📦 Raw data received:", data);
-  
+
   const router = useRouter();
   const notifications: NotificationItem[] = data?.result?.data || [];
-  
-  console.log("📨 Processed notifications:", notifications);
-  console.log("🔢 Total notifications count:", notifications.length);
 
   const displayNotifications = notifications.slice(0, 5);
   
-  console.log("👀 Display notifications (first 5):", displayNotifications);
 
   const [markAllAsRead, { isLoading: markAllLoading }] =
     useMarkAllAsReadMutation();
@@ -67,22 +57,17 @@ const Notifications = () => {
     useDeleteOneNotificationMutation();
   const [markOne, { isLoading: markOneLoading }] = useMarkOneAsReadMutation();
 
-  console.log("🔄 Mutation states:", { 
-    markAllLoading, 
-    deleteAllLoading, 
-    deleteOneLoading, 
-    markOneLoading 
-  });
+
 
   const handleMarkAllAsRead = async () => {
-    console.log("📌 handleMarkAllAsRead triggered");
+   
     try {
-      console.log("⏳ Marking all as read...");
+    
       await markAllAsRead(null).unwrap();
-      console.log("✅ All notifications marked as read successfully");
+     
       toast.success("All notifications marked as read");
       refetch();
-      console.log("🔄 Refetching notifications...");
+     
     } catch (error) {
       console.error("❌ Error in handleMarkAllAsRead:", error);
       toast.error("Error occurred");
@@ -90,29 +75,29 @@ const Notifications = () => {
   };
 
   const handleDeleteAll = async () => {
-    console.log("🗑️ handleDeleteAll triggered");
+   
     try {
-      console.log("⏳ Deleting all notifications...");
+     
       await deleteAll(null).unwrap();
-      console.log("✅ All notifications deleted successfully");
+     
       toast.success("All notifications deleted");
       refetch();
-      console.log("🔄 Refetching notifications...");
+     
     } catch (error) {
-      console.error("❌ Error in handleDeleteAll:", error);
+    
       toast.error("Error occurred");
     }
   };
 
   const handleDeleteOne = async (id: string) => {
-    console.log(`🗑️ handleDeleteOne triggered for notification ID: ${id}`);
+   
     try {
-      console.log(`⏳ Deleting notification with ID: ${id}...`);
+    
       await deleteOne(id).unwrap();
-      console.log(`✅ Notification ${id} deleted successfully`);
+    
       toast.success("Deleted Successfully");
       refetch();
-      console.log("🔄 Refetching notifications...");
+     
     } catch (error) {
       console.error(`❌ Error deleting notification ${id}:`, error);
       toast.error("Error occurred");
@@ -120,14 +105,14 @@ const Notifications = () => {
   };
 
   const handleMarkOne = async (id: string) => {
-    console.log(`📌 handleMarkOne triggered for notification ID: ${id}`);
+  
     try {
-      console.log(`⏳ Marking notification ${id} as read...`);
+    
       await markOne(id).unwrap();
-      console.log(`✅ Notification ${id} marked as read successfully`);
+     
       toast.success("Success");
       refetch();
-      console.log("🔄 Refetching notifications...");
+     
     } catch (error) {
       console.error(`❌ Error marking notification ${id} as read:`, error);
       toast.error("Error occurred");
@@ -136,22 +121,16 @@ const Notifications = () => {
 
   const handleViewTypeToggle = () => {
     const newViewType = viewType === "unread" ? "read" : "unread";
-    console.log(`🔄 Toggling viewType from "${viewType}" to "${newViewType}"`);
+   
     setViewType(newViewType);
   };
 
   const handleViewAll = () => {
-    console.log("👆 View All button clicked, navigating to /notification");
+  
     router.push("/notification");
   };
 
-  console.log("🎨 Rendering UI with state:", {
-    viewType,
-    notificationsCount: notifications.length,
-    displayCount: displayNotifications.length,
-    isFetching,
-    isLoading
-  });
+
 
   return (
     <div>
@@ -173,12 +152,7 @@ const Notifications = () => {
             <Spinner />
           ) : displayNotifications.length > 0 ? (
             displayNotifications.map((notification) => {
-              console.log(`📋 Rendering notification:`, {
-                id: notification.id,
-                title: notification.title,
-                isRead: notification.isRead,
-                type: notification.type
-              });
+             
               return (
                 <SwipeableNotification
                   refetch={refetch}

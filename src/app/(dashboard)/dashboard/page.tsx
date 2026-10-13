@@ -40,14 +40,13 @@ const { data: info, isLoading: loading, isFetching } = useGetDashboardQuery({ pa
 
 const result = info?.result;
 
-console.log("niyu result", result)
 
 const userData = info?.result?.activeTrips?.data || [];          
 const totalPages = result?.activeTrips?.meta?.pageCount ?? 0; 
 const stats = result?.users;
 
 const graphData = result?.graphData ?? [];
-console.log('graph data', graphData)
+
 const totalRevenue = result?.finance?.totalRevenue;
 
   const onPageChange = (pageNumber: number) => {

@@ -41,14 +41,13 @@ const Slug = () => {
   const details = tripData; //array
   const passengers = tripData?.passengers; //array
 
-  console.log('trip data', tripData)
 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
       setPage(pageNumber);
     }
   };
-console.log("na this", data)
+
   return (
     <div>
       {isFetching || loading ? (

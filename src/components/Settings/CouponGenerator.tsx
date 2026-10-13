@@ -106,7 +106,6 @@ const CouponGenerator = () => {
       payload.description = data.description;
     }
 
-    console.log("generate payload →", payload); // remove once confirmed working
 
     await generateCoupon(payload)
       .unwrap()

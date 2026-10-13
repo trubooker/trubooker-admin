@@ -36,7 +36,6 @@ const SystemAlert = () => {
     isFetching,
   } = useGetPassengersQuery({ page, search: searchQuery });
 
-  console.log("Passenger", userData);
 
   const PassengerListData = userData?.data;
   const totalPages = userData?.meta?.last_page;

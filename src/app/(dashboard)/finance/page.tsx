@@ -99,18 +99,13 @@ const Finance = () => {
     type: "passenger",
   });
 
-  console.log("report: ", report);
-  console.log("driverEarnings: ", driverEarnings);
-  console.log("agentsEarnings: ", agentsEarnings);
-  console.log("driver refund request: ", driverRefundRequest);
-  console.log("passenger refund request: ", passengerRefundRequest);
   const revenue = report?.result;
-  console.log('revenue', report)
+
 
   // DriverRefund request ----------------------------------------------------------
 
   const driverRefundRequests = driverRefundRequest?.result?.data;
-  console.log("driverRefundRequests", driverRefundRequests)
+
   const totalDriverRefundRequestsPages = driverRefundRequest?.result?.meta?.totalRecords;
   const onDriverRefundRequestPageChange = (pageNumber: number) => {
     if (

@@ -60,7 +60,7 @@ const useCountryCurrency = (amountInUSD: number): CurrencyData => {
     try {
       const response = await fetch(`${EXCHANGE_API_URL}&base=USD`);
       const data: ExchangeRatesResponse = await response.json();
-      // console.log(data);
+
       return data.rates;
     } catch (error) {
       console.error("Error fetching exchange rates:", error);
@@ -95,7 +95,7 @@ const useCountryCurrency = (amountInUSD: number): CurrencyData => {
       amount: number
     ): Promise<number> => {
       const exchangeRates = await fetchExchangeRates();
-      // console.log(exchangeRates);
+
       if (exchangeRates && exchangeRates[currencyCode]) {
         return amount * exchangeRates[currencyCode];
       }

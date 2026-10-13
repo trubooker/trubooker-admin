@@ -160,11 +160,11 @@ const Settings = () => {
     await update(formdata)
       .unwrap()
       .then((res: any) => {
-        console.log(res);
+       
         toast.success(`Updated Successfully!! ✅`);
       })
       .catch((err: any) => {
-        console.log(err);
+       
       });
   };
 

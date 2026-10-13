@@ -31,7 +31,6 @@ export function DriverTable({
     alert(`Trip with id # ${id} Deleted!!`);
   };
 
-  console.log("history", DriverTableData)
 
   const params = useParams();
   const driverId = params.driverId;

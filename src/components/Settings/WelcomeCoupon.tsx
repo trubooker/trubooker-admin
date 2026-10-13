@@ -62,7 +62,7 @@ const WelcomeCoupon = () => {
   } = useGetWelcomeCouponSettingsQuery(null);
   const [setWelcomeCoupon, { isLoading }] = useSetWelcomeCouponSettingsMutation();
 
-  console.log("welcome", welcomeCouponData)
+ 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -128,7 +128,7 @@ const WelcomeCoupon = () => {
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const payload = buildPayload(isEnabled, data);
-    console.log("welcome coupon payload →", payload); // remove once confirmed
+
     try {
       await setWelcomeCoupon(payload).unwrap();
       toast.success("Welcome coupon settings saved successfully");

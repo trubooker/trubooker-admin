@@ -24,7 +24,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 export function DriverList({ data: Data, isFetching, loading }: any) {
   const router = useRouter();
 
-  console.log("my new", Data)
+
   // Function to get badge color for document status
   const getDocStatusColor = (status: string) => {
     switch (status) {
@@ -221,7 +221,7 @@ export function DriverList({ data: Data, isFetching, loading }: any) {
                               onClick={() => {
                                 // Toggle driver status
                                 const newStatus = data.user.status === 'active' ? 'inactive' : 'active';
-                                console.log(`Toggle ${data.id} status to ${newStatus}`);
+                               
                                 // You would call your API here
                               }}
                               className="cursor-pointer hover:bg-gray-100"

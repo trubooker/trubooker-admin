@@ -25,13 +25,13 @@ const Roles = () => {
   } = useGetRolesQuery(null);
   const role = data?.result;
 
-  console.log('roles data', data)
+
   const {
     data: groupUsers,
     isLoading: groupUsersLoading,
     isFetching: groupUsersFetching,
   } = useGroupUserByRolesQuery(null);
-  console.log('groupUsers', groupUsers)
+
 
   return (
     <div>

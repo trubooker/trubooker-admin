@@ -78,7 +78,7 @@ const UpdatePassword = () => {
       .then((res) => {
         form.setValue("password", "");
         form.setValue("new_password", "");
-        console.log(res);
+
 
         toast.success("Password is updated! Login again");
         setTimeout(() => {
@@ -86,7 +86,7 @@ const UpdatePassword = () => {
         }, 2000);
       })
       .catch((error: any) => {
-        console.log(error);
+
         setPasswordError(error?.data?.error?.message);
         setNewPasswordError(
           error?.data?.errors?.password.map((err: any, index: number) => (
