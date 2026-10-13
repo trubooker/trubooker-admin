@@ -78,7 +78,7 @@ export function EditRoles({
       permissions: data.permissions, // string[] of permission names
     };
 
-    console.log("Updated Role Data: ", formData);
+
     await update(formData)
       .unwrap()
       .then((res) => {

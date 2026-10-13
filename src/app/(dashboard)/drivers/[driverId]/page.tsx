@@ -30,8 +30,6 @@ const ViewDriver = () => {
   const id = String(params.driverId);
   const router = useRouter();
   
-  console.log("🆔 Driver ID from params:", id);
-  
   const {
     isLoading: loading,
     data: userData,
@@ -39,16 +37,15 @@ const ViewDriver = () => {
     error,
   } = useGetOneDriverQuery(id);
 
-  console.log("📦 Full userData:", userData);
-  
+
   const [mutate, { isLoading: loadingToggle }] =
     useToggleDriverStatusMutation();
 
   const toggleDriverStatus = async () => {
-    console.log("🔄 Toggling driver status for ID:", id);
+   
     try {
       await mutate(id).unwrap();
-      console.log("✅ Driver status toggled successfully");
+     
     } catch (error) {
       console.error("❌ Failed to toggle status:", error);
     }
@@ -58,9 +55,6 @@ const ViewDriver = () => {
   // Try different possible data structures
   const dataSource = userData?.data || userData?.result || userData || {};
   
-  console.log("🔍 Data source for extraction:", dataSource);
-  console.log("🔍 Data source keys:", Object.keys(dataSource));
-
   const currentBalance =
   userData?.result?.currentBalance ??
   userData?.data?.currentBalance ??
@@ -73,9 +67,6 @@ const ViewDriver = () => {
                   userData?.profile || 
                   userData?.user || 
                   {};
-
-  console.log("👤 Profile extracted:", profile);
-  console.log("👤 Profile keys:", Object.keys(profile));
 
   // Extract vehicles - try multiple possible paths
   let vehicle: any[] = [];
@@ -120,17 +111,10 @@ const ViewDriver = () => {
     }
   }
 
-  console.log("🚗 Vehicle data extracted:", vehicle);
-  console.log("🚗 Vehicle count:", vehicle.length);
-  if (vehicle.length > 0) {
-    console.log("🚗 First vehicle:", vehicle[0]);
-    console.log("🚗 Vehicle keys:", Object.keys(vehicle[0]));
-  }
 
   // Extract feedback/reviews - try multiple paths
   let feedback: any[] = [];
   
-  console.log("userData/Niyu", userData)
   if (userData?.result?.reviews && Array.isArray(userData.result.reviews)) {
     feedback = userData?.result?.reviews;
   } else if (userData?.reviews && Array.isArray(userData.reviews)) {
@@ -141,7 +125,6 @@ const ViewDriver = () => {
     feedback = userData?.result.feedback;
   }
 
-  console.log("💬 Feedback extracted:", feedback.length);
 
   // Extract trip history - try multiple paths
   let th: any[] = [];
@@ -156,19 +139,9 @@ const ViewDriver = () => {
     th = userData.result.trips;
   }
 
-  console.log("📋 Trip history extracted:", th.length);
-
-  // Log extracted data summary
-  console.log("📊 EXTRACTION SUMMARY:");
-  console.log(`- Profile: ${Object.keys(profile).length > 0 ? '✅ Found' : '❌ Not found'}`);
-  console.log(`- Vehicles: ${vehicle.length > 0 ? `✅ ${vehicle.length} found` : '❌ Not found'}`);
-  console.log(`- Feedback: ${feedback.length > 0 ? `✅ ${feedback.length} found` : '❌ Not found'}`);
-  console.log(`- Trip History: ${th.length > 0 ? `✅ ${th.length} found` : '❌ Not found'}`);
-
   // Safe name display
   const driverName = `${profile?.firstName || profile?.firstName || ''} ${profile?.lastName || profile?.lastName || ''}`.trim() || 'Unknown Driver';
-  console.log("👤 Driver name:", driverName);
-  
+
   // Safe date display
   const joinDate = profile?.createdAt || profile?.createdAt || profile?.joinDate
     ? new Date(profile?.createdAt || profile?.createdAt || profile?.joinDate).toLocaleDateString("en-US", {
@@ -177,7 +150,6 @@ const ViewDriver = () => {
         year: "numeric",
       })
     : 'N/A';
-  console.log("📅 Join date:", joinDate);
 
   // Handle error state
   if (error) {

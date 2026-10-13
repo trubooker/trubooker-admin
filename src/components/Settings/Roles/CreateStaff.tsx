@@ -66,7 +66,6 @@ const CreateStaff = ({
       email: data.email,
     };
 
-    console.log("data: ", formData);
     await invite(formData)
       .unwrap()
       .then((res: any) => {

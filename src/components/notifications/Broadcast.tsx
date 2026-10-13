@@ -27,8 +27,7 @@ const Broadcast = () => {
 
   const { data, isLoading } = useGetAnnouncementsQuery(null);
   const router = useRouter();
-  console.log("SystemSettings", userData);
-  console.log(data);
+
 
   const SystemSettingsListData = userData?.result;
 

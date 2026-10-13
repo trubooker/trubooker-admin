@@ -18,7 +18,7 @@ export function Tab({ data: PassengerTableData, isFetching, loading }: any) {
   const handleSuspend = (id: string) => {
     alert(`Account id ${id} suspended!!`);
   };
-  console.log("withdrawalreq: ", PassengerTableData);
+
   return (
     <div>
       {/* <ScrollArea className="w-full"> */}

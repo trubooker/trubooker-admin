@@ -71,7 +71,6 @@ const ReferralProgramPage = () => {
     refetch: refetchReferralData,
   } = useGetReferralProgramsQuery(null);
   const { data: systemSettingsData, refetch: refetchSettings } = useGetSystemSettingsQuery(null);
-  console.log("systemSettingsData", systemSettingsData)
 
   const price_control = systemSettingsData?.result?.filter(
     (setting: { key: string }) => setting.key === "price_control"
@@ -85,7 +84,6 @@ const ReferralProgramPage = () => {
   const revenue = info?.result;
   const ReferralProgramListData = info?.result?.referral_performance?.data;
 
-  console.log("info", info)
   
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {

@@ -40,7 +40,7 @@ const ViewAgent = () => {
 
   const profile = userData?.result?.user;
    const top = userData?.result; // object
-  console.log("userdata_niyu", userData)
+
   const agent_ref = userData?.result?.agent_referrals; // array
   const referral = userData?.result?.refferals; // array
   const earning_overview = userData?.result?.earning_overview; // object

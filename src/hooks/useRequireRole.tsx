@@ -26,7 +26,6 @@ export const useRoleCheck = ({ user }: UseRoleCheckProps) => {
       return;
     }
 
-    console.log(router);
 
     // const isStudentPage = router.pathname.startsWith("/student");
     // const isTeacherPage = router.pathname.startsWith("/teacher");

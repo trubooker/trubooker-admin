@@ -16,28 +16,24 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, MapPin, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IoPersonOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Modal } from "@/components/DualModal";
-import { TransactionDetails } from "@/components/finance/transactionDetails";
 import Image from "next/image";
-import { formatCurrency } from "@/lib/utils";
 import {
   useGetAllTripsQuery,
   useGetTripRequestQuery,
+  useGetAllNoShowsQuery,
 } from "@/redux/services/Slices/tripsApiSlice";
 import { debounce } from "lodash";
 import { formatDistanceStrict } from "date-fns";
-import Search from "@/components/SearchBar";
 import Pagination from "@/components/Pagination";
 
 // Compute a human-readable duration from the trip's date/time fields.
-// The API doesn't return a `duration` field, so we derive it.
 const getTripDuration = (data: any) => {
   try {
     if (data?.duration) return data.duration;
@@ -58,16 +54,18 @@ const getTripDuration = (data: any) => {
   }
 };
 
-// Single source of truth for status colors, driven by the actual status value
-// so the same status always looks identical across every tab.
-const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
+// Single source of truth for status colors.
+const STATUS_STYLES: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
   active: { bg: "#CCFFCD", text: "#00B771", label: "Active" },
   completed: { bg: "#E6F4FF", text: "#1E90FF", label: "Completed" },
   upcoming: { bg: "#FFF4E6", text: "#FFA500", label: "Upcoming" },
   pending: { bg: "#FFF4E6", text: "#FFA500", label: "Pending" },
   approved: { bg: "#CCFFCD", text: "#00B771", label: "Approved" },
   fulfilled: { bg: "#E6F0FF", text: "#0077FF", label: "Fulfilled" },
-  declined: { bg: "#FFE6E6", text: "#FF4500", label: "Declined" },
+  declined: { bg: "#FFE6E6", text: "#FF4500", label: "Past Request" },
   cancelled: { bg: "#FFE6E6", text: "#FF4500", label: "Cancelled" },
   past: { bg: "#F1F1F1", text: "#6B7280", label: "Past" },
 };
@@ -94,23 +92,92 @@ const StatusBadge = ({ status }: { status?: string }) => {
   );
 };
 
-// Filter options for the Trip Requests tab. `undefined` = all statuses.
-const REQUEST_STATUS_FILTERS: { label: string; value?: string }[] = [
+// Filter options for the Trip Requests tab.
+// "Past Requests" bundles declined + cancelled.
+const REQUEST_STATUS_FILTERS: {
+  label: string;
+  value?: string | string[];
+}[] = [
   { label: "All", value: undefined },
   { label: "Pending", value: "pending" },
   { label: "Approved", value: "approved" },
   { label: "Fulfilled", value: "fulfilled" },
+  { label: "Past Requests", value: ["declined", "cancelled"] },
+];
+
+// Filter options for the Driver Refunds (No-Shows) tab.
+const NO_SHOW_STATUS_FILTERS: { label: string; value?: string }[] = [
+  { label: "All", value: undefined },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
   { label: "Declined", value: "declined" },
 ];
 
+// Format an ISO timestamp into a readable string.
+const formatDateTime = (iso?: string) => {
+  if (!iso) return "—";
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleString("en-NG", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "—";
+  }
+};
+
+// Clickable lat/long pill — opens Google Maps in a new tab.
+const CoordinatePill = ({
+  lat,
+  lng,
+}: {
+  lat?: number | string;
+  lng?: number | string;
+}) => {
+  const hasCoords =
+    lat !== undefined && lat !== null && lng !== undefined && lng !== null;
+
+  if (!hasCoords) {
+    return <span className="text-gray-400">—</span>;
+  }
+
+  const url = `https://www.google.com/maps?q=${lat},${lng}`;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-x-1 px-2 py-1 rounded-md bg-[#E6F4FF] text-[#1E90FF] hover:bg-[#CFE9FF] transition text-xs font-medium"
+      title={`Open ${lat}, ${lng} in Google Maps`}
+    >
+      <MapPin size={12} />
+      <span>
+        {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
+      </span>
+    </a>
+  );
+};
+
 const Trips = () => {
   const router = useRouter();
+
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [upcomingSearchQuery, setUpcomingSearchQuery] = useState("");
 
   const [requestPage, setRequestPage] = useState(1);
-  const [requestStatus, setRequestStatus] = useState<string | undefined>(
-    undefined
+  const [requestStatus, setRequestStatus] = useState<
+    string | string[] | undefined
+  >(undefined);
+
+  const [noShowPage, setNoShowPage] = useState(1);
+  const [noShowStatus, setNoShowStatus] = useState<string | undefined>(
+    "pending"
   );
 
   const [pastPage, setPastPage] = useState(1);
@@ -149,14 +216,22 @@ const Trips = () => {
     isLoading: requestsLoading,
     isFetching: requestsFetching,
   } = useGetTripRequestQuery({
-    status: requestStatus, // undefined => all: pending, approved, fulfilled, declined
+    status: requestStatus,
     page: requestPage,
     limit: 20,
   });
 
+  const {
+    data: noShows,
+    isLoading: noShowsLoading,
+    isFetching: noShowsFetching,
+  } = useGetAllNoShowsQuery({
+    status: noShowStatus,
+    page: noShowPage,
+    limit: 20,
+  });
+
   // Upcoming ----------------------------------------------------------
-  // FIX: totalPages must read `pageCount`, not `previousPage`
-  // (previousPage is only false / page-1, which broke pagination).
   const totalUpcomingPage = upcoming?.result?.meta?.pageCount;
   const upcomingData = upcoming?.result?.data;
   const onUpcomingChange = (pageNumber: number) => {
@@ -173,9 +248,22 @@ const Trips = () => {
       setRequestPage(pageNumber);
     }
   };
-  const onRequestStatusChange = (value?: string) => {
+  const onRequestStatusChange = (value?: string | string[]) => {
     setRequestStatus(value);
-    setRequestPage(1); // reset to first page when the filter changes
+    setRequestPage(1);
+  };
+
+  // Driver Refunds (No-Shows) --------------------------------------------------
+  const noShowData = noShows?.result?.data;
+  const totalNoShowPages = noShows?.result?.meta?.pageCount;
+  const onNoShowPageChange = (pageNumber: number) => {
+    if (!noShowsLoading && pageNumber !== noShowPage) {
+      setNoShowPage(pageNumber);
+    }
+  };
+  const onNoShowStatusChange = (value?: string) => {
+    setNoShowStatus(value);
+    setNoShowPage(1);
   };
 
   const [upcomingfiltered, setUpcomingFiltered] = useState(upcomingData);
@@ -185,7 +273,7 @@ const Trips = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upcomingData]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const debounceUpcomingSearch = useCallback(
     debounce((query: string) => {
       setUpcomingSearchQuery(query);
@@ -198,7 +286,6 @@ const Trips = () => {
   };
 
   // Past --------------------------------------------------
-  // FIX: pageCount instead of previousPage
   const totalPastPages = past?.result?.meta?.pageCount;
   const pastData = past?.result?.data;
   const onPastPageChange = (pageNumber: number) => {
@@ -213,7 +300,7 @@ const Trips = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pastData]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const debouncePastSearch = useCallback(
     debounce((query: string) => {
       setPastSearchQuery(query);
@@ -226,7 +313,6 @@ const Trips = () => {
   };
 
   // Completed --------------------------------------------------
-  // FIX: pageCount instead of previousPage
   const totalCompletedPages = completed?.result?.meta?.pageCount;
   const completedData = completed?.result?.data;
   const onCompletedPageChange = (pageNumber: number) => {
@@ -241,7 +327,7 @@ const Trips = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedData]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const debounceCompletedSearch = useCallback(
     debounce((query: string) => {
       setCompletedSearchQuery(query);
@@ -253,10 +339,24 @@ const Trips = () => {
     debounceCompletedSearch(query);
   };
 
+  // Helper to determine if a filter pill is active (handles arrays too)
+  const isRequestFilterActive = (
+    value?: string | string[]
+  ): boolean => {
+    if (value === undefined && requestStatus === undefined) return true;
+    if (Array.isArray(value) && Array.isArray(requestStatus)) {
+      return (
+        value.length === requestStatus.length &&
+        value.every((v) => (requestStatus as string[]).includes(v))
+      );
+    }
+    return value === requestStatus;
+  };
+
   return (
     <div>
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full lg:w-[700px] justify-start text-center h-full grid-rows-1 lg:grid-cols-4 gap-y-3 mb-5">
+        <TabsList className="grid w-full lg:w-[900px] justify-start text-center h-full grid-rows-1 lg:grid-cols-5 gap-y-3 mb-5">
           <TabsTrigger className="me-auto lg:w-full" value="upcoming">
             Upcoming Trips
           </TabsTrigger>
@@ -266,64 +366,59 @@ const Trips = () => {
           <TabsTrigger className="me-auto lg:w-full" value="completed">
             Completed Trips
           </TabsTrigger>
-
           <TabsTrigger className="me-auto lg:w-full" value="requests">
             Trip Requests
           </TabsTrigger>
+          <TabsTrigger className="me-auto lg:w-full" value="no-shows">
+            Driver Refunds
+          </TabsTrigger>
         </TabsList>
 
+        {/* ============================== UPCOMING ============================== */}
         <TabsContent value="upcoming">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
               {upcomingFetching || upcomingLoading ? (
-                <>
-                  <Table className=" min-w-[700px] py-2">
-                    <TableHeader>
-                      <TableRow className="text-[10px] lg:text-sm text-center">
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Departure date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Arrival date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Booking closing Date & Time
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Duration
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Action
-                        </TableHead>
+                <Table className="min-w-[700px] py-2">
+                  <TableHeader>
+                    <TableRow className="text-[10px] lg:text-sm text-center">
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Departure date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Arrival date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Booking closing Date & Time
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Duration
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      <TableRow key={i}>
+                        {[1, 2, 3, 4, 5, 6].map((j) => (
+                          <TableCell key={j}>
+                            <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                        <TableRow key={i}>
-                          {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <TableCell key={i}>
-                              <div>
-                                <div className="w-full rounded-md">
-                                  <div>
-                                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <>
                   {upcomingfiltered?.length > 0 ? (
                     <ScrollArea>
-                      <Table className=" min-w-[900px] py-2">
+                      <Table className="min-w-[900px] py-2">
                         <TableHeader>
                           <TableRow className="text-[10px] lg:text-sm text-center">
                             <TableHead className="text-xs font-bold w-1/6 text-left">
@@ -354,7 +449,7 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation}</span>
+                                  <span>{data.departureLocation}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
                                     {data.departureDate}, {data?.departureTime}
@@ -397,18 +492,18 @@ const Trips = () => {
                                   </small>
                                 </div>
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {data.bookingClosingDate},{" "}
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
                                 <StatusBadge status={data?.status} />
                               </TableCell>
-                              <TableCell className=" py-5 text-center w-[100px]">
+                              <TableCell className="py-5 text-center w-[100px]">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -470,58 +565,51 @@ const Trips = () => {
           </div>
         </TabsContent>
 
+        {/* ============================== PAST ============================== */}
         <TabsContent value="past">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
               {pastFetching || pastLoading ? (
-                <>
-                  <Table className=" min-w-[700px] py-2">
-                    <TableHeader>
-                      <TableRow className="text-[10px] lg:text-sm text-center">
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Departure date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Arrival date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Booking closing Date & Time
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Duration
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Action
-                        </TableHead>
+                <Table className="min-w-[700px] py-2">
+                  <TableHeader>
+                    <TableRow className="text-[10px] lg:text-sm text-center">
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Departure date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Arrival date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Booking closing Date & Time
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Duration
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      <TableRow key={i}>
+                        {[1, 2, 3, 4, 5, 6].map((j) => (
+                          <TableCell key={j}>
+                            <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                        <TableRow key={i}>
-                          {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <TableCell key={i}>
-                              <div>
-                                <div className="w-full rounded-md">
-                                  <div>
-                                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <>
                   {pastfiltered?.length > 0 ? (
                     <ScrollArea>
-                      <Table className=" min-w-[900px] py-2">
+                      <Table className="min-w-[900px] py-2">
                         <TableHeader>
                           <TableRow className="text-[10px] lg:text-sm text-center">
                             <TableHead className="text-xs font-bold w-1/6 text-left">
@@ -552,7 +640,7 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation?.state}</span>
+                                  <span>{data.departureLocation?.state}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
                                     {data.departureDate}, {data?.departureTime}
@@ -572,7 +660,7 @@ const Trips = () => {
                                 </div>
                               </TableCell>
 
-                              <TableCell className="w-1/7 py-5 text-left ">
+                              <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
                                   <span>
                                     {data.arrivalDestination?.[0]?.name}
@@ -595,18 +683,18 @@ const Trips = () => {
                                   </small>
                                 </div>
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {data.bookingClosingDate},{" "}
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
                                 <StatusBadge status={data?.status} />
                               </TableCell>
-                              <TableCell className=" py-5 text-center w-[100px]">
+                              <TableCell className="py-5 text-center w-[100px]">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -668,58 +756,51 @@ const Trips = () => {
           </div>
         </TabsContent>
 
+        {/* ============================== COMPLETED ============================== */}
         <TabsContent value="completed">
           <div className="bg-white rounded-xl p-5">
             <ScrollArea className="w-full">
               {completedFetching || completedLoading ? (
-                <>
-                  <Table className=" min-w-[700px] py-2">
-                    <TableHeader>
-                      <TableRow className="text-[10px] lg:text-sm text-center">
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Departure date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-left">
-                          Arrival date
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Booking closing Date & Time
-                        </TableHead>
-                        <TableHead className="text-xs font-bold w-1/6 text-center">
-                          Duration
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-xs w-1/6 font-bold text-center">
-                          Action
-                        </TableHead>
+                <Table className="min-w-[700px] py-2">
+                  <TableHeader>
+                    <TableRow className="text-[10px] lg:text-sm text-center">
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Departure date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-left">
+                        Arrival date
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Booking closing Date & Time
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Duration
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs w-1/6 font-bold text-center">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      <TableRow key={i}>
+                        {[1, 2, 3, 4, 5, 6].map((j) => (
+                          <TableCell key={j}>
+                            <Skeleton className="h-4 w-1/7 bg-gray-400" />
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                        <TableRow key={i}>
-                          {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <TableCell key={i}>
-                              <div>
-                                <div className="w-full rounded-md">
-                                  <div>
-                                    <Skeleton className="h-4 w-1/7 bg-gray-400" />
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </>
+                    ))}
+                  </TableBody>
+                </Table>
               ) : (
                 <>
                   {completedfiltered?.length > 0 ? (
                     <ScrollArea>
-                      <Table className=" min-w-[700px] py-2">
+                      <Table className="min-w-[700px] py-2">
                         <TableHeader>
                           <TableRow className="text-[10px] lg:text-sm text-center">
                             <TableHead className="text-xs font-bold w-1/6 text-left">
@@ -750,7 +831,7 @@ const Trips = () => {
                             >
                               <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
-                                  <span> {data.departureLocation?.state}</span>
+                                  <span>{data.departureLocation?.state}</span>
                                   <small className="mt-1 font-light flex gap-x-2">
                                     <span className="font-normal">Date:</span>{" "}
                                     {data.departureDate}, {data?.departureTime}
@@ -770,7 +851,7 @@ const Trips = () => {
                                 </div>
                               </TableCell>
 
-                              <TableCell className="w-1/7 py-5 text-left ">
+                              <TableCell className="w-1/7 py-5 text-left">
                                 <div className="flex flex-col">
                                   <span>
                                     {data.arrivalDestination?.[0]?.address ??
@@ -794,18 +875,18 @@ const Trips = () => {
                                   </small>
                                 </div>
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {data.bookingClosingDate},{" "}
                                 {data?.bookingClosingTime}{" "}
                               </TableCell>
-                              <TableCell className="w-1/6  py-5">
+                              <TableCell className="w-1/6 py-5">
                                 {getTripDuration(data)}
                               </TableCell>
 
                               <TableCell className="w-1/6 py-5">
                                 <StatusBadge status={data?.status} />
                               </TableCell>
-                              <TableCell className=" py-5 text-center w-[100px]">
+                              <TableCell className="py-5 text-center w-[100px]">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -867,12 +948,12 @@ const Trips = () => {
           </div>
         </TabsContent>
 
+        {/* ============================== REQUESTS ============================== */}
         <TabsContent value="requests">
           <div className="bg-white rounded-xl p-5">
-            {/* Status filter — undefined = all statuses */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {REQUEST_STATUS_FILTERS.map((f) => {
-                const active = requestStatus === f.value;
+                const active = isRequestFilterActive(f.value);
                 return (
                   <button
                     key={f.label}
@@ -1070,6 +1151,270 @@ const Trips = () => {
                   currentPage={requestPage}
                   totalPages={totalRequestPages}
                   onPageChange={onRequestPageChange}
+                />
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* ============================== DRIVER REFUNDS (NO-SHOWS) ============================== */}
+        <TabsContent value="no-shows">
+          <div className="bg-white rounded-xl p-5">
+            {/* Status filter */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {NO_SHOW_STATUS_FILTERS.map((f) => {
+                const active = noShowStatus === f.value;
+                return (
+                  <button
+                    key={f.label}
+                    onClick={() => onNoShowStatusChange(f.value)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
+                      active
+                        ? "bg-[#00B771] text-white border-[#00B771]"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <ScrollArea className="w-full">
+              {noShowsFetching || noShowsLoading ? (
+                <Table className="min-w-[900px] py-2">
+                  <TableHeader>
+                    <TableRow className="text-[10px] lg:text-sm text-center">
+                      <TableHead className="text-xs font-bold w-1/5 text-left">
+                        Driver
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/5 text-left">
+                        Passenger
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/5 text-left">
+                        Trip route
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Reported at
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Driver location
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs font-bold w-1/6 text-center">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                      <TableRow key={i}>
+                        {[1, 2, 3, 4, 5, 6, 7].map((j) => (
+                          <TableCell key={j}>
+                            <Skeleton className="h-4 w-full bg-gray-400" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <>
+                  {noShowData?.length > 0 ? (
+                    <ScrollArea>
+                      <Table className="min-w-[1100px] py-2">
+                        <TableHeader>
+                          <TableRow className="text-[10px] lg:text-sm text-center">
+                            <TableHead className="text-xs font-bold w-1/5 text-left">
+                              Driver
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/5 text-left">
+                              Passenger
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/5 text-left">
+                              Trip route
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Reported at
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Driver location
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Status
+                            </TableHead>
+                            <TableHead className="text-xs font-bold w-1/6 text-center">
+                              Action
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {noShowData?.map((data: any) => (
+                            <TableRow
+                              key={data.id}
+                              className="text-xs text-center lg:text-sm"
+                            >
+                              {/* Driver */}
+                              <TableCell className="w-1/5 py-5 text-left">
+                                <div className="flex items-center gap-x-3">
+                                  <Avatar className="h-9 w-9">
+                                    <AvatarImage
+                                      src={data.driver?.profileImage}
+                                    />
+                                    <AvatarFallback>
+                                      <IoPersonOutline />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">
+                                      {data.driver?.firstName}{" "}
+                                      {data.driver?.lastName}
+                                    </span>
+                                    <small className="font-light">
+                                      {data.driver?.email}
+                                    </small>
+                                    {data.driver?.phone && (
+                                      <small className="font-light text-gray-500">
+                                        {data.driver.phone}
+                                      </small>
+                                    )}
+                                  </div>
+                                </div>
+                              </TableCell>
+
+                              {/* Passenger */}
+                              <TableCell className="w-1/5 py-5 text-left">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {data.passenger?.firstName}{" "}
+                                    {data.passenger?.lastName}
+                                  </span>
+                                  <small className="font-light">
+                                    {data.passenger?.email}
+                                  </small>
+                                  {data.booking?.bookingCode && (
+                                    <small className="font-light text-gray-500">
+                                      Booking: {data.booking.bookingCode}
+                                    </small>
+                                  )}
+                                </div>
+                              </TableCell>
+
+                              {/* Trip route */}
+                              <TableCell className="w-1/5 py-5 text-left">
+                                <div className="flex flex-col">
+                                  <small className="font-light flex gap-x-2">
+                                    <span className="font-normal">From:</span>{" "}
+                                    {data.trip?.departureLocation?.name ||
+                                      data.trip?.departureLocation ||
+                                      "—"}
+                                  </small>
+                                  <small className="mt-1 font-light flex gap-x-2">
+                                    <span className="font-normal">To:</span>{" "}
+                                    {data.trip?.arrivalDestination?.[0]?.name ||
+                                      data.trip?.arrivalDestination?.name ||
+                                      "—"}
+                                  </small>
+                                  {data.trip?.departureDate && (
+                                    <small className="mt-1 font-light text-gray-500">
+                                      {data.trip.departureDate}{" "}
+                                      {data.trip.departureTime}
+                                    </small>
+                                  )}
+                                </div>
+                              </TableCell>
+
+                              {/* Reported at */}
+                              <TableCell className="w-1/6 py-5">
+                                <div className="flex flex-col items-center gap-y-1">
+                                  <span className="inline-flex items-center gap-x-1 text-xs text-gray-600">
+                                    <Clock size={12} />
+                                    {formatDateTime(
+                                      data.reportedAt || data.createdAt
+                                    )}
+                                  </span>
+                                </div>
+                              </TableCell>
+
+                              {/* Location — clickable */}
+                              <TableCell className="w-1/6 py-5">
+                                <div className="flex flex-col items-center gap-y-1">
+                                  <CoordinatePill
+                                    lat={data.latitude}
+                                    lng={data.longitude}
+                                  />
+                                  <small className="text-[10px] text-gray-400">
+                                    Tap to open map
+                                  </small>
+                                </div>
+                              </TableCell>
+
+                              {/* Status */}
+                              <TableCell className="w-1/6 py-5">
+                                <StatusBadge status={data?.status} />
+                              </TableCell>
+
+                              {/* Action */}
+                              <TableCell className="py-5 text-center w-[100px]">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <span className="sr-only">Open menu</span>
+                                      <MoreHorizontal />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="center"
+                                    className="cursor-pointer"
+                                  >
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        router.push(
+                                          `/trips/driver-refunds/${data?.id}`
+                                        )
+                                      }
+                                      className="w-full text-center cursor-pointer"
+                                    >
+                                      View details
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
+                  ) : (
+                    <div className="flex items-center w-full h-[357px] flex-col justify-center">
+                      <Image
+                        src={"/nodata.svg"}
+                        alt=""
+                        width={200}
+                        height={200}
+                        className="object-cover me-5"
+                      />
+                      <h1 className="mt-8 text-lg text-center font-semibold">
+                        No Data
+                      </h1>
+                    </div>
+                  )}
+                </>
+              )}
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+            {totalNoShowPages > 1 && (
+              <div className="pt-10">
+                <Pagination
+                  currentPage={noShowPage}
+                  totalPages={totalNoShowPages}
+                  onPageChange={onNoShowPageChange}
                 />
               </div>
             )}

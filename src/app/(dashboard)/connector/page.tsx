@@ -32,8 +32,7 @@ const Agent = () => {
   // Step 1: status filter state. "all" means no filter sent to the API.
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  console.log("🤖 Agents component rendered");
-  console.log("📋 Current status filter:", statusFilter);
+  
 
   // NOTE: status is now sent to the API so filtering works across ALL
   // records, not just the 10 currently loaded on this page. This assumes
@@ -58,15 +57,10 @@ const Agent = () => {
   // Correct field for the total record count across all pages, for the badge.
   const totalRecords = userData?.result?.meta?.totalRecords ?? 0;
 
-  console.log("📊 Agent data:", { 
-    total: totalRecords, 
-    agents: AgentListData?.length,
-    totalPages 
-  });
 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
-      console.log(`🔄 Page change from ${page} to ${pageNumber}`);
+     
       setPage(pageNumber);
     }
   };
@@ -74,7 +68,7 @@ const Agent = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceSearch = useCallback(
     debounce((query: string) => {
-      console.log(`🔍 Searching for: "${query}"`);
+     
       setSearchQuery(query);
       setPage(1);
     }, 300),
@@ -86,7 +80,7 @@ const Agent = () => {
   };
 
   const handleStatusFilter = (status: string) => {
-    console.log(`📌 Status filter changed to: "${status}"`);
+    
     setStatusFilter(status);
     setPage(1); // reset to page 1 whenever the filter changes
   };

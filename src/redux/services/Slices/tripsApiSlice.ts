@@ -1,7 +1,7 @@
 import { api } from "../apiSlice";
 
 const tripsApiConfig = api.enhanceEndpoints({
-  addTagTypes: ["Trips", "TripRequests"],
+  addTagTypes: ["Trips", "TripRequests", "NoShows"],
 });
 
 const tripsApi = tripsApiConfig.injectEndpoints({
@@ -19,8 +19,6 @@ const tripsApi = tripsApiConfig.injectEndpoints({
       query: ({ status, page = 1, limit = 20 }: any = {}) => ({
         url: `/v1/trip-requests`,
         method: "GET",
-        // undefined `status` is stripped by fetchBaseQuery => returns ALL statuses.
-        // an array serializes as ?status=approved&status=fulfilled (DTO now accepts it).
         params: { status, page, limit },
       }),
       providesTags: ["TripRequests"],
@@ -44,8 +42,6 @@ const tripsApi = tripsApiConfig.injectEndpoints({
       ],
     }),
 
-    // ✅ Approve a trip request.
-    // Called as approveTripRequest(id) OR approveTripRequest({ tripid, tripId, adminNote }).
     approveTripRequest: builder.mutation({
       query: (
         arg:
@@ -57,7 +53,6 @@ const tripsApi = tripsApiConfig.injectEndpoints({
         return {
           url: `/v1/trip-requests/${tripid}/approve`,
           method: "PATCH",
-          // {} when called with just an id; { tripId, adminNote } otherwise
           body,
         };
       },
@@ -67,8 +62,6 @@ const tripsApi = tripsApiConfig.injectEndpoints({
       },
     }),
 
-    // ✅ Decline a trip request. Backend requires a non-empty `reason`.
-    // Accepts either `reason` or your existing `adminNote` and sends `reason`.
     declineTripRequest: builder.mutation({
       query: ({
         tripid,
@@ -88,6 +81,160 @@ const tripsApi = tripsApiConfig.injectEndpoints({
         { type: "TripRequests", id: tripid },
       ],
     }),
+
+    // ============================================================
+    // ADMIN — No-Show / Driver Refund endpoints
+    // ============================================================
+
+    // 3) List no-shows with optional status filter + pagination
+    getAllNoShows: builder.query({
+      query: ({ status, page = 1, limit = 20 }: any = {}) => ({
+        url: `/v1/admin/no-shows`,
+        method: "GET",
+        params: { status, page, limit },
+      }),
+      providesTags: ["NoShows"],
+      // 👇 DEBUG LOG: fires whenever the query resolves with data
+      async onQueryStarted(arg, { queryFulfilled }) {
+        console.log(
+          "[getAllNoShows] 🚀 Request params:",
+          JSON.stringify(arg, null, 2)
+        );
+        try {
+          const { data } = await queryFulfilled;
+          console.log(
+            "[getAllNoShows] ✅ Full response:",
+            JSON.stringify(data, null, 2)
+          );
+          console.log(
+            "[getAllNoShows] 📦 List count:",
+            data?.result?.data?.length ?? 0
+          );
+          console.log(
+            "[getAllNoShows] 📄 Pagination meta:",
+            JSON.stringify(data?.result?.meta, null, 2)
+          );
+          if (data?.result?.data?.length) {
+            console.log(
+              "[getAllNoShows] 🧾 First no-show item:",
+              JSON.stringify(data.result.data[0], null, 2)
+            );
+          }
+        } catch (err) {
+          console.error("[getAllNoShows] ❌ Failed:", err);
+        }
+      },
+    }),
+
+    // 4) Single no-show details
+    getSingleNoShow: builder.query({
+      query: (id: string) => ({
+        url: `/v1/admin/no-shows/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "NoShows", id }],
+      // 👇 DEBUG LOG: fires whenever a single no-show is fetched
+      async onQueryStarted(id, { queryFulfilled }) {
+        console.log("[getSingleNoShow] 🚀 Requesting id:", id);
+        try {
+          const { data } = await queryFulfilled;
+          console.log(
+            "[getSingleNoShow] ✅ Full response:",
+            JSON.stringify(data, null, 2)
+          );
+          console.log(
+            "[getSingleNoShow] 🧾 No-show payload:",
+            JSON.stringify(data?.result ?? data?.data ?? data, null, 2)
+          );
+          console.log(
+            "[getSingleNoShow] 📍 Coordinates:",
+            {
+              latitude: data?.result?.latitude ?? data?.data?.latitude,
+              longitude: data?.result?.longitude ?? data?.data?.longitude,
+            }
+          );
+          console.log(
+            "[getSingleNoShow] 🕒 Reported at:",
+            data?.result?.reportedAt ??
+              data?.data?.reportedAt ??
+              data?.result?.createdAt ??
+              data?.data?.createdAt
+          );
+        } catch (err) {
+          console.error("[getSingleNoShow] ❌ Failed:", err);
+        }
+      },
+    }),
+
+    // 5) Approve a no-show (credits driver wallet)
+    approveNoShow: builder.mutation({
+      query: ({
+        id,
+        adminNote,
+      }: {
+        id: string;
+        adminNote?: string;
+      }) => ({
+        url: `/v1/admin/no-shows/${id}/approve`,
+        method: "PATCH",
+        body: adminNote ? { adminNote } : {},
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        "NoShows",
+        { type: "NoShows", id },
+      ],
+      // 👇 DEBUG LOG: fires after the mutation succeeds/fails
+      async onQueryStarted(arg, { queryFulfilled }) {
+        console.log(
+          "[approveNoShow] 🚀 Request payload:",
+          JSON.stringify(arg, null, 2)
+        );
+        try {
+          const { data } = await queryFulfilled;
+          console.log(
+            "[approveNoShow] ✅ Response:",
+            JSON.stringify(data, null, 2)
+          );
+        } catch (err) {
+          console.error("[approveNoShow] ❌ Failed:", err);
+        }
+      },
+    }),
+
+    // 6) Decline a no-show
+    declineNoShow: builder.mutation({
+      query: ({
+        id,
+        reason,
+      }: {
+        id: string;
+        reason?: string;
+      }) => ({
+        url: `/v1/admin/no-shows/${id}/decline`,
+        method: "PATCH",
+        body: { reason: reason ?? "" },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        "NoShows",
+        { type: "NoShows", id },
+      ],
+      // 👇 DEBUG LOG: fires after the mutation succeeds/fails
+      async onQueryStarted(arg, { queryFulfilled }) {
+        console.log(
+          "[declineNoShow] 🚀 Request payload:",
+          JSON.stringify(arg, null, 2)
+        );
+        try {
+          const { data } = await queryFulfilled;
+          console.log(
+            "[declineNoShow] ✅ Response:",
+            JSON.stringify(data, null, 2)
+          );
+        } catch (err) {
+          console.error("[declineNoShow] ❌ Failed:", err);
+        }
+      },
+    }),
   }),
 });
 
@@ -98,4 +245,8 @@ export const {
   useGetSingleTripRequestQuery,
   useApproveTripRequestMutation,
   useDeclineTripRequestMutation,
+  useGetAllNoShowsQuery,
+  useGetSingleNoShowQuery,
+  useApproveNoShowMutation,
+  useDeclineNoShowMutation,
 } = tripsApi;

@@ -17,7 +17,7 @@ const AgentInfo = ({
   params,
 }: any) => {
 
-  console.log("profile", profile)
+
   return (
     <div className="w-full">
       <div className="gap-4 flex xl:flex-row flex-col w-full">

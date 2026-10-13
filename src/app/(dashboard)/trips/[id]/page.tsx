@@ -61,7 +61,6 @@ const SingleTrip = () => {
   const avgRating = Number(driver?.averageRating ?? 0);
   const ratingCount = Number(driver?.ratingCount ?? 0);
 
-  console.log("details", details);
 
   return (
     <div>

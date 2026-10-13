@@ -15,7 +15,6 @@ const handler = async (req: Request) => {
     io = new Server(server);
 
     io.on("connection", (socket) => {
-      console.log("Client connected");
 
       // Example of emitting messages from the server
       socket.emit("welcome", "Hello, Client!");
@@ -33,7 +32,7 @@ const handler = async (req: Request) => {
       // Clean up when the client disconnects
       socket.on("disconnect", () => {
         clearInterval(interval);
-        console.log("Client disconnected");
+
       });
     });
   }

@@ -21,7 +21,6 @@ const Announcement = () => {
     refetch,
   } = useGetAnnouncementsQuery(null);
 
-  console.log("Announcement", data);
 
   const announcement = data?.result;
   return (

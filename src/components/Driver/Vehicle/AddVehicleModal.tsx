@@ -76,28 +76,18 @@ export const AddVehicleModal = ({ driverId, vehicle, onSuccess, trigger }: AddVe
   // Fetch vehicle types from API
 const { data: vehicleTypesData, isLoading: typesLoading, error: typesError } = useGetVehicleTypesQuery({});
 
-console.log("vehicleTypesData", vehicleTypesData)
+
   const [addVehicle] = useAddVehicleMutation();
   const [updateVehicle] = useUpdateVehicleMutation();
 
   // Debug logging
   useEffect(() => {
     if (vehicle) {
-      console.log("📝 Editing vehicle with features:", vehicle.features);
-      console.log("📝 Vehicle photos:", vehicle.photos);
-      console.log("📝 Vehicle type ID:", vehicle.vehicle_type_id || vehicle.vehicle_type?.id);
+
     }
   }, [vehicle]);
 
-  // Log vehicle types data
-  useEffect(() => {
-    if (vehicleTypesData) {
-      console.log("🚗 Vehicle types from API:", vehicleTypesData);
-    }
-    if (typesError) {
-      console.error("❌ Error loading vehicle types:", typesError);
-    }
-  }, [vehicleTypesData, typesError]);
+
 
   // Update form when vehicle prop changes (for editing)
   useEffect(() => {
@@ -122,7 +112,7 @@ console.log("vehicleTypesData", vehicleTypesData)
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newPhotos = Array.from(e.target.files);
-      console.log("📸 Photos selected:", newPhotos.length);
+    
       setPhotos(prev => [...prev, ...newPhotos]);
     }
   };
@@ -141,7 +131,7 @@ console.log("vehicleTypesData", vehicleTypesData)
         ? prev.features.filter(f => f !== featureId)
         : [...prev.features, featureId];
       
-      console.log("🔧 Features updated:", features);
+     
       return { ...prev, features };
     });
   };
@@ -220,20 +210,7 @@ console.log("vehicleTypesData", vehicleTypesData)
       submitData.append("vehicle_id", vehicle.id);
     }
 
-    // Log for debugging
-    console.log("📝 Submitting vehicle:", {
-      driverId,
-      vehicle_type_id: formData.vehicle_type_id,
-      model: formData.model,
-      license_plate_number: formData.license_plate_number,
-      capacity: formData.capacity,
-      color: formData.color,
-      features: formData.features,
-      newPhotosCount: photos.length,
-      existingPhotosCount: existingPhotos.length,
-      totalPhotos: photos.length + existingPhotos.length,
-      isEdit: !!vehicle?.id
-    });
+
 
     try {
       let response;
@@ -245,7 +222,7 @@ console.log("vehicleTypesData", vehicleTypesData)
         toast.success("Vehicle added successfully");
       }
       
-      console.log("✅ Vehicle saved:", response);
+     
       onSuccess?.();
       resetForm();
     } catch (error: any) {
@@ -273,8 +250,6 @@ const vehicleTypes: VehicleType[] = Object.values(
   vehicleTypesData?.result || {}
 ) as VehicleType[];
 
-console.log("vehicle type", vehicleTypes);
-console.log("vehicle type length", vehicleTypes.length);
 
   // Create the modal content
   const modalContent = (

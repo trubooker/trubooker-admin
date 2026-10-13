@@ -31,7 +31,6 @@ const RolesTable = ({ role }: any) => {
 
   const usersByRole = data?.result.data;
 
-  console.log("user by role", data)
 
   const totalPages = data?.meta?.totalRecords;
 

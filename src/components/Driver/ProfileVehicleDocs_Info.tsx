@@ -173,15 +173,13 @@ const ProfileVehicleDocs_Info = ({
 
   // Safe vehicle data - ensure it's an array
   const safeVehicle = Array.isArray(vehicle) ? vehicle : [];
-  console.log("safevehicle", safeVehicle)
-  
+
   // Safe feedback data - ensure it's an array
   const safeFeedback = Array.isArray(feedback) ? feedback : [];
   
   // Safe trip history data
   const safeTripHistory = Array.isArray(th) ? th : [];
 
-  console.log("TH", safeTripHistory)
 
   // Set verifiable ID when vehicle data is available
   useEffect(() => {
@@ -378,7 +376,7 @@ const ProfileVehicleDocs_Info = ({
       }
     });
 
-    console.log("🚗 Vehicle documents extracted:::", vehicleDocs);
+
     return vehicleDocs;
   };
 
@@ -476,12 +474,7 @@ const ProfileVehicleDocs_Info = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      console.log("📎 File selected:", {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        lastModified: new Date(file.lastModified)
-      });
+     
       
       setDocumentFile(file);
     } else {
@@ -596,7 +589,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
       let fileUrl: string;
       try {
         fileUrl = await uploadFile(file);
-        console.log("✅ File uploaded successfully:", fileUrl);
+       
       } catch (uploadError) {
         toast.error("Failed to upload file. Please try again.", { id: toastId });
         setIsUploading(false);
@@ -712,12 +705,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
   const vehicleDocs = getVehicleDocuments(safeVehicle);
   const allDocs = [...docs, ...vehicleDocs];
   
-  console.log("📄 Mapped driver documents:", docs);
-  console.log("🚗 Vehicle documents:", vehicleDocs);
-  console.log("📄 All documents combined:", allDocs);
 
   const history: any[] = documentHistory?.result || [];
-  console.log("new history", history)
+
 
   return (
     <div className="w-full">
@@ -876,7 +866,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
             <AddVehicleModal 
               driverId={driverId}
               onSuccess={() => {
-                console.log("Vehicle operation successful");
+              
               }}
               trigger={
                 <Button className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
@@ -958,7 +948,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                           driverId={driverId}
                           vehicle={deets}
                           onSuccess={() => {
-                            console.log("Vehicle updated successfully");
+                          
                           }}
                           trigger={
                             <Button
@@ -1258,7 +1248,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                   <div className="mt-4">
                     <AddVehicleModal 
                       driverId={driverId}
-                      onSuccess={() => console.log("Vehicle added")}
+                     
                       trigger={
                         <Button className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md">
                           Add Your First Vehicle

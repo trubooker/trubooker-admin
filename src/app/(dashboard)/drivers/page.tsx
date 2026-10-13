@@ -61,18 +61,12 @@ const Drivers = () => {
 
   // Source of truth — read straight from the query, no mirror state
   const DriverListData = userData?.result?.data;
-  console.log("DriverListData", DriverListData)
 
   // NOTE: verify these against your actual meta object.
   const totalPages = userData?.result?.meta?.pageCount ?? 1;
   const totalDrivers = userData?.result?.meta?.totalRecords ?? 0;
 
-  console.log("🚀 Drivers component rendered");
-  console.log("📊 Driver data:", { 
-    total: totalDrivers, 
-    approvedCount,
-    drivers: DriverListData?.length 
-  });
+
 
   const onPageChange = (pageNumber: number) => {
     if (!isFetching && pageNumber !== page) {
