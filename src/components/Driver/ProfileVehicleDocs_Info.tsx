@@ -17,7 +17,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { FaExternalLinkAlt, FaPlus, FaTrash, FaEdit, FaHistory } from "react-icons/fa";
+import {
+  FaExternalLinkAlt,
+  FaPlus,
+  FaTrash,
+  FaEdit,
+  FaHistory,
+} from "react-icons/fa";
 import { FaRegFileLines, FaClock } from "react-icons/fa6";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -28,7 +34,8 @@ import {
   useAddDriversDocumentMutation,
   useUpdateDriversDocumentMutation,
   useDeleteDriversDocumentMutation,
-  useGetDocumentHistoryQuery
+  useGetDocumentHistoryQuery,
+  useDeleteUserMutation,
 } from "@/redux/services/Slices/driverApiSlice";
 import {
   useApproveVehicleMutation,
@@ -49,6 +56,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AddVehicleModal } from "./Vehicle/AddVehicleModal";
+import { useRouter } from "next/navigation";
 
 // Define document types to match mobile app patterns
 const DOCUMENT_TYPES = [
@@ -61,14 +69,14 @@ const DOCUMENT_TYPES = [
 
 // Available vehicle features matching your mobile app
 const AVAILABLE_FEATURES = [
-  { id: "wifi", label: "Wifi", },
-  { id: "ac", label: "Air conditioner",},
-  { id: "usb", label: "USB charging port", },
-  { id: "neck_pillow", label: "Neck pillow",  },
-  { id: "refreshment", label: "Onboard refreshment", },
-  { id: "bluetooth", label: "Bluetooth connectivity",  },
-  { id: "extra_legroom", label: "Extra legroom",  },
-  { id: "others", label: "Others", },
+  { id: "wifi", label: "Wifi" },
+  { id: "ac", label: "Air conditioner" },
+  { id: "usb", label: "USB charging port" },
+  { id: "neck_pillow", label: "Neck pillow" },
+  { id: "refreshment", label: "Onboard refreshment" },
+  { id: "bluetooth", label: "Bluetooth connectivity" },
+  { id: "extra_legroom", label: "Extra legroom" },
+  { id: "others", label: "Others" },
 ];
 
 // Document type labels mapping
@@ -80,30 +88,39 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   other: "Other Document",
 };
 
-// Status badge component - Fixed version
+// Status badge component
 const StatusBadge = ({ status }: { status: any }) => {
-  // Convert status to string safely
-  const statusStr = typeof status === 'string' 
-    ? status 
-    : typeof status === 'object' && status !== null && status.text 
-      ? status.text 
-      : String(status || '');
-  
+  const statusStr =
+    typeof status === "string"
+      ? status
+      : typeof status === "object" && status !== null && status.text
+        ? status.text
+        : String(status || "");
+
   const statusConfig: Record<string, { color: string; label: string }> = {
-    approved: { color: "bg-green-100 text-green-800 border-green-200", label: "Approved" },
-    pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending" },
-    rejected: { color: "bg-red-100 text-red-800 border-red-200", label: "Rejected" },
-    verified: { color: "bg-green-100 text-green-800 border-green-200", label: "Verified" },
+    approved: {
+      color: "bg-green-100 text-green-800 border-green-200",
+      label: "Approved",
+    },
+    pending: {
+      color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      label: "Pending",
+    },
+    rejected: {
+      color: "bg-red-100 text-red-800 border-red-200",
+      label: "Rejected",
+    },
+    verified: {
+      color: "bg-green-100 text-green-800 border-green-200",
+      label: "Verified",
+    },
   };
 
-  // Safely get the status key
   const statusKey = statusStr?.toLowerCase?.() || statusStr;
-  
-  // Try to find matching config
+
   let config = statusConfig[statusKey];
-  
-  // If not found, try to find by checking if the status string includes any known status
-  if (!config && typeof statusStr === 'string') {
+
+  if (!config && typeof statusStr === "string") {
     const lowerStatus = statusStr.toLowerCase();
     for (const [key, value] of Object.entries(statusConfig)) {
       if (lowerStatus.includes(key) || lowerStatus === key) {
@@ -112,17 +129,19 @@ const StatusBadge = ({ status }: { status: any }) => {
       }
     }
   }
-  
-  // If still not found, use default
+
   if (!config) {
-    config = { 
-      color: "bg-gray-100 text-gray-800 border-gray-200", 
-      label: typeof statusStr === 'string' ? statusStr : "Unknown" 
+    config = {
+      color: "bg-gray-100 text-gray-800 border-gray-200",
+      label: typeof statusStr === "string" ? statusStr : "Unknown",
     };
   }
 
   return (
-    <Badge className={`${config.color} border px-2 py-0.5 text-xs font-medium`} variant="outline">
+    <Badge
+      className={`${config.color} border px-2 py-0.5 text-xs font-medium`}
+      variant="outline"
+    >
       {config.label}
     </Badge>
   );
@@ -137,6 +156,8 @@ const ProfileVehicleDocs_Info = ({
   isFetching,
   driverId,
 }: any) => {
+  const router = useRouter();
+
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
@@ -145,15 +166,27 @@ const ProfileVehicleDocs_Info = ({
   const [documentName, setDocumentName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("current");
-  const [verifiableType, setVerifiableType] = useState<"driver" | "vehicle">("driver");
+  const [verifiableType, setVerifiableType] = useState<"driver" | "vehicle">(
+    "driver"
+  );
   const [verifiableId, setVerifiableId] = useState("");
-  
-  const { data: driverDocs, isLoading: docsLoading, refetch: refetchDocs } = 
-    useGetDriversDocumentsQuery(driverId);
-  
-  const { data: documentHistory, isLoading: historyLoading, refetch: refetchHistory } = 
-    useGetDocumentHistoryQuery(driverId);
-  
+
+  // Delete driver state
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deleteReasonError, setDeleteReasonError] = useState("");
+
+  const {
+    data: driverDocs,
+    isLoading: docsLoading,
+    refetch: refetchDocs,
+  } = useGetDriversDocumentsQuery(driverId);
+
+  const {
+    data: documentHistory,
+    isLoading: historyLoading,
+    refetch: refetchHistory,
+  } = useGetDocumentHistoryQuery(driverId);
+
   const [approveDocs, { isLoading: approveLoading }] =
     useApproveDriversDocumentsMutation();
   const [rejectDocs, { isLoading: rejectLoading }] =
@@ -168,6 +201,9 @@ const ProfileVehicleDocs_Info = ({
   const [updateDocument] = useUpdateDriversDocumentMutation();
   const [deleteDocument] = useDeleteDriversDocumentMutation();
 
+  // Delete driver (user) mutation
+  const [deleteUser, { isLoading: deleteUserLoading }] = useDeleteUserMutation();
+
   // Safe profile data
   const safeProfile = profile || {};
 
@@ -176,10 +212,9 @@ const ProfileVehicleDocs_Info = ({
 
   // Safe feedback data - ensure it's an array
   const safeFeedback = Array.isArray(feedback) ? feedback : [];
-  
+
   // Safe trip history data
   const safeTripHistory = Array.isArray(th) ? th : [];
-
 
   // Set verifiable ID when vehicle data is available
   useEffect(() => {
@@ -192,118 +227,113 @@ const ProfileVehicleDocs_Info = ({
   const uploadFile = async (file: File): Promise<string> => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      
-      // Adjust this endpoint based on your actual file upload endpoint
-      const response = await fetch('/v1/admin/drivers/add-document', {
-        method: 'POST',
+      formData.append("file", file);
+
+      const response = await fetch("/v1/admin/drivers/add-document", {
+        method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to upload file');
+        throw new Error("Failed to upload file");
       }
-      
+
       const data = await response.json();
-      // Adjust based on your API response structure
       return data.url || data.fileUrl || data.data?.url;
     } catch (error) {
-      console.error('File upload failed:', error);
-      throw new Error('Failed to upload file. Please try again.');
+      console.error("File upload failed:", error);
+      throw new Error("Failed to upload file. Please try again.");
     }
   };
 
   // Helper function to map API document data to a consistent format
   const mapDocumentData = (doc: any) => {
-    // Check if document has the nested structure from the API
     if (doc?.result?.document_images) {
-      // Extract status from the nested structure
       let status = doc.verificationState || "pending";
-      
-      // If status is an object with a text property, extract it
-      if (typeof status === 'object' && status !== null && status.text) {
+
+      if (typeof status === "object" && status !== null && status.text) {
         status = status.text;
       }
-      
-      // Check for rejection status
+
       if (doc.rejectedAt && !doc.verifiedAt) {
         status = "rejected";
       }
-      
-      // This is the main document object from the API
+
       return {
-  id: doc.id || doc.document_id || doc._id,
-  verification_type: doc.verification_type || doc.documentType || doc.document_type || "other",
-  document_type_label:
-    doc.document_type_label || doc.document_name || DOCUMENT_TYPE_LABELS[doc.documentType] || "Document",
-  status: status,
-  link: doc.link || doc.documentUrl || doc.driverLicense || doc.image_url || doc.images_front_side_url,
-  created_at: doc.created_at || doc.createdAt || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
-  reason: doc.reason || doc.rejectionReason,
-  name: doc.name || doc.document_name || "Document",
-  verifiable_type: doc.verifiable_type || "driver",
-  _raw: doc,
-};
-      // return {
-      //   id: doc.id || doc.document_id || doc._id,
-      //   verification_type: doc.document_type || "other",
-      //   document_type_label: doc.document_name || "Document",
-      //   status: status,
-      //   link: doc.driverLicense || doc.image_url || doc.images_front_side_url,
-      //   created_at: doc.submittedAt || doc.verifiedAt || doc.created_at || new Date().toISOString(),
-      //   reason: doc.rejectionReason || doc.reason,
-      //   name: doc.document_name || "Document",
-      //   verifiable_type: doc.verifiable_type || "driver",
-      //   // Store the full document for later use
-      //   _raw: doc
-      // };
+        id: doc.id || doc.document_id || doc._id,
+        verification_type:
+          doc.verification_type ||
+          doc.documentType ||
+          doc.document_type ||
+          "other",
+        document_type_label:
+          doc.document_type_label ||
+          doc.document_name ||
+          DOCUMENT_TYPE_LABELS[doc.documentType] ||
+          "Document",
+        status: status,
+        link:
+          doc.link ||
+          doc.documentUrl ||
+          doc.driverLicense ||
+          doc.image_url ||
+          doc.images_front_side_url,
+        created_at:
+          doc.created_at ||
+          doc.createdAt ||
+          doc.submittedAt ||
+          doc.verifiedAt ||
+          new Date().toISOString(),
+        reason: doc.reason || doc.rejectionReason,
+        name: doc.name || doc.document_name || "Document",
+        verifiable_type: doc.verifiable_type || "driver",
+        _raw: doc,
+      };
     }
-    
-    // If it's a regular document object
+
     let status = doc.status || doc.verificationState || "pending";
-    
-    // If status is an object with a text property, extract it
-    if (typeof status === 'object' && status !== null && status.text) {
+
+    if (typeof status === "object" && status !== null && status.text) {
       status = status.text;
     }
-    
-    // Check for rejection status
+
     if (doc.rejectedAt && !doc.verifiedAt) {
       status = "rejected";
     }
 
     return {
-  id: doc.id || doc.document_id || doc._id,
-  verification_type: doc.verification_type || doc.documentType || doc.document_type || "other",
-  document_type_label:
-    doc.document_type_label || doc.document_name || DOCUMENT_TYPE_LABELS[doc.documentType] || "Document",
-  status: status,
-  link: doc.link || doc.documentUrl || doc.driverLicense || doc.image_url || doc.images_front_side_url,
-  created_at: doc.created_at || doc.createdAt || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
-  reason: doc.reason || doc.rejectionReason,
-  name: doc.name || doc.document_name || "Document",
-  verifiable_type: doc.verifiable_type || "driver",
-  _raw: doc,
-};
-    
-    // return {
-    //   id: doc.id || doc.document_id || doc._id,
-    //   verification_type: doc.verification_type || doc.document_type || "other",
-    //   document_type_label: doc.document_type_label || doc.document_name || "Document",
-    //   status: status,
-    //   link: doc.link || doc.driverLicense || doc.image_url || doc.images_front_side_url,
-    //   created_at: doc.created_at || doc.submittedAt || doc.verifiedAt || new Date().toISOString(),
-    //   reason: doc.reason || doc.rejectionReason,
-    //   name: doc.name || doc.document_name || "Document",
-    //   verifiable_type: doc.verifiable_type || "driver",
-    //   _raw: doc
-    // };
+      id: doc.id || doc.document_id || doc._id,
+      verification_type:
+        doc.verification_type ||
+        doc.documentType ||
+        doc.document_type ||
+        "other",
+      document_type_label:
+        doc.document_type_label ||
+        doc.document_name ||
+        DOCUMENT_TYPE_LABELS[doc.documentType] ||
+        "Document",
+      status: status,
+      link:
+        doc.link ||
+        doc.documentUrl ||
+        doc.driverLicense ||
+        doc.image_url ||
+        doc.images_front_side_url,
+      created_at:
+        doc.created_at ||
+        doc.createdAt ||
+        doc.submittedAt ||
+        doc.verifiedAt ||
+        new Date().toISOString(),
+      reason: doc.reason || doc.rejectionReason,
+      name: doc.name || doc.document_name || "Document",
+      verifiable_type: doc.verifiable_type || "driver",
+      _raw: doc,
+    };
   };
 
-  // Function to extract vehicle documents and add them to the documents list.
-  // Status/reason now reflect the vehicle's real admin-review state
-  // (Vehicle.verificationStatus / Vehicle.rejectionReason) instead of being
-  // hardcoded to "verified".
+  // Extract vehicle documents
   const getVehicleDocuments = (vehicles: any[]) => {
     const vehicleDocs: any[] = [];
 
@@ -313,7 +343,6 @@ const ProfileVehicleDocs_Info = ({
         (vehicle?.isVerified ? "approved" : "pending");
       const vehicleReason = vehicle?.rejectionReason || undefined;
 
-      // Check for insurance document
       if (vehicle?.insurance) {
         vehicleDocs.push({
           id: `vehicle-insurance-${vehicle.id || index}`,
@@ -322,15 +351,17 @@ const ProfileVehicleDocs_Info = ({
           status: vehicleStatus,
           reason: vehicleReason,
           link: vehicle.insurance,
-          created_at: vehicle.insuranceUploadedAt || vehicle.created_at || new Date().toISOString(),
-          name: `Insurance - ${vehicle.model || 'Vehicle'}`,
+          created_at:
+            vehicle.insuranceUploadedAt ||
+            vehicle.created_at ||
+            new Date().toISOString(),
+          name: `Insurance - ${vehicle.model || "Vehicle"}`,
           verifiable_type: "vehicle",
           vehicleId: vehicle.id,
-          _raw: vehicle
+          _raw: vehicle,
         });
       }
 
-      // Check for registration document
       if (vehicle?.registrationDoc || vehicle?.registration_doc) {
         const regDoc = vehicle.registrationDoc || vehicle.registration_doc;
         vehicleDocs.push({
@@ -340,20 +371,23 @@ const ProfileVehicleDocs_Info = ({
           status: vehicleStatus,
           reason: vehicleReason,
           link: regDoc,
-          created_at: vehicle.registrationUploadedAt || vehicle.created_at || new Date().toISOString(),
-          name: `Registration - ${vehicle.model || 'Vehicle'}`,
+          created_at:
+            vehicle.registrationUploadedAt ||
+            vehicle.created_at ||
+            new Date().toISOString(),
+          name: `Registration - ${vehicle.model || "Vehicle"}`,
           verifiable_type: "vehicle",
           vehicleId: vehicle.id,
-          _raw: vehicle
+          _raw: vehicle,
         });
       }
 
-      // Check for vehicle photos - added back as documents
-      const photos = vehicle?.photos ||
-                    vehicle?.vehiclePhoto ||
-                    vehicle?.vehicle_photos ||
-                    vehicle?.images ||
-                    [];
+      const photos =
+        vehicle?.photos ||
+        vehicle?.vehiclePhoto ||
+        vehicle?.vehicle_photos ||
+        vehicle?.images ||
+        [];
 
       if (Array.isArray(photos) && photos.length > 0) {
         photos.forEach((photo: string, photoIndex: number) => {
@@ -366,29 +400,27 @@ const ProfileVehicleDocs_Info = ({
               reason: vehicleReason,
               link: photo,
               created_at: vehicle.created_at || new Date().toISOString(),
-              name: `Vehicle Photo ${photoIndex + 1} - ${vehicle.model || 'Vehicle'}`,
+              name: `Vehicle Photo ${photoIndex + 1} - ${
+                vehicle.model || "Vehicle"
+              }`,
               verifiable_type: "vehicle",
               vehicleId: vehicle.id,
-              _raw: vehicle
+              _raw: vehicle,
             });
           }
         });
       }
     });
 
-
     return vehicleDocs;
   };
 
-  // Approves the given document. Vehicle-type docs (insurance, registration,
-  // photos) all resolve to one vehicle, so this hits the vehicle endpoint
-  // instead of the driver-document endpoint when doc.verifiable_type === "vehicle".
+  // Approve document
   const handleApproveDocument = async (
     doc: any,
     onModalClose?: () => void
   ) => {
     try {
-      
       if (doc?.verifiable_type === "vehicle" && doc?.vehicleId) {
         await approveVehicle(doc.vehicleId)
           .unwrap()
@@ -424,9 +456,7 @@ const ProfileVehicleDocs_Info = ({
     return true;
   };
 
-  // Rejects the given document. Vehicle-type docs route to the vehicle
-  // reject endpoint using doc.vehicleId; everything else goes through the
-  // existing driver-document reject endpoint.
+  // Reject document
   const handleDisapproveDocument = async ({
     reason,
     doc,
@@ -474,8 +504,6 @@ const ProfileVehicleDocs_Info = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-     
-      
       setDocumentFile(file);
     } else {
       setDocumentFile(null);
@@ -489,93 +517,95 @@ const ProfileVehicleDocs_Info = ({
     setSelectedDoc(null);
   };
 
-const handleAddDocument = async (onModalClose?: () => void) => {
-  const fileInput = document.getElementById('docFile') as HTMLInputElement;
-  const file = fileInput?.files?.[0];
+  const handleAddDocument = async (onModalClose?: () => void) => {
+    const fileInput = document.getElementById("docFile") as HTMLInputElement;
+    const file = fileInput?.files?.[0];
 
-  if (!file) {
-    toast.error("Please select a file");
-    return;
-  }
-
-  if (!documentType) {
-    toast.error("Please select a document type");
-    return;
-  }
-
-  // If document belongs to a vehicle, verifiableId must be selected
-  if (verifiableType === 'vehicle' && !verifiableId) {
-    toast.error("Please select a vehicle");
-    return;
-  }
-
-  setIsUploading(true);
-  let toastId = toast.loading("Uploading document...");
-
-  try {
-    const formData = new FormData();
-
-    // Required file field (matches FileInterceptor('document'))
-    formData.append('document', file);
-    formData.append('documentType', documentType);
-
-    if (documentName) {
-      formData.append('name', documentName);
+    if (!file) {
+      toast.error("Please select a file");
+      return;
     }
 
-    // --- ADD THESE LINES TO SEND VEHICLE INFO ---
-    formData.append('verifiableType', verifiableType);
-    if (verifiableType === 'vehicle') {
-      // Use 'vehicleId' because the backend error says it's required
-      formData.append('vehicleId', verifiableId);
-      // Also send verifiableId if the backend expects it
-      formData.append('verifiableId', verifiableId);
-    }
-    // -------------------------------------------
-
-    const response = await addDocument({
-      id: driverId,
-      formData: formData
-    }).unwrap();
-
-    toast.success("Document added successfully", { id: toastId });
-    refetchDocs();
-    refetchHistory();
-    resetDocumentForm();
-
-    if (fileInput) {
-      fileInput.value = '';
+    if (!documentType) {
+      toast.error("Please select a document type");
+      return;
     }
 
-    onModalClose?.();
-  } catch (error: any) {
-    console.error("❌ Failed to add document:", error);
-    if (error?.data?.errors) {
-      const errors = error.data.errors;
-      if (Array.isArray(errors)) {
-        errors.forEach((err: any) => {
-          toast.error(`${err.field || err.path || 'Error'}: ${err.message}`, { id: toastId });
-        });
-      } else if (typeof errors === 'object') {
-        Object.keys(errors).forEach(key => {
-          toast.error(`${key}: ${errors[key]}`, { id: toastId });
+    if (verifiableType === "vehicle" && !verifiableId) {
+      toast.error("Please select a vehicle");
+      return;
+    }
+
+    setIsUploading(true);
+    let toastId = toast.loading("Uploading document...");
+
+    try {
+      const formData = new FormData();
+      formData.append("document", file);
+      formData.append("documentType", documentType);
+
+      if (documentName) {
+        formData.append("name", documentName);
+      }
+
+      formData.append("verifiableType", verifiableType);
+      if (verifiableType === "vehicle") {
+        formData.append("vehicleId", verifiableId);
+        formData.append("verifiableId", verifiableId);
+      }
+
+      const response = await addDocument({
+        id: driverId,
+        formData: formData,
+      }).unwrap();
+
+      toast.success("Document added successfully", { id: toastId });
+      refetchDocs();
+      refetchHistory();
+      resetDocumentForm();
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
+      onModalClose?.();
+    } catch (error: any) {
+      console.error("❌ Failed to add document:", error);
+      if (error?.data?.errors) {
+        const errors = error.data.errors;
+        if (Array.isArray(errors)) {
+          errors.forEach((err: any) => {
+            toast.error(
+              `${err.field || err.path || "Error"}: ${err.message}`,
+              { id: toastId }
+            );
+          });
+        } else if (typeof errors === "object") {
+          Object.keys(errors).forEach((key) => {
+            toast.error(`${key}: ${errors[key]}`, { id: toastId });
+          });
+        }
+      } else if (error?.data?.message) {
+        toast.error(error.data.message, { id: toastId });
+      } else {
+        toast.error("Failed to add document. Please try again.", {
+          id: toastId,
         });
       }
-    } else if (error?.data?.message) {
-      toast.error(error.data.message, { id: toastId });
-    } else {
-      toast.error("Failed to add document. Please try again.", { id: toastId });
+    } finally {
+      setIsUploading(false);
     }
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
-  const handleUpdateDocument = async (docId: string, onModalClose?: () => void) => {
-    // Get file from input
-    const fileInput = document.getElementById('updateDocFile') as HTMLInputElement;
+  const handleUpdateDocument = async (
+    docId: string,
+    onModalClose?: () => void
+  ) => {
+    const fileInput = document.getElementById(
+      "updateDocFile"
+    ) as HTMLInputElement;
     const file = fileInput?.files?.[0];
-    
+
     if (!file) {
       toast.error("Please select a file");
       return;
@@ -583,57 +613,62 @@ const handleAddDocument = async (onModalClose?: () => void) => {
 
     setIsUploading(true);
     let toastId = toast.loading("Updating document...");
-    
+
     try {
-      // Step 1: Upload the file to get a URL
       let fileUrl: string;
       try {
         fileUrl = await uploadFile(file);
-       
       } catch (uploadError) {
-        toast.error("Failed to upload file. Please try again.", { id: toastId });
+        toast.error("Failed to upload file. Please try again.", {
+          id: toastId,
+        });
         setIsUploading(false);
         return;
       }
-      
-      const doc = selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
-      
-      // Step 2: Prepare update data
+
+      const doc =
+        selectedDoc || driverDocs?.result?.find((d: any) => d.id === docId);
+
       const updateData = {
         documents: [
           {
             documentType: doc?.verification_type || documentType,
             documentUrl: fileUrl,
             verificationData: {
-              name: documentName || doc?.name || doc?.document_name || "Document",
-              updatedAt: new Date().toISOString()
-            }
-          }
-        ]
+              name:
+                documentName || doc?.name || doc?.document_name || "Document",
+              updatedAt: new Date().toISOString(),
+            },
+          },
+        ],
       };
-      
-      // Step 3: Send the update
+
       await updateDocument({ id: docId, formData: updateData }).unwrap();
-      
+
       toast.success("Document updated successfully", { id: toastId });
       refetchDocs();
       refetchHistory();
       resetDocumentForm();
-      
+
       if (fileInput) {
-        fileInput.value = '';
+        fileInput.value = "";
       }
-      
+
       onModalClose?.();
     } catch (error: any) {
       console.error("Failed to update document:", error);
-      toast.error(error?.data?.message || "Failed to update document", { id: toastId });
+      toast.error(error?.data?.message || "Failed to update document", {
+        id: toastId,
+      });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleDeleteDocument = async (docId: string, onModalClose?: () => void) => {
+  const handleDeleteDocument = async (
+    docId: string,
+    onModalClose?: () => void
+  ) => {
     try {
       await deleteDocument(docId).unwrap();
       toast.success("Document deleted successfully");
@@ -647,30 +682,45 @@ const handleAddDocument = async (onModalClose?: () => void) => {
   };
 
   const getDocumentIcon = (type: string) => {
-    switch(type) {
+    switch (type) {
       case "license":
-        return <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-blue-600" />;
+        return (
+          <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-blue-600" />
+        );
       case "insurance":
-        return <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-green-600" />;
+        return (
+          <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-green-600" />
+        );
       case "registration_doc":
-        return <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-purple-600" />;
+        return (
+          <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-purple-600" />
+        );
       case "vehicle":
-        return <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-orange-600" />;
+        return (
+          <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-orange-600" />
+        );
       default:
-        return <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-gray-700" />;
+        return (
+          <FaRegFileLines className="w-[35px] h-[35px] mt-1 text-gray-700" />
+        );
     }
   };
 
   const getDocumentTypeLabel = (doc: any) => {
     if (doc?.document_type_label) return doc.document_type_label;
     if (doc?.document_name) return doc.document_name;
-    
-    switch(doc?.verification_type) {
-      case "license": return "Driver's License";
-      case "insurance": return "Vehicle Insurance";
-      case "registration_doc": return "Registration Document";
-      case "vehicle": return "Vehicle Photo";
-      default: return doc?.verification_type || 'Document';
+
+    switch (doc?.verification_type) {
+      case "license":
+        return "Driver's License";
+      case "insurance":
+        return "Vehicle Insurance";
+      case "registration_doc":
+        return "Registration Document";
+      case "vehicle":
+        return "Vehicle Photo";
+      default:
+        return doc?.verification_type || "Document";
     }
   };
 
@@ -690,7 +740,6 @@ const handleAddDocument = async (onModalClose?: () => void) => {
   };
 
   // Extract documents from the API response
-  // Driver documents come from the document_verifications rows (real UUID id), via the history endpoint.
   const driverRows: any[] = Array.isArray(documentHistory?.result)
     ? documentHistory.result
     : Array.isArray(documentHistory?.data)
@@ -700,24 +749,128 @@ const handleAddDocument = async (onModalClose?: () => void) => {
         : [];
 
   const docs: any[] = driverRows.map(mapDocumentData);
-  
-  // Merge vehicle documents with driver documents
+
   const vehicleDocs = getVehicleDocuments(safeVehicle);
   const allDocs = [...docs, ...vehicleDocs];
-  
 
   const history: any[] = documentHistory?.result || [];
 
+  // ============================================================
+  // DELETE DRIVER HANDLERS
+  // ============================================================
+  const validateDeleteReason = (value: string) => {
+    if (value.trim().length < 6) {
+      setDeleteReasonError("Reason must be at least 6 characters long");
+      return false;
+    }
+    setDeleteReasonError("");
+    return true;
+  };
+
+  const handleDeleteUser = async (onModalClose?: () => void) => {
+    if (!driverId) {
+      toast.error("Driver ID is missing");
+      return;
+    }
+
+    if (!validateDeleteReason(deleteReason)) return;
+
+    try {
+      await deleteUser({
+        userId: driverId,
+        deleteReason: deleteReason.trim(),
+      }).unwrap();
+
+      toast.success("Driver deleted successfully");
+      setDeleteReason("");
+      setDeleteReasonError("");
+      onModalClose?.();
+
+      // Navigate back to drivers list after delete
+      router.push("/drivers");
+    } catch (error: any) {
+      console.error("Failed to delete driver:", error);
+      const msg =
+        error?.data?.message ||
+        error?.data?.error?.message ||
+        "Failed to delete driver";
+      toast.error(msg);
+    }
+  };
 
   return (
     <div className="w-full">
       <div className="gap-4 grid xl:grid-cols-3 grid-rows-1 w-full">
         {/* Profile Card */}
         <Card className="h-auto w-full">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-gray-500">
               Profile Information
             </CardTitle>
+
+            {/* Delete driver button */}
+            <Modal
+              trigger={
+                <Button
+                  className="bg-red-500 hover:bg-red-600 text-white text-xs px-1 py-0 rounded-md flex items-center gap-2"
+                  title="Delete driver account"
+                >
+                  <FaTrash className="w-2 h-2" />
+                  Delete User
+                </Button>
+              }
+              title="Delete Driver Account"
+              description="This action is irreversible. Please provide a reason."
+              content={
+                <div className="flex flex-col space-y-4 lg:mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    You are about to permanently delete{" "}
+                    <span className="font-semibold text-gray-800">
+                      {safeProfile?.firstName
+                        ? `${safeProfile.firstName} ${
+                            safeProfile.lastName || ""
+                          }`.trim()
+                        : "this driver"}
+                    </span>
+                    . This will remove their account and associated data. This
+                    action cannot be undone.
+                  </p>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="deleteReason">Reason for deletion</Label>
+                    <Textarea
+                      id="deleteReason"
+                      value={deleteReason}
+                      onChange={(e) => {
+                        setDeleteReason(e.target.value);
+                        validateDeleteReason(e.target.value);
+                      }}
+                      placeholder="e.g., Fraudulent account"
+                      className={`w-full text-sm border rounded-md h-24 ${
+                        deleteReasonError ? "border-red-500" : "border-gray-300"
+                      }`}
+                    />
+                    {deleteReasonError && (
+                      <p className="text-red-500 text-xs">
+                        {deleteReasonError}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-4">
+                    <Button
+                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 w-full hover:bg-red-700 rounded-md disabled:bg-red-300"
+                      onClick={() => handleDeleteUser()}
+                      disabled={
+                        deleteUserLoading || deleteReason.trim().length < 6
+                      }
+                    >
+                      {deleteUserLoading ? "Deleting..." : "Yes, Delete Account"}
+                    </Button>
+                  </div>
+                </div>
+              }
+            />
           </CardHeader>
           <CardContent>
             <div>
@@ -728,30 +881,29 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       Full name
                     </span>
                     <span className="font-medium text-sm">
-                      {(!safeProfile?.firstName && !safeProfile?.lastName) ? (
+                      {!safeProfile?.firstName && !safeProfile?.lastName ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
                         <div className="flex gap-x-2">
-                          <span> {safeProfile?.firstName || 'N/A'}</span>
-                          <span> {safeProfile?.lastName || ''}</span>
+                          <span> {safeProfile?.firstName || "N/A"}</span>
+                          <span> {safeProfile?.lastName || ""}</span>
                         </div>
                       )}
                     </span>
                   </div>
-                 
                 </div>
-                 <div className="flex  flex-col">
-                    <span className="font-normal text-xs text-gray-500">
-                      Email address
-                    </span>
-                    <span className="font-medium text-sm">
-                      {!safeProfile?.email ? (
-                        <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
-                      ) : (
-                        safeProfile?.email
-                      )}
-                    </span>
-                  </div>
+                <div className="flex  flex-col">
+                  <span className="font-normal text-xs text-gray-500">
+                    Email address
+                  </span>
+                  <span className="font-medium text-sm">
+                    {!safeProfile?.email ? (
+                      <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
+                    ) : (
+                      safeProfile?.email
+                    )}
+                  </span>
+                </div>
 
                 <div className="flex justify-between">
                   <div className="flex flex-col">
@@ -777,7 +929,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       {!safeProfile?.address ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.address || 'Not provided'
+                        safeProfile?.address || "Not provided"
                       )}
                     </span>
                   </div>
@@ -808,7 +960,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       {!safeProfile?.city ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.city || 'Not provided'
+                        safeProfile?.city || "Not provided"
                       )}
                     </span>
                   </div>
@@ -820,7 +972,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       {!safeProfile?.country ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.country || 'Not provided'
+                        safeProfile?.country || "Not provided"
                       )}
                     </span>
                   </div>
@@ -835,7 +987,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       {!safeProfile?.gender ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.gender || 'Not provided'
+                        safeProfile?.gender || "Not provided"
                       )}
                     </span>
                   </div>
@@ -847,7 +999,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                       {!safeProfile?.referralCode ? (
                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                       ) : (
-                        safeProfile?.referralCode || 'Not provided'
+                        safeProfile?.referralCode || "Not provided"
                       )}
                     </span>
                   </div>
@@ -863,11 +1015,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
             <CardTitle className="text-lg text-gray-500">
               Vehicle Information
             </CardTitle>
-            <AddVehicleModal 
+            <AddVehicleModal
               driverId={driverId}
-              onSuccess={() => {
-              
-              }}
+              onSuccess={() => {}}
               trigger={
                 <Button className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1.5 rounded-md flex items-center gap-2">
                   <FaPlus className="w-3 h-3" />
@@ -898,22 +1048,27 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                       Vehicle Type
                                     </span>
                                     <span className="font-medium text-sm">
-                                      {!deets?.vehicle_type?.name && !deets?.type ? (
+                                      {!deets?.vehicle_type?.name &&
+                                      !deets?.type ? (
                                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                       ) : (
-                                        deets?.vehicle_type?.name || deets?.type || 'Not specified'
+                                        deets?.vehicle_type?.name ||
+                                        deets?.type ||
+                                        "Not specified"
                                       )}
                                     </span>
                                   </div>
 
-                                   <div className="flex items-center gap-2 mt-5 mb-3">
-                            <StatusBadge
-                              status={
-                                deets?.verificationStatus ||
-                                (deets?.isVerified ? "approved" : "pending")
-                              }
-                            />
-                          </div>
+                                  <div className="flex items-center gap-2 mt-5 mb-3">
+                                    <StatusBadge
+                                      status={
+                                        deets?.verificationStatus ||
+                                        (deets?.isVerified
+                                          ? "approved"
+                                          : "pending")
+                                      }
+                                    />
+                                  </div>
                                 </TableHead>
                                 <TableHead className="font-bold w-1/2 text-left">
                                   <div className="flex text-end flex-col">
@@ -924,32 +1079,22 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                       {!deets?.model ? (
                                         <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                       ) : (
-                                        deets?.model || 'Not specified'
+                                        deets?.model || "Not specified"
                                       )}
                                     </span>
                                   </div>
-                                  
                                 </TableHead>
                               </TableRow>
-
-                              
                             </TableHeader>
-                            
                           </Table>
-                         
                         </div>
                       </AccordionTrigger>
 
-                      {/* Keep the edit button outside AccordionTrigger.
-                          AccordionTrigger renders a <button>, so nesting another
-                          Button here would create <button><button>...</button></button>. */}
                       <div className="flex justify-end -mt-14 mr-3 mb-2 relative z-10">
                         <AddVehicleModal
                           driverId={driverId}
                           vehicle={deets}
-                          onSuccess={() => {
-                          
-                          }}
+                          onSuccess={() => {}}
                           trigger={
                             <Button
                               type="button"
@@ -968,10 +1113,13 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 License plate number
                               </span>
                               <span className="font-medium text-sm">
-                                {!deets?.plateNumber && !deets?.license_plate_number ? (
+                                {!deets?.plateNumber &&
+                                !deets?.license_plate_number ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  deets?.plateNumber || deets?.license_plate_number || 'Not specified'
+                                  deets?.plateNumber ||
+                                  deets?.license_plate_number ||
+                                  "Not specified"
                                 )}
                               </span>
                             </div>
@@ -983,12 +1131,12 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 {!deets?.capacity ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  `${deets?.capacity || '0'} Seats`
+                                  `${deets?.capacity || "0"} Seats`
                                 )}
                               </span>
                             </div>
                           </div>
-                          
+
                           <div className="flex justify-between">
                             <div className="flex flex-col">
                               <span className="font-normal text-xs text-gray-500">
@@ -998,7 +1146,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 {!deets?.color ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  deets?.color || 'Not specified'
+                                  deets?.color || "Not specified"
                                 )}
                               </span>
                             </div>
@@ -1010,9 +1158,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 {!deets?.insurance ? (
                                   <Skeleton className="h-4 mt-2 w-auto bg-gray-200" />
                                 ) : (
-                                  <Link 
-                                    href={deets?.insurance || '#'} 
-                                    target="_blank" 
+                                  <Link
+                                    href={deets?.insurance || "#"}
+                                    target="_blank"
                                     className="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
                                   >
                                     View Insurance
@@ -1025,8 +1173,12 @@ const handleAddDocument = async (onModalClose?: () => void) => {
 
                           {deets?.rejectionReason && (
                             <div className="text-xs bg-red-50 border border-red-100 rounded p-2">
-                              <span className="font-medium text-red-700">Rejection reason:</span>
-                              <span className="text-red-600 ml-1">{deets.rejectionReason}</span>
+                              <span className="font-medium text-red-700">
+                                Rejection reason:
+                              </span>
+                              <span className="text-red-600 ml-1">
+                                {deets.rejectionReason}
+                              </span>
                             </div>
                           )}
 
@@ -1057,7 +1209,8 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                               content={
                                 <div className="flex flex-col space-y-4 lg:mb-4">
                                   <p className="text-sm text-gray-600">
-                                    Are you sure you want to approve this vehicle?
+                                    Are you sure you want to approve this
+                                    vehicle?
                                   </p>
                                   <div className="flex justify-end space-x-3 pt-4">
                                     <Button
@@ -1082,7 +1235,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                             <Modal
                               trigger={
                                 <Button
-                                  disabled={deets?.verificationStatus === "rejected"}
+                                  disabled={
+                                    deets?.verificationStatus === "rejected"
+                                  }
                                   className={`px-3 py-1.5 text-xs rounded-md w-full font-bold ${
                                     deets?.verificationStatus === "rejected"
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -1100,7 +1255,8 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 <div className="flex flex-col space-y-4 lg:mb-4">
                                   <p className="text-sm text-gray-600 mb-2">
                                     Please provide a reason for rejecting this
-                                    vehicle. This will be shared with the driver.
+                                    vehicle. This will be shared with the
+                                    driver.
                                   </p>
                                   <div className="space-y-4 mx-1">
                                     <div className="space-y-2">
@@ -1136,7 +1292,8 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                           });
                                         }}
                                         disabled={
-                                          rejectVehicleLoading || reason.length < 6
+                                          rejectVehicleLoading ||
+                                          reason.length < 6
                                         }
                                       >
                                         {rejectVehicleLoading
@@ -1152,40 +1309,52 @@ const handleAddDocument = async (onModalClose?: () => void) => {
 
                           <Tabs defaultValue="vehiclePhotos" className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
-                              <TabsTrigger value="vehiclePhotos">Photos</TabsTrigger>
-                              <TabsTrigger value="features">Features</TabsTrigger>
+                              <TabsTrigger value="vehiclePhotos">
+                                Photos
+                              </TabsTrigger>
+                              <TabsTrigger value="features">
+                                Features
+                              </TabsTrigger>
                             </TabsList>
-                            
+
                             <TabsContent value="vehiclePhotos">
                               <div className="w-full grid grid-cols-1 pt-5 gap-4">
                                 {(() => {
-                                  // Try different possible photo field names
-                                  const photos = deets?.photos || 
-                                                deets?.vehiclePhoto || 
-                                                deets?.vehicle_photos || 
-                                                deets?.images || 
-                                                [];
-                                  
-                                  if (Array.isArray(photos) && photos.length > 0) {
-                                    return photos.map((photo: string, photoIndex: number) => (
-                                      <div key={photoIndex}>
-                                        <Link href={photo || '#'} target="_blank">
-                                          <span className="font-medium text-sm">
-                                            <span className="flex gap-x-2 items-center">
-                                              <Image
-                                                src={"/photoGrid.svg"}
-                                                alt="Vehicle Photo"
-                                                width={35}
-                                                height={35}
-                                              />
-                                              <div className="text-sm font-medium text-[#333F53]">
-                                                Vehicle photo {photoIndex + 1}
-                                              </div>
+                                  const photos =
+                                    deets?.photos ||
+                                    deets?.vehiclePhoto ||
+                                    deets?.vehicle_photos ||
+                                    deets?.images ||
+                                    [];
+
+                                  if (
+                                    Array.isArray(photos) &&
+                                    photos.length > 0
+                                  ) {
+                                    return photos.map(
+                                      (photo: string, photoIndex: number) => (
+                                        <div key={photoIndex}>
+                                          <Link
+                                            href={photo || "#"}
+                                            target="_blank"
+                                          >
+                                            <span className="font-medium text-sm">
+                                              <span className="flex gap-x-2 items-center">
+                                                <Image
+                                                  src={"/photoGrid.svg"}
+                                                  alt="Vehicle Photo"
+                                                  width={35}
+                                                  height={35}
+                                                />
+                                                <div className="text-sm font-medium text-[#333F53]">
+                                                  Vehicle photo {photoIndex + 1}
+                                                </div>
+                                              </span>
                                             </span>
-                                          </span>
-                                        </Link>
-                                      </div>
-                                    ));
+                                          </Link>
+                                        </div>
+                                      )
+                                    );
                                   } else {
                                     return (
                                       <div className="text-sm text-gray-500 text-center py-4">
@@ -1196,29 +1365,33 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 })()}
                               </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="features">
                               <div className="w-full pt-5">
-                                {deets?.features && Array.isArray(deets.features) && deets.features.length > 0 ? (
+                                {deets?.features &&
+                                Array.isArray(deets.features) &&
+                                deets.features.length > 0 ? (
                                   <div className="flex flex-wrap gap-2">
-                                    {deets.features.map((feature: string, idx: number) => {
-                                      const featureDetails = AVAILABLE_FEATURES.find(
-                                        (f) => f.id === feature || f.label.toLowerCase() === feature.toLowerCase()
-                                      );
-                                      
-                                      return (
-                                        <Badge
-                                          key={idx}
-                                          variant="outline"
-                                          className="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 border-orange-200"
-                                        >
-                                          {typeof feature === 'string' 
-                                            ? feature.charAt(0).toUpperCase() + feature.slice(1).replace(/_/g, ' ')
-                                            : feature
-                                          }
-                                        </Badge>
-                                      );
-                                    })}
+                                    {deets.features.map(
+                                      (feature: string, idx: number) => {
+                                        return (
+                                          <Badge
+                                            key={idx}
+                                            variant="outline"
+                                            className="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 border-orange-200"
+                                          >
+                                            {typeof feature === "string"
+                                              ? feature
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                                feature
+                                                  .slice(1)
+                                                  .replace(/_/g, " ")
+                                              : feature}
+                                          </Badge>
+                                        );
+                                      }
+                                    )}
                                   </div>
                                 ) : (
                                   <div className="text-sm text-gray-500 text-center py-4">
@@ -1246,9 +1419,8 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                     No Vehicle Information
                   </h1>
                   <div className="mt-4">
-                    <AddVehicleModal 
+                    <AddVehicleModal
                       driverId={driverId}
-                     
                       trigger={
                         <Button className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-md">
                           Add Your First Vehicle
@@ -1268,7 +1440,11 @@ const handleAddDocument = async (onModalClose?: () => void) => {
             <CardTitle className="text-lg text-gray-500">
               Driver Documents
             </CardTitle>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-[200px]">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-[200px]"
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="current" className="text-xs">
                   Current
@@ -1299,17 +1475,29 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                   className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                                 >
                                   <div className="flex justify-between items-start">
-                                    <Link href={doc?.link || '#'} target="_blank" className="flex-1">
+                                    <Link
+                                      href={doc?.link || "#"}
+                                      target="_blank"
+                                      className="flex-1"
+                                    >
                                       <span className="font-medium text-sm">
                                         <span className="flex gap-x-2 items-start">
-                                          {getDocumentIcon(doc?.verification_type)}
+                                          {getDocumentIcon(
+                                            doc?.verification_type
+                                          )}
                                           <div className="flex flex-col">
                                             <div className="text-sm font-bold items-center flex gap-x-2 text-[#333F53] capitalize">
                                               {getDocumentTypeLabel(doc)}
-                                              {doc?.link && <FaExternalLinkAlt className="w-3 h-3" />}
+                                              {doc?.link && (
+                                                <FaExternalLinkAlt className="w-3 h-3" />
+                                              )}
                                             </div>
                                             <div className="text-xs mt-2">
-                                              <StatusBadge status={doc?.status || 'unknown'} />
+                                              <StatusBadge
+                                                status={
+                                                  doc?.status || "unknown"
+                                                }
+                                              />
                                             </div>
                                             {doc?.verifiable_type && (
                                               <div className="text-[10px] mt-0.5 text-gray-400">
@@ -1327,14 +1515,14 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                               </div>
                                             )}
                                             <div className="text-[11px] mt-1 text-gray-500">
-                                              Added: {formatDate(doc?.created_at)}
+                                              Added:{" "}
+                                              {formatDate(doc?.created_at)}
                                             </div>
                                           </div>
                                         </span>
                                       </span>
                                     </Link>
 
-                                    {/* Show edit/delete for all documents */}
                                     <div className="flex gap-2 ml-2">
                                       <Modal
                                         trigger={
@@ -1343,29 +1531,39 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                             title="Update document"
                                             onClick={() => {
                                               setSelectedDoc(doc);
-                                              setDocumentName(doc?.name || '');
+                                              setDocumentName(doc?.name || "");
                                             }}
                                           >
                                             <FaEdit className="w-4 h-4" />
                                           </Button>
                                         }
                                         title="Update Document"
-                                        description={`Update ${getDocumentTypeLabel(doc)}`}
+                                        description={`Update ${getDocumentTypeLabel(
+                                          doc
+                                        )}`}
                                         content={
                                           <div className="flex flex-col space-y-4 lg:mb-4">
                                             <div className="space-y-4">
                                               <div className="space-y-2">
-                                                <Label htmlFor="updateDocName">Document Name (Optional)</Label>
+                                                <Label htmlFor="updateDocName">
+                                                  Document Name (Optional)
+                                                </Label>
                                                 <Input
                                                   id="updateDocName"
                                                   value={documentName}
-                                                  onChange={(e) => setDocumentName(e.target.value)}
+                                                  onChange={(e) =>
+                                                    setDocumentName(
+                                                      e.target.value
+                                                    )
+                                                  }
                                                   placeholder="Enter document name"
                                                 />
                                               </div>
 
                                               <div className="space-y-2">
-                                                <Label htmlFor="updateDocFile">New Document File</Label>
+                                                <Label htmlFor="updateDocFile">
+                                                  New Document File
+                                                </Label>
                                                 <Input
                                                   id="updateDocFile"
                                                   type="file"
@@ -1373,17 +1571,26 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                                   onChange={handleFileChange}
                                                 />
                                                 <p className="text-xs text-gray-500">
-                                                  Select a file to replace the current document
+                                                  Select a file to replace the
+                                                  current document
                                                 </p>
                                               </div>
 
                                               <div className="flex justify-end space-x-3 pt-5">
                                                 <Button
                                                   className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 w-full hover:bg-yellow-700 rounded-md disabled:bg-yellow-300"
-                                                  onClick={() => handleUpdateDocument(doc?.id)}
-                                                  disabled={isUploading || !documentFile}
+                                                  onClick={() =>
+                                                    handleUpdateDocument(
+                                                      doc?.id
+                                                    )
+                                                  }
+                                                  disabled={
+                                                    isUploading || !documentFile
+                                                  }
                                                 >
-                                                  {isUploading ? "Updating..." : "Update Document"}
+                                                  {isUploading
+                                                    ? "Updating..."
+                                                    : "Update Document"}
                                                 </Button>
                                               </div>
                                             </div>
@@ -1405,12 +1612,16 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                         content={
                                           <div className="flex flex-col space-y-4 lg:mb-4">
                                             <p className="text-sm text-gray-600">
-                                              This action cannot be undone. The document will be permanently removed.
+                                              This action cannot be undone. The
+                                              document will be permanently
+                                              removed.
                                             </p>
                                             <div className="flex justify-end space-x-3 pt-4">
                                               <Button
                                                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 w-full hover:bg-red-700 rounded-md"
-                                                onClick={() => handleDeleteDocument(doc?.id)}
+                                                onClick={() =>
+                                                  handleDeleteDocument(doc?.id)
+                                                }
                                               >
                                                 Yes, Delete
                                               </Button>
@@ -1421,19 +1632,23 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                     </div>
                                   </div>
 
-                                  {/* Show approve/reject for all documents */}
                                   <div className="mt-4 flex gap-x-2">
                                     <Modal
                                       trigger={
                                         <Button
-                                          disabled={doc?.status === "approved" || doc?.status === "verified"}
+                                          disabled={
+                                            doc?.status === "approved" ||
+                                            doc?.status === "verified"
+                                          }
                                           className={`px-3 py-1.5 w-full text-xs font-bold rounded-md ${
-                                            doc?.status === "approved" || doc?.status === "verified"
+                                            doc?.status === "approved" ||
+                                            doc?.status === "verified"
                                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                               : "bg-green-500 text-white hover:bg-green-600"
                                           }`}
                                         >
-                                          {doc?.status === "approved" || doc?.status === "verified"
+                                          {doc?.status === "approved" ||
+                                          doc?.status === "verified"
                                             ? "Approved"
                                             : "Approve"}
                                         </Button>
@@ -1443,13 +1658,15 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                       content={
                                         <div className="flex flex-col space-y-4 lg:mb-4">
                                           <p className="text-sm text-gray-600">
-                                            Are you sure you want to approve this
-                                            document? This action cannot be undone.
+                                            Are you sure you want to approve
+                                            this document? This action cannot be
+                                            undone.
                                           </p>
                                           <div className="flex justify-end space-x-3 pt-4">
                                             <Button
                                               disabled={
-                                                doc?.verifiable_type === "vehicle"
+                                                doc?.verifiable_type ===
+                                                "vehicle"
                                                   ? approveVehicleLoading
                                                   : approveLoading
                                               }
@@ -1458,9 +1675,12 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                                 handleApproveDocument(doc);
                                               }}
                                             >
-                                              {(doc?.verifiable_type === "vehicle"
-                                                ? approveVehicleLoading
-                                                : approveLoading)
+                                              {(
+                                                doc?.verifiable_type ===
+                                                "vehicle"
+                                                  ? approveVehicleLoading
+                                                  : approveLoading
+                                              )
                                                 ? "Approving"
                                                 : "Yes, Approve"}
                                             </Button>
@@ -1472,7 +1692,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                     <Modal
                                       trigger={
                                         <Button
-                                          disabled={doc?.status === "rejected"}
+                                          disabled={
+                                            doc?.status === "rejected"
+                                          }
                                           className={`px-3 py-1.5 text-xs rounded-md w-full font-bold ${
                                             doc?.status === "rejected"
                                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -1489,9 +1711,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                       content={
                                         <div className="flex flex-col space-y-4 lg:mb-4">
                                           <p className="text-sm text-gray-600 mb-2">
-                                            Please provide a reason for rejecting this
-                                            document. This will be shared with the
-                                            driver.
+                                            Please provide a reason for
+                                            rejecting this document. This will
+                                            be shared with the driver.
                                           </p>
                                           <div className="space-y-4 mx-1">
                                             <div className="space-y-2">
@@ -1499,7 +1721,9 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                                 value={reason}
                                                 onChange={(e) => {
                                                   setReason(e.target.value);
-                                                  validateReason(e.target.value);
+                                                  validateReason(
+                                                    e.target.value
+                                                  );
                                                 }}
                                                 placeholder="Enter reason for rejection..."
                                                 className={`w-full text-sm border rounded-md h-24 ${
@@ -1524,12 +1748,15 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                                   });
                                                 }}
                                                 disabled={
-                                                  (doc?.verifiable_type === "vehicle"
+                                                  (doc?.verifiable_type ===
+                                                  "vehicle"
                                                     ? rejectVehicleLoading
-                                                    : rejectLoading) || reason.length < 6
+                                                    : rejectLoading) ||
+                                                  reason.length < 6
                                                 }
                                               >
-                                                {(doc?.verifiable_type === "vehicle"
+                                                {(doc?.verifiable_type ===
+                                                "vehicle"
                                                   ? rejectVehicleLoading
                                                   : rejectLoading)
                                                   ? "Submitting..."
@@ -1563,8 +1790,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                           </p>
                         </div>
                       )}
-                      
-                      {/* Add Document Button - ALWAYS VISIBLE */}
+
                       <div className="mt-4">
                         <Modal
                           trigger={
@@ -1579,14 +1805,22 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                             <div className="flex flex-col space-y-4 lg:mb-4">
                               <div className="space-y-4">
                                 <div className="space-y-2">
-                                  <Label htmlFor="docType">Document Type</Label>
-                                  <Select value={documentType} onValueChange={setDocumentType}>
+                                  <Label htmlFor="docType">
+                                    Document Type
+                                  </Label>
+                                  <Select
+                                    value={documentType}
+                                    onValueChange={setDocumentType}
+                                  >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select document type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {DOCUMENT_TYPES.map((type) => (
-                                        <SelectItem key={type.value} value={type.value}>
+                                        <SelectItem
+                                          key={type.value}
+                                          value={type.value}
+                                        >
                                           {type.label}
                                         </SelectItem>
                                       ))}
@@ -1595,48 +1829,75 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label htmlFor="verifiableType">Belongs To</Label>
-                                  <Select value={verifiableType} onValueChange={(value: "driver" | "vehicle") => setVerifiableType(value)}>
+                                  <Label htmlFor="verifiableType">
+                                    Belongs To
+                                  </Label>
+                                  <Select
+                                    value={verifiableType}
+                                    onValueChange={(
+                                      value: "driver" | "vehicle"
+                                    ) => setVerifiableType(value)}
+                                  >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="driver">Driver</SelectItem>
-                                      <SelectItem value="vehicle">Vehicle</SelectItem>
+                                      <SelectItem value="driver">
+                                        Driver
+                                      </SelectItem>
+                                      <SelectItem value="vehicle">
+                                        Vehicle
+                                      </SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
 
-                                {verifiableType === "vehicle" && safeVehicle.length > 0 && (
-                                  <div className="space-y-2">
-                                    <Label htmlFor="vehicleSelect">Select Vehicle</Label>
-                                    <Select value={verifiableId} onValueChange={setVerifiableId}>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select vehicle" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {safeVehicle.map((v: any) => (
-                                          <SelectItem key={v.id} value={v.id}>
-                                            {v.model} - {v.license_plate_number}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                )}
+                                {verifiableType === "vehicle" &&
+                                  safeVehicle.length > 0 && (
+                                    <div className="space-y-2">
+                                      <Label htmlFor="vehicleSelect">
+                                        Select Vehicle
+                                      </Label>
+                                      <Select
+                                        value={verifiableId}
+                                        onValueChange={setVerifiableId}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select vehicle" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {safeVehicle.map((v: any) => (
+                                            <SelectItem
+                                              key={v.id}
+                                              value={v.id}
+                                            >
+                                              {v.model} -{" "}
+                                              {v.license_plate_number}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  )}
 
                                 <div className="space-y-2">
-                                  <Label htmlFor="docName">Document Name (Optional)</Label>
+                                  <Label htmlFor="docName">
+                                    Document Name (Optional)
+                                  </Label>
                                   <Input
                                     id="docName"
                                     value={documentName}
-                                    onChange={(e) => setDocumentName(e.target.value)}
+                                    onChange={(e) =>
+                                      setDocumentName(e.target.value)
+                                    }
                                     placeholder="e.g., Driver's License Front"
                                   />
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label htmlFor="docFile">Document File</Label>
+                                  <Label htmlFor="docFile">
+                                    Document File
+                                  </Label>
                                   <Input
                                     id="docFile"
                                     name="docFile"
@@ -1653,9 +1914,15 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                   <Button
                                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 w-full hover:bg-blue-700 rounded-md disabled:bg-blue-300"
                                     onClick={() => handleAddDocument()}
-                                    disabled={isUploading || !documentFile || !documentType}
+                                    disabled={
+                                      isUploading ||
+                                      !documentFile ||
+                                      !documentType
+                                    }
                                   >
-                                    {isUploading ? "Uploading..." : "Upload Document"}
+                                    {isUploading
+                                      ? "Uploading..."
+                                      : "Upload Document"}
                                   </Button>
                                 </div>
                               </div>
@@ -1689,34 +1956,43 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                                   <h4 className="text-sm font-semibold text-gray-700">
                                     {getDocumentTypeLabel(item)}
                                   </h4>
-                                  <StatusBadge status={item?.status || 'unknown'} />
+                                  <StatusBadge
+                                    status={item?.status || "unknown"}
+                                  />
                                 </div>
-                                
+
                                 <p className="text-xs text-gray-500 mt-1">
                                   {formatDate(item?.created_at)}
                                 </p>
-                                
+
                                 {item?.reason && (
                                   <div className="mt-2 text-xs bg-red-50 border border-red-100 rounded p-2">
-                                    <span className="font-medium text-red-700">Rejection reason:</span>
-                                    <span className="text-red-600 ml-1">{item.reason}</span>
+                                    <span className="font-medium text-red-700">
+                                      Rejection reason:
+                                    </span>
+                                    <span className="text-red-600 ml-1">
+                                      {item.reason}
+                                    </span>
                                   </div>
                                 )}
 
                                 {item?.link && (
-                                  <Link 
-                                    href={item.link} 
-                                    target="_blank" 
+                                  <Link
+                                    href={item.link}
+                                    target="_blank"
                                     className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
                                   >
-                                    View Document <FaExternalLinkAlt className="w-3 h-3" />
+                                    View Document{" "}
+                                    <FaExternalLinkAlt className="w-3 h-3" />
                                   </Link>
                                 )}
 
                                 <div className="mt-2 flex flex-wrap gap-2 text-[10px] text-gray-400">
                                   <span>ID: {item?.id}</span>
                                   <span>•</span>
-                                  <span>Type: {item?.verifiable_type || 'driver'}</span>
+                                  <span>
+                                    Type: {item?.verifiable_type || "driver"}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -1753,10 +2029,10 @@ const handleAddDocument = async (onModalClose?: () => void) => {
             <div className="py-4">
               <h2 className="text-base font-bold">Trip history</h2>
             </div>
-            <DriversTable 
-              data={safeTripHistory} 
-              loading={loading} 
-              isFetching={isFetching} 
+            <DriversTable
+              data={safeTripHistory}
+              loading={loading}
+              isFetching={isFetching}
             />
           </div>
           <ScrollBar orientation="horizontal" />
@@ -1785,7 +2061,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                         </Avatar>
                         <div className="">
                           <p className="text-gray-800 font-bold text-sm">
-                            {actions?.passenger || 'Anonymous'}
+                            {actions?.passenger || "Anonymous"}
                           </p>
                           <span className="flex items-center gap-x-3">
                             {(actions?.rating || 0).toFixed(1)}{" "}
@@ -1802,7 +2078,7 @@ const handleAddDocument = async (onModalClose?: () => void) => {
                         </div>
                       </div>
                       <div className="text-sm mt-3">
-                        {actions?.comment || 'No comment provided'}
+                        {actions?.comment || "No comment provided"}
                       </div>
                     </div>
                   </div>
@@ -1830,4 +2106,3 @@ const handleAddDocument = async (onModalClose?: () => void) => {
 };
 
 export default ProfileVehicleDocs_Info;
-

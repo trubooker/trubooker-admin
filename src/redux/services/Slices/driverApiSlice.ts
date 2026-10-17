@@ -37,14 +37,12 @@ const driversApi = driversApiConfig.injectEndpoints({
     }),
 
     getDrivers: builder.query({
-  query: ({ page, search = "", limit = 10 }) => ({
-    url: `/v1/admin/drivers?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
-    method: "GET",
-  }),
-  providesTags: ["Drivers"],
-}),
-
-
+      query: ({ page, search = "", limit = 10 }) => ({
+        url: `/v1/admin/drivers?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
 
     getOneDriver: builder.query({
       query: (driver) => ({
@@ -70,78 +68,93 @@ const driversApi = driversApiConfig.injectEndpoints({
       invalidatesTags: ["Drivers"],
     }),
 
-addDriversDocument: builder.mutation({
-  query: ({ id, formData }) => {
-    // Check if formData is FormData or plain object
-    if (formData instanceof FormData) {
-      // If it's FormData, send as multipart
-      return {
-        url: `/v1/admin/drivers/add-document/${id}`,
+    addDriversDocument: builder.mutation({
+      query: ({ id, formData }) => {
+        // Check if formData is FormData or plain object
+        if (formData instanceof FormData) {
+          // If it's FormData, send as multipart
+          return {
+            url: `/v1/admin/drivers/add-document/${id}`,
+            method: "POST",
+            body: formData,
+            // Don't set Content-Type
+          };
+        } else {
+          // If it's a plain object, send as JSON
+          return {
+            url: `/v1/admin/drivers/add-document/${id}`,
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
+
+    updateDriversDocument: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/v1/admin/drivers/update-document/${id}`,
         method: "POST",
         body: formData,
-        // Don't set Content-Type
-      };
-    } else {
-      // If it's a plain object, send as JSON
-      return {
-        url: `/v1/admin/drivers/add-document/${id}`,
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-    }
-  },
-  invalidatesTags: ["Drivers"],
+      }),
+      invalidatesTags: ["Drivers"],
+    }),
 
-}),
+    deleteDriversDocument: builder.mutation({
+      query: (id) => ({
+        url: `/v1/admin/drivers/delete-document/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Drivers"],
+    }),
 
-updateDriversDocument: builder.mutation({
-  query: ({ id, formData }) => ({
-    url: `/v1/admin/drivers/update-document/${id}`,
-    method: "POST",
-    body: formData,
+    getDocumentHistory: builder.query({
+      query: (driverId) => ({
+        url: `/v1/admin/drivers/document-history/${driverId}`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
+
+    getApprovedDriversCount: builder.query({
+      query: () => ({
+        url: `/v1/admin/drivers/approved/count`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
+
+    getVehicleUploadedCount: builder.query({
+      query: () => ({
+        url: `/v1/admin/drivers/vehicle-uploaded/count`,
+        method: "GET",
+      }),
+      providesTags: ["Drivers"],
+    }),
+
+    // ============================================================
+    // DELETE USER (driver / passenger) — admin only
+    // DELETE /v1/admin/users/:userUuid
+    // Body: { deleteReason: string }
+    // ============================================================
+    deleteUser: builder.mutation({
+      query: ({
+        userId,
+        deleteReason,
+      }: {
+        userId: string;
+        deleteReason: string;
+      }) => ({
+        url: `/v1/admin/users/${userId}`,
+        method: "DELETE",
+        body: { deleteReason },
+      }),
+      invalidatesTags: ["Drivers"],
+    }),
   }),
-  invalidatesTags: ["Drivers"],
-}),
-
-deleteDriversDocument: builder.mutation({
-  query: (id) => ({
-    url: `/v1/admin/drivers/delete-document/${id}`,
-    method: "DELETE",
-  }),
-  invalidatesTags: ["Drivers"],
-}),
-
-getDocumentHistory: builder.query({
-  query: (driverId) => ({
-    url: `/v1/admin/drivers/document-history/${driverId}`,
-    method: "GET",
-  }),
-  providesTags: ["Drivers"],
-}),
-
-getApprovedDriversCount: builder.query({
-  query: () => ({
-    url: `/v1/admin/drivers/approved/count`,
-    method: "GET",
-  }),
-  providesTags: ["Drivers"],
-}),
-
-
-getVehicleUploadedCount: builder.query({
-  query: () => ({
-    url: `/v1/admin/drivers/vehicle-uploaded/count`,
-    method: "GET",
-  }),
-  providesTags: ["Drivers"],
-}),
-
-  }),
-
-  
 });
 
 export const {
@@ -157,5 +170,6 @@ export const {
   useDeleteDriversDocumentMutation,
   useGetDocumentHistoryQuery,
   useGetApprovedDriversCountQuery,
-  useGetVehicleUploadedCountQuery
+  useGetVehicleUploadedCountQuery,
+  useDeleteUserMutation,
 } = driversApi;
