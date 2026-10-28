@@ -54,6 +54,19 @@ const getTripDuration = (data: any) => {
   }
 };
 
+// ✅ Helper to determine if a trip's departure time has already passed
+const isPastTrip = (trip: any) => {
+  if (!trip?.departureDate) return false;
+  
+  // Combine date and time into a single string (e.g., "2026-09-21T15:57:00")
+  const timeStr = trip.departureTime || "00:00:00";
+  const departureDateTime = new Date(`${trip.departureDate}T${timeStr}`);
+  
+  if (isNaN(departureDateTime.getTime())) return false;
+  
+  return departureDateTime.getTime() < Date.now();
+};
+
 // Single source of truth for status colors.
 const STATUS_STYLES: Record<
   string,
@@ -93,7 +106,6 @@ const StatusBadge = ({ status }: { status?: string }) => {
 };
 
 // Filter options for the Trip Requests tab.
-// "Past Requests" bundles declined + cancelled.
 const REQUEST_STATUS_FILTERS: {
   label: string;
   value?: string | string[];
@@ -113,7 +125,6 @@ const NO_SHOW_STATUS_FILTERS: { label: string; value?: string }[] = [
   { label: "Declined", value: "declined" },
 ];
 
-// Format an ISO timestamp into a readable string.
 const formatDateTime = (iso?: string) => {
   if (!iso) return "—";
   try {
@@ -131,7 +142,6 @@ const formatDateTime = (iso?: string) => {
   }
 };
 
-// Clickable lat/long pill — opens Google Maps in a new tab.
 const CoordinatePill = ({
   lat,
   lng,
@@ -269,7 +279,11 @@ const Trips = () => {
   const [upcomingfiltered, setUpcomingFiltered] = useState(upcomingData);
   useEffect(() => {
     if (upcomingData) {
-      setUpcomingFiltered(upcomingData);
+      // ✅ Filter out any trip whose departure time has already passed
+      const strictlyUpcoming = upcomingData.filter(
+        (trip: any) => !isPastTrip(trip)
+      );
+      setUpcomingFiltered(strictlyUpcoming);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upcomingData]);
@@ -339,10 +353,7 @@ const Trips = () => {
     debounceCompletedSearch(query);
   };
 
-  // Helper to determine if a filter pill is active (handles arrays too)
-  const isRequestFilterActive = (
-    value?: string | string[]
-  ): boolean => {
+  const isRequestFilterActive = (value?: string | string[]): boolean => {
     if (value === undefined && requestStatus === undefined) return true;
     if (Array.isArray(value) && Array.isArray(requestStatus)) {
       return (
