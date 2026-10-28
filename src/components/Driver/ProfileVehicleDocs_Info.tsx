@@ -157,7 +157,7 @@ const ProfileVehicleDocs_Info = ({
   driverId,
 }: any) => {
   const router = useRouter();
-
+console.log(driverId, profile);
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
@@ -777,7 +777,7 @@ const ProfileVehicleDocs_Info = ({
 
     try {
       await deleteUser({
-        userId: driverId,
+        userId: profile.id,
         deleteReason: deleteReason.trim(),
       }).unwrap();
 
