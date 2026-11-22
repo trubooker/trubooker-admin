@@ -98,11 +98,14 @@ const Passengers = () => {
     }
   };
 
-  const [filteredStudents, setFilteredStudents] = useState(PassengerListData);
+  const [filteredStudents, setFilteredStudents] = useState<Passenger[]>([]);
 
   useEffect(() => {
     if (PassengerListData) {
-      setFilteredStudents(PassengerListData);
+      // Drop records where user is null to prevent downstream crashes
+      setFilteredStudents(
+        PassengerListData.filter((p: Passenger) => p.user != null)
+      );
     }
   }, [PassengerListData]);
 
@@ -124,15 +127,15 @@ const Passengers = () => {
     statusFilter === "all"
       ? filteredStudents
       : filteredStudents?.filter(
-          (passenger: any) => passenger.user.status === statusFilter
+          (passenger: Passenger) => passenger.user?.status === statusFilter
         );
 
   const verifiedCount = {
     emailVerified:
-      filteredStudents?.filter((p: Passenger) => p.user.isEmailVerified)
+      filteredStudents?.filter((p: Passenger) => p.user?.isEmailVerified)
         .length || 0,
     phoneVerified:
-      filteredStudents?.filter((p: Passenger) => p.user.isPhoneVerified)
+      filteredStudents?.filter((p: Passenger) => p.user?.isPhoneVerified)
         .length || 0,
   };
 
